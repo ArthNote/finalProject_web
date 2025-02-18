@@ -179,7 +179,7 @@ export function LoginForm({
           </Form>
         </CardContent>
       </Card>
-      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
+      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
         {t("terms")} <a href="#">{t("termsLink")}</a> {t("and")}{" "}
         <a href="#">{t("privacyLink")}</a>.
       </div>

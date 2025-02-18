@@ -13,10 +13,10 @@ export function ThemeCard({
   const getThemeStyles = (theme: "light" | "dark" | "system") => {
     if (theme === "system") {
       return {
-        card: "bg-gradient-to-br from-white to-zinc-950",
+        card: "bg-linear-to-br from-white to-zinc-950",
         border: "border-zinc-400",
         dots: "bg-zinc-500",
-        mockContent: "bg-gradient-to-r from-zinc-300 to-zinc-700",
+        mockContent: "bg-linear-to-r from-zinc-300 to-zinc-700",
       };
     }
     return {
