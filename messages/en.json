@@ -1,0 +1,69 @@
+{
+  "auth": {
+    "signin": {
+      "title": "Welcome back",
+      "description": "Sign In to your account",
+      "email": {
+        "label": "Email",
+        "placeholder": "m@example.com"
+      },
+      "password": {
+        "label": "Password",
+        "forgot": "Forgot your password?",
+        "placeholder": "Enter your password"
+      },
+      "submit": "Sign In",
+      "or": "Or continue with",
+      "noAccount": "Don't have an account?",
+      "signup": "Sign up",
+      "terms": "By clicking continue, you agree to our",
+      "termsLink": "Terms of Service",
+      "and": "and",
+      "privacyLink": "Privacy Policy",
+      "providers": {
+        "apple": "Sign in with Apple",
+        "google": "Sign in with Google",
+        "facebook": "Sign in with Facebook"
+      }
+    },
+    "signup": {
+      "title": "Create an account",
+      "description": "Enter your information to get started",
+      "name": {
+        "label": "Full name",
+        "placeholder": "John Doe"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "m@example.com"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Create a password"
+      },
+      "submit": "Sign up",
+      "or": "Or continue with",
+      "hasAccount": "Already have an account?",
+      "signin": "Sign in",
+      "terms": "By clicking continue, you agree to our",
+      "termsLink": "Terms of Service",
+      "and": "and",
+      "privacyLink": "Privacy Policy",
+      "providers": {
+        "apple": "Sign up with Apple",
+        "google": "Sign up with Google",
+        "facebook": "Sign up with Facebook"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "features": "Features",
+    "pricing": "Pricing",
+    "dashboard": "Dashboard",
+    "docs": "Documentation",
+    "blog": "Blog",
+    "signin": "Sign in",
+    "signup": "Sign up"
+  }
+}

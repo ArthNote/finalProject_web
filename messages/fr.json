@@ -1,0 +1,69 @@
+{
+  "auth": {
+    "signin": {
+      "title": "Bon retour",
+      "description": "Connectez-vous à votre compte",
+      "email": {
+        "label": "Email",
+        "placeholder": "m@exemple.com"
+      },
+      "password": {
+        "label": "Mot de passe",
+        "forgot": "Mot de passe oublié ?",
+        "placeholder": "Entrez votre mot de passe"
+      },
+      "submit": "Se connecter",
+      "or": "Ou continuer avec",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "signup": "S'inscrire",
+      "terms": "En continuant, vous acceptez nos",
+      "termsLink": "Conditions d'utilisation",
+      "and": "et",
+      "privacyLink": "Politique de confidentialité",
+      "providers": {
+        "apple": "Se connecter avec Apple",
+        "google": "Se connecter avec Google",
+        "facebook": "Se connecter avec Facebook"
+      }
+    },
+    "signup": {
+      "title": "Créer un compte",
+      "description": "Entrez vos informations pour commencer",
+      "name": {
+        "label": "Nom complet",
+        "placeholder": "Jean Dupont"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "m@exemple.com"
+      },
+      "password": {
+        "label": "Mot de passe",
+        "placeholder": "Créer un mot de passe"
+      },
+      "submit": "S'inscrire",
+      "or": "Ou continuer avec",
+      "hasAccount": "Vous avez déjà un compte ?",
+      "signin": "Se connecter",
+      "terms": "En continuant, vous acceptez nos",
+      "termsLink": "Conditions d'utilisation",
+      "and": "et",
+      "privacyLink": "Politique de confidentialité",
+      "providers": {
+        "apple": "S'inscrire avec Apple",
+        "google": "S'inscrire avec Google",
+        "facebook": "S'inscrire avec Facebook"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Accueil",
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "dashboard": "Tableau de bord",
+    "docs": "Documentation",
+    "blog": "Blog",
+    "signin": "Se connecter",
+    "signup": "S'inscrire"
+  }
+}
