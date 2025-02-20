@@ -1,9 +1,12 @@
 "use client";
 
-import * as z from "zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  createAuthValidators,
+  type SigninFormData,
+} from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FaGoogle, FaApple, FaFacebookF } from "react-icons/fa";
@@ -33,36 +36,33 @@ import {
 import { Link } from "@/i18n/routing";
 import { PasswordInput } from "@/components/ui/password-input";
 
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-});
-
-export function LoginForm({
+export function SigninForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.signin");
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const tValidation = useTranslations();
+  const { signinSchema } = createAuthValidators(tValidation);
+
+  const form = useForm<SigninFormData>({
+    resolver: zodResolver(signinSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: SigninFormData) {
     console.log(values);
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
+    <div
+      className={cn("flex flex-col gap-6 w-full max-w-[500px]", className)}
+      {...props}
+    >
+      <Card className="w-full">
+        <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">{t("title")}</CardTitle>
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
@@ -112,17 +112,17 @@ export function LoginForm({
                   )}
                 />
 
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full min-w-[200px]">
                   {t("submit")}
                 </Button>
 
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                  <span className="relative z-10 bg-background px-2 text-muted-foreground">
+                  <span className="relative z-8 bg-background px-2 text-muted-foreground">
                     {t("or")}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>

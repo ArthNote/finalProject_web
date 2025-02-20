@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Moon, Sun, Languages } from "lucide-react";
+import { Moon, Sun, Languages, Settings } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter, usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
@@ -18,7 +19,7 @@ export function CombinedToggle() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = useLocale();
-  const t = useTranslations("Navigation");
+  const t = useTranslations("navigation");
 
   const handleLanguageChange = (locale: string) => {
     const newPathname = pathname.replace(`/${currentLocale}`, `/${locale}`);
@@ -29,25 +30,30 @@ export function CombinedToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" className="size-9">
-          {resolvedTheme === "light" ? (
-            <Sun className="h-4 w-4" />
-          ) : (
-            <Moon className="h-4 w-4" />
-          )}
+          <Settings className="h-4 w-4" />
           <span className="sr-only">{t("toggleLabel")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => setTheme("light")}>
+          <DropdownMenuItem
+            onClick={() => setTheme("light")}
+            className={resolvedTheme === "light" ? "bg-accent" : ""}
+          >
             <Sun className="size-4 mr-2" />
             {t("theme.light")}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("dark")}>
+          <DropdownMenuItem
+            onClick={() => setTheme("dark")}
+            className={resolvedTheme === "dark" ? "bg-accent" : ""}
+          >
             <Moon className="size-4 mr-2" />
             {t("theme.dark")}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("system")}>
+          <DropdownMenuItem
+            onClick={() => setTheme("system")}
+            className={resolvedTheme === "system" ? "bg-accent" : ""}
+          >
             <svg
               className="size-4 mr-2"
               xmlns="http://www.w3.org/2000/svg"
@@ -67,13 +73,19 @@ export function CombinedToggle() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => handleLanguageChange("en")}>
+          <DropdownMenuItem
+            onClick={() => handleLanguageChange("en")}
+            className={currentLocale === "en" ? "bg-accent" : ""}
+          >
             <Languages className="size-4 mr-2" />
             {t("language.en")}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleLanguageChange("kr")}>
+          <DropdownMenuItem
+            onClick={() => handleLanguageChange("fr")}
+            className={currentLocale === "fr" ? "bg-accent" : ""}
+          >
             <Languages className="size-4 mr-2" />
-            {t("language.kr")}
+            {t("language.fr")}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -1,13 +1,22 @@
 "use client";
 
-import * as z from "zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  createAuthValidators,
+  type SignupFormData,
+} from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FaGoogle, FaApple, FaFacebookF } from "react-icons/fa";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -27,50 +36,42 @@ import {
 import { Link } from "@/i18n/routing";
 import { PasswordInput } from "@/components/ui/password-input";
 
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-});
-
 export function SignupForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations("auth.signup");
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const tValidation = useTranslations();
+  const { signupSchema } = createAuthValidators(tValidation);
+
+  const form = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: SignupFormData) {
     console.log(values);
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden">
-        <CardContent className="grid p-0 md:grid-cols-2">
+    <div
+      className={cn("flex flex-col gap-6 w-full max-w-[500px]", className)}
+      {...props}
+    >
+      <Card className="w-full">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl">{t("title")}</CardTitle>
+          <CardDescription>{t("description")}</CardDescription>
+        </CardHeader>
+        <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
+            <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6">
-                <div className="flex flex-col items-center text-center">
-                  <h1 className="text-2xl font-bold">{t("title")}</h1>
-                  <p className="text-balance text-muted-foreground">
-                    {t("description")}
-                  </p>
-                </div>
-
                 <FormField
                   control={form.control}
                   name="name"
@@ -119,7 +120,24 @@ export function SignupForm({
                   )}
                 />
 
-                <Button type="submit" className="w-full">
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("confirmPassword.label")}</FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          placeholder={t("confirmPassword.placeholder")}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" className="w-full min-w-[200px]">
                   {t("submit")}
                 </Button>
 
@@ -129,7 +147,7 @@ export function SignupForm({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -184,9 +202,6 @@ export function SignupForm({
               </div>
             </form>
           </Form>
-          <div className="relative hidden bg-muted md:block">
-            <PlaceholderIllustration />
-          </div>
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">

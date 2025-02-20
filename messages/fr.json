@@ -41,6 +41,10 @@
         "label": "Mot de passe",
         "placeholder": "Créer un mot de passe"
       },
+      "confirmPassword": {
+        "label": "Confirmer le mot de passe",
+        "placeholder": "Confirmez votre mot de passe"
+      },
       "submit": "S'inscrire",
       "or": "Ou continuer avec",
       "hasAccount": "Vous avez déjà un compte ?",
@@ -64,6 +68,66 @@
     "docs": "Documentation",
     "blog": "Blog",
     "signin": "Se connecter",
-    "signup": "S'inscrire"
+    "signup": "S'inscrire",
+    "navbar": {
+      "menu": "Menu",
+      "closeMenu": "Fermer le menu",
+      "mainNav": "Navigation principale"
+    },
+    "toggleLabel": "Changer le thème et la langue",
+    "theme": {
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "language": {
+      "en": "Anglais",
+      "fr": "Français",
+      "kr": "Coréen"
+    },
+    "sections": {
+      "home": "Accueil",
+      "about": "À propos",
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "whyUs": "Pourquoi nous",
+      "contact": "Contact"
+    }
+  },
+  "footer": {
+    "newsletter": {
+      "title": "Abonnez-vous à notre newsletter",
+      "description": "Restez informé de nos dernières actualités directement dans votre boîte mail.",
+      "emailPlaceholder": "Entrez votre email",
+      "submit": "S'abonner"
+    },
+    "socials": {
+      "title": "Suivez-nous",
+      "twitter": "Twitter",
+      "instagram": "Instagram"
+    },
+    "helpfulLinks": {
+      "title": "Liens utiles",
+      "contact": "Contact",
+      "careers": "Carrières",
+      "support": "Support"
+    },
+    "legal": {
+      "terms": "Conditions générales",
+      "privacy": "Politique de confidentialité",
+      "rights": "Tous droits réservés."
+    }
+  },
+  "validation": {
+    "name": {
+      "min": "Le nom doit contenir au moins 2 caractères"
+    },
+    "email": {
+      "invalid": "Veuillez entrer une adresse email valide"
+    },
+    "password": {
+      "min": "Le mot de passe doit contenir au moins 8 caractères",
+      "match": "Les mots de passe doivent correspondre"
+    }
   }
 }

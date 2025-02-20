@@ -41,6 +41,10 @@
         "label": "Password",
         "placeholder": "Create a password"
       },
+      "confirmPassword": {
+        "label": "Confirm password",
+        "placeholder": "Confirm your password"
+      },
       "submit": "Sign up",
       "or": "Or continue with",
       "hasAccount": "Already have an account?",
@@ -64,6 +68,66 @@
     "docs": "Documentation",
     "blog": "Blog",
     "signin": "Sign in",
-    "signup": "Sign up"
+    "signup": "Sign up",
+    "navbar": {
+      "menu": "Menu",
+      "closeMenu": "Close Menu",
+      "mainNav": "Main Navigation"
+    },
+    "toggleLabel": "Toggle theme and language",
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": {
+      "en": "English",
+      "fr": "French",
+      "kr": "Korean"
+    },
+    "sections": {
+      "home": "Home",
+      "about": "About",
+      "features": "Features",
+      "pricing": "Pricing",
+      "whyUs": "Why Us",
+      "contact": "Contact"
+    }
+  },
+  "footer": {
+    "newsletter": {
+      "title": "Subscribe to our newsletter",
+      "description": "Stay updated with our latest news and updates delivered to your inbox.",
+      "emailPlaceholder": "Enter your email",
+      "submit": "Subscribe"
+    },
+    "socials": {
+      "title": "Follow us",
+      "twitter": "Twitter",
+      "instagram": "Instagram"
+    },
+    "helpfulLinks": {
+      "title": "Helpful Links",
+      "contact": "Contact",
+      "careers": "Careers",
+      "support": "Support"
+    },
+    "legal": {
+      "terms": "Terms & Conditions",
+      "privacy": "Privacy Policy",
+      "rights": "All rights reserved."
+    }
+  },
+  "validation": {
+    "name": {
+      "min": "Name must be at least 2 characters"
+    },
+    "email": {
+      "invalid": "Please enter a valid email address"
+    },
+    "password": {
+      "min": "Password must be at least 8 characters",
+      "match": "Passwords must match"
+    }
   }
 }
