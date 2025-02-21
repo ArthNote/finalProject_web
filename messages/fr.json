@@ -94,6 +94,15 @@
       "contact": "Contact"
     }
   },
+  "HomePage": {
+    "announcement": "Bienvenue sur {appName} !",
+    "hero": {
+      "title": "Enrichissez Votre Parcours",
+      "titleHighlight": "Numérique",
+      "description": "Transformez votre présence en ligne avec nos solutions de pointe. Conçu pour les créateurs, les entrepreneurs et les visionnaires.",
+      "getStarted": "Commencer"
+    }
+  },
   "footer": {
     "newsletter": {
       "title": "Abonnez-vous à notre newsletter",

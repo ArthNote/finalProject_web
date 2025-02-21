@@ -129,5 +129,14 @@
       "min": "Password must be at least 8 characters",
       "match": "Passwords must match"
     }
+  },
+  "HomePage": {
+    "announcement": "Welcome to {appName}!",
+    "hero": {
+      "title": "Empowering Your Digital",
+      "titleHighlight": "Journey",
+      "description": "Transform your online presence with our cutting-edge solutions. Built for creators, entrepreneurs, and visionaries.",
+      "getStarted": "Get Started"
+    }
   }
 }

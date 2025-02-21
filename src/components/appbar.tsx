@@ -24,6 +24,7 @@ import { useScroll } from "@/hooks/use-scroll";
 import { consts } from "@/lib/constants";
 import { useTranslations } from "next-intl";
 import { CombinedToggle } from "@/components/combined_toggle";
+import { FaTasks } from "react-icons/fa";
 
 interface NavBarProps {
   scroll?: boolean;
@@ -102,7 +103,7 @@ export default function NavBar({ scroll = true }: NavBarProps) {
             <SheetHeader>
               <SheetTitle>
                 <Link href="/" className="pl-2 flex items-center gap-2">
-                  <CompassIcon className="text-primary" />
+                  <FaTasks className="text-primary" />
                   <h1 className="text-md font-medium">{consts.appName}</h1>
                 </Link>
               </SheetTitle>
@@ -123,13 +124,13 @@ export default function NavBar({ scroll = true }: NavBarProps) {
           </SheetContent>
         </Sheet>
         <Link href="/" className="pl-2 flex items-center gap-2">
-          <CompassIcon className="text-primary" />
+          <FaTasks className="text-primary" />
           <h1 className="text-md font-medium">{consts.appName}</h1>
         </Link>
       </div>
 
       <Link href="/" className="pl-2 hidden items-center gap-2 group lg:flex">
-        <CompassIcon
+        <FaTasks
           aria-hidden="true"
           className="text-primary group-hover:-rotate-12 transition-all duration-300"
         />
