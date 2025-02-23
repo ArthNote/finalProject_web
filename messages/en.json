@@ -143,7 +143,7 @@
       "mainTitle": "Redefining Productivity",
       "story": {
         "title": "Our Story",
-        "description": "At TaskAI, we believe productivity should be effortless and engaging. Our mission is to help individuals and teams organize, optimize, and accomplish more with the power of AI."
+        "description": "At TaskFlow, we believe productivity should be effortless and engaging. Our mission is to help individuals and teams organize, optimize, and accomplish more with the power of AI."
       },
       "vision": {
         "title": "Our Vision",
@@ -189,7 +189,7 @@
     "whyUs": {
       "subtitle": "Why Choose Us",
       "title": "Experience the Difference",
-      "description": "Discover why thousands trust TaskAI for their productivity needs",
+      "description": "Discover why thousands trust TaskFlow for their productivity needs",
       "features": {
         "userFriendly": {
           "title": "User-Friendly Interface",
@@ -243,11 +243,11 @@
         "saveText": "Save 20%"
       },
       "plans": {
-        "pro": {
-          "title": "Pro",
+        "individual": {
+          "title": "Individual",
           "highlight": "For individuals who want more",
-          "price": "$9",
-          "yearlyPrice": "$90",
+          "price": "$10",
+          "yearlyPrice": "$96",
           "features": {
             "ai": "AI-powered task generation & optimization",
             "scheduling": "Smart scheduling & prioritization",
@@ -260,8 +260,8 @@
         "team": {
           "title": "Team",
           "highlight": "For teams & businesses",
-          "price": "$19",
-          "yearlyPrice": "$190",
+          "price": "$25",
+          "yearlyPrice": "$240",
           "features": {
             "pro": "Everything in Pro, plus:",
             "collaboration": "Team collaboration & task sharing",
@@ -290,8 +290,8 @@
       "monthly": "/mo",
       "yearly": "/yr",
       "freeTrial": {
-        "badge": "Free Trial",
-        "info": "7 days free trial, no credit card required"
+        "badge": "7-Day Trial",
+        "info": "7 days free trial, credit card required"
       }
     },
     "contact": {
@@ -330,6 +330,33 @@
           "number": "+1 (555) 000-0000"
         }
       }
+    },
+    "reviews": {
+      "subtitle": "User Reviews",
+      "title": "What Our Users Say",
+      "description": "Discover how TaskFlow is transforming the way people work and manage their tasks.",
+      "reviews": [
+        {
+          "name": "Sarah Johnson",
+          "title": "Product Manager",
+          "message": "TaskFlow has completely transformed how our team manages projects. The AI suggestions are spot-on and save us hours of planning time every week."
+        },
+        {
+          "name": "Michael Chen",
+          "title": "Freelance Developer",
+          "message": "As a freelancer juggling multiple projects, TaskFlow's smart scheduling has been a game-changer. It's like having a personal assistant that knows exactly how I work."
+        },
+        {
+          "name": "Emily Rodriguez",
+          "title": "Marketing Director",
+          "message": "The cross-platform sync is flawless, and the AI-powered insights have helped our team optimize our workflow in ways we never thought possible."
+        },
+        {
+          "name": "David Kim",
+          "title": "Startup Founder",
+          "message": "TaskFlow's enterprise features have scaled perfectly with our growing team. The customization options and integrations are exactly what we needed."
+        }
+      ]
     }
   }
 }

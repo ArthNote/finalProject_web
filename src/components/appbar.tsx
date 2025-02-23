@@ -95,7 +95,18 @@ export default function NavBar({ scroll = true }: NavBarProps) {
               {links.map((link) => (
                 <SheetClose asChild key={link.link}>
                   <Link href={link.link} className="w-full">
-                    <Button variant="outline" className="w-full">
+                    <Button
+                      variant={
+                        link.link === "/"
+                          ? pathname === "/"
+                            ? "secondary"
+                            : "outline"
+                          : pathname.includes(link.link)
+                          ? "secondary"
+                          : "outline"
+                      }
+                      className="w-full"
+                    >
                       {link.title}
                     </Button>
                   </Link>
@@ -141,7 +152,19 @@ export default function NavBar({ scroll = true }: NavBarProps) {
           {links.map((link) => (
             <NavigationMenuItem key={link.title}>
               <Link href={link.link} className="hidden lg:inline-flex">
-                <Button variant="ghost">{link.title}</Button>
+                <Button
+                  variant={
+                    link.link === "/"
+                      ? pathname === "/"
+                        ? "secondary"
+                        : "ghost"
+                      : pathname.includes(link.link)
+                      ? "secondary"
+                      : "ghost"
+                  }
+                >
+                  {link.title}
+                </Button>
               </Link>
             </NavigationMenuItem>
           ))}

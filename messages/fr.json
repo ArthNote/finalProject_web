@@ -107,7 +107,7 @@
       "mainTitle": "Redéfinir la Productivité",
       "story": {
         "title": "Notre Histoire",
-        "description": "Chez TaskAI, nous croyons que la productivité devrait être simple et engageante. Notre mission est d'aider les individus et les équipes à s'organiser, optimiser et accomplir davantage grâce à la puissance de l'IA."
+        "description": "Chez TaskFlow, nous croyons que la productivité devrait être simple et engageante. Notre mission est d'aider les individus et les équipes à s'organiser, optimiser et accomplir davantage grâce à la puissance de l'IA."
       },
       "vision": {
         "title": "Notre Vision",
@@ -161,8 +161,8 @@
         "saveText": "Économisez 20%"
       },
       "plans": {
-        "pro": {
-          "title": "Pro",
+        "individual": {
+          "title": "Individuel",
           "highlight": "Pour les individus qui veulent plus",
           "price": "9€",
           "yearlyPrice": "90€",
@@ -208,14 +208,14 @@
       "monthly": "/mois",
       "yearly": "/an",
       "freeTrial": {
-        "badge": "Essai Gratuit",
-        "info": "7 jours d'essai gratuit, aucune carte bancaire requise"
+        "badge": "7 Jours d'Essai",
+        "info": "7 jours d'essai gratuit, carte bancaire requise"
       }
     },
     "whyUs": {
       "subtitle": "Pourquoi Nous Choisir",
       "title": "Découvrez la Différence",
-      "description": "Découvrez pourquoi des milliers font confiance à TaskAI pour leur productivité",
+      "description": "Découvrez pourquoi des milliers font confiance à TaskFlow pour leur productivité",
       "features": {
         "userFriendly": {
           "title": "Interface Conviviale",
@@ -294,6 +294,33 @@
           "number": "+1 (555) 000-0000"
         }
       }
+    },
+    "reviews": {
+      "subtitle": "Avis Utilisateurs",
+      "title": "Ce Que Disent Nos Utilisateurs",
+      "description": "Découvrez comment TaskFlow transforme la façon dont les gens travaillent et gèrent leurs tâches.",
+      "reviews": [
+        {
+          "name": "Sarah Johnson",
+          "title": "Chef de Produit",
+          "message": "TaskFlow a complètement transformé la façon dont notre équipe gère les projets. Les suggestions de l'IA sont pertinentes et nous font gagner des heures de planification chaque semaine."
+        },
+        {
+          "name": "Michael Chen",
+          "title": "Développeur Freelance",
+          "message": "En tant que freelance jonglant avec plusieurs projets, la planification intelligente de TaskFlow a changé la donne. C'est comme avoir un assistant personnel qui sait exactement comment je travaille."
+        },
+        {
+          "name": "Emily Rodriguez",
+          "title": "Directrice Marketing",
+          "message": "La synchronisation multi-plateforme est parfaite, et les insights basés sur l'IA ont aidé notre équipe à optimiser notre flux de travail d'une manière que nous n'aurions jamais imaginée."
+        },
+        {
+          "name": "David Kim",
+          "title": "Fondateur de Startup",
+          "message": "Les fonctionnalités entreprise de TaskFlow ont parfaitement évolué avec notre équipe en croissance. Les options de personnalisation et les intégrations sont exactement ce dont nous avions besoin."
+        }
+      ]
     }
   },
   "footer": {

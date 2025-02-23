@@ -34,11 +34,17 @@ const PricingSection = () => {
           : t(`plans.${plan}.yearlyPrice`);
 
       return (
-        <div className="mt-4 flex items-baseline gap-1.5">
-          <span className="text-3xl font-bold">{price}</span>
-          <span className="text-sm text-muted-foreground font-medium">
-            {billingCycle === "monthly" ? t("monthly") : t("yearly")}
-          </span>
+        <div className="mt-4 flex flex-col gap-2">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-3xl font-bold">{price}</span>
+            <span className="text-sm text-muted-foreground font-medium">
+              {billingCycle === "monthly" ? t("monthly") : t("yearly")}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="h-1 w-1 rounded-full bg-primary"></div>
+            <span>{t("freeTrial.info")}</span>
+          </div>
         </div>
       );
     };
@@ -56,12 +62,22 @@ const PricingSection = () => {
             : "hover:border-primary/50"
         )}
       >
-        {/* Add trial badge */}
+        {/* Free trial badge with credit card icon
         <div className="absolute -top-3 right-4 z-10">
-          <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
+          <div className="relative px-3 py-1 bg-primary/10 text-xs font-medium rounded-full flex items-center gap-1.5">
+            <svg
+              className="h-3 w-3 text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
             {t("freeTrial.badge")}
-          </span>
-        </div>
+          </div>
+        </div> */}
 
         {featured && (
           <div className="absolute -top-3 left-0 right-0 mx-auto w-fit px-4 py-1 bg-primary rounded-full">
@@ -117,11 +133,6 @@ const PricingSection = () => {
               </div>
             ))}
           </div>
-
-          {/* Add trial info text */}
-          <p className="text-xs text-muted-foreground mt-2">
-            {t("freeTrial.info")}
-          </p>
 
           <Button
             className="mt-8 w-full transition-all duration-300 bg-primary hover:bg-primary/90 shadow-sm hover:shadow-lg"
@@ -179,7 +190,7 @@ const PricingSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <PriceCard plan="pro" icon={Rocket} />
+          <PriceCard plan="individual" icon={Rocket} />
           <PriceCard plan="team" icon={Users} featured />
           <PriceCard plan="enterprise" icon={Building} />
         </div>

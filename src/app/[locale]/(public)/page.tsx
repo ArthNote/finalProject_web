@@ -7,6 +7,7 @@ import WhyChooseUs from "@/components/public/why_us";
 import MobileAppSection from "@/components/public/mobile_app_section";
 import PricingSection from "@/components/public/pricing_section";
 import ContactSection from "@/components/public/contact_section";
+import ReviewsSection from "@/components/public/reviews_section";
 
 const page = () => {
   return (
@@ -17,6 +18,7 @@ const page = () => {
       <FeatureSection />
       {/* <PricingSection /> */}
       <WhyChooseUs />
+      <ReviewsSection />
       <MobileAppSection />
       {/* <ContactSection /> */}
     </section>
