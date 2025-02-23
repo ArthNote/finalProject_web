@@ -97,10 +97,203 @@
   "HomePage": {
     "announcement": "Bienvenue sur {appName} !",
     "hero": {
-      "title": "Enrichissez Votre Parcours",
-      "titleHighlight": "Numérique",
-      "description": "Transformez votre présence en ligne avec nos solutions de pointe. Conçu pour les créateurs, les entrepreneurs et les visionnaires.",
+      "title": "Gestion des Tâches",
+      "titleHighlight": "par IA",
+      "description": "Restez organisé, planifiez efficacement et accomplissez davantage grâce aux tâches générées par l'IA, adaptées à votre flux de travail.",
       "getStarted": "Commencer"
+    },
+    "aboutUs": {
+      "subtitle": "À Propos",
+      "mainTitle": "Redéfinir la Productivité",
+      "story": {
+        "title": "Notre Histoire",
+        "description": "Chez TaskAI, nous croyons que la productivité devrait être simple et engageante. Notre mission est d'aider les individus et les équipes à s'organiser, optimiser et accomplir davantage grâce à la puissance de l'IA."
+      },
+      "vision": {
+        "title": "Notre Vision",
+        "description": "Nous avons conçu cette plateforme pour éliminer la surcharge de travail, rendant la gestion des tâches plus intelligente et plus intuitive. Que vous gériez des tâches quotidiennes, des projets à long terme ou cherchiez à améliorer votre efficacité, notre système basé sur l'IA s'adapte à votre flux de travail."
+      },
+      "highlights": {
+        "ai": "Automatisation Intelligente",
+        "workflow": "Intégration Transparente",
+        "focus": "Concentration Améliorée",
+        "team": "Collaboration d'Équipe"
+      },
+      "cta": "Rejoignez-nous et redéfinissez votre façon de travailler, une tâche optimisée à la fois."
+    },
+    "features": {
+      "subtitle": "Fonctionnalités",
+      "title": "Tout ce dont vous avez besoin",
+      "description": "Découvrez comment nos fonctionnalités alimentées par l'IA peuvent transformer votre productivité",
+      "ai": {
+        "title": "Gestion des Tâches par IA",
+        "description": "Laissez l'IA faire le gros du travail ! Obtenez des recommandations de tâches intelligentes, une planification automatisée et des flux de travail optimisés adaptés à votre style de productivité."
+      },
+      "smart": {
+        "title": "Création et Édition Intelligente",
+        "description": "Ajoutez manuellement des tâches ou laissez l'IA les générer pour vous. Modifiez, régénérez ou acceptez les tâches suggérées par l'IA sans effort pour répondre à vos besoins."
+      },
+      "gamified": {
+        "title": "Productivité Ludique",
+        "description": "Restez motivé avec des séries, des réalisations et des récompenses lorsque vous complétez des tâches et atteignez vos objectifs. La productivité n'a jamais été aussi amusante !"
+      },
+      "sync": {
+        "title": "Synchronisation Multi-Plateformes",
+        "description": "Accédez facilement à vos tâches depuis n'importe quel appareil - que vous soyez sur ordinateur ou mobile, votre progression est toujours synchronisée."
+      },
+      "auth": {
+        "title": "Authentification Sécurisée",
+        "description": "Connectez-vous facilement avec plusieurs fournisseurs tout en gardant vos données sécurisées. Un compte, accès total."
+      },
+      "insights": {
+        "title": "Analyses et Suivi des Progrès",
+        "description": "Obtenez des analyses en temps réel de votre productivité. Suivez vos habitudes, surveillez vos performances et améliorez votre flux de travail avec des insights basés sur les données."
+      }
+    },
+    "pricing": {
+      "subtitle": "Tarifs",
+      "title": "Choisissez Votre Plan",
+      "description": "Choisissez un plan qui maximise votre productivité. Que vous soyez un individu ou une équipe, notre système alimenté par l'IA s'adapte à votre flux de travail et vous aide à garder une longueur d'avance.",
+      "popular": "Plus Populaire",
+      "billing": {
+        "monthly": "Mensuel",
+        "yearly": "Annuel",
+        "saveText": "Économisez 20%"
+      },
+      "plans": {
+        "pro": {
+          "title": "Pro",
+          "highlight": "Pour les individus qui veulent plus",
+          "price": "9€",
+          "yearlyPrice": "90€",
+          "features": {
+            "ai": "Génération et optimisation de tâches par IA",
+            "scheduling": "Planification et priorisation intelligentes",
+            "analytics": "Rapports et analyses avancés",
+            "goals": "Objectifs de productivité personnalisables",
+            "access": "Accès web et mobile",
+            "support": "Support prioritaire"
+          }
+        },
+        "team": {
+          "title": "Équipe",
+          "highlight": "Pour les équipes et entreprises",
+          "price": "19€",
+          "yearlyPrice": "190€",
+          "features": {
+            "pro": "Tout ce qui est inclus dans Pro, plus :",
+            "collaboration": "Collaboration d'équipe et partage de tâches",
+            "roles": "Contrôle d'accès basé sur les rôles",
+            "insights": "Analyses de performance d'équipe",
+            "integration": "Intégration avec des outils externes",
+            "admin": "Tableau de bord administrateur"
+          }
+        },
+        "enterprise": {
+          "title": "Entreprise",
+          "highlight": "Pour les organisations avec des besoins spécifiques",
+          "priceLabel": "Contactez-nous",
+          "features": {
+            "team": "Tout ce qui est inclus dans Équipe, plus :",
+            "automations": "Automatisations et flux de travail IA personnalisés",
+            "manager": "Gestionnaire de compte dédié",
+            "sla": "Support prioritaire garanti par SLA",
+            "deployment": "Options de déploiement sur site",
+            "api": "Accès API pour intégrations personnalisées"
+          }
+        }
+      },
+      "getStarted": "Commencer",
+      "contactUs": "Contactez-nous",
+      "monthly": "/mois",
+      "yearly": "/an",
+      "freeTrial": {
+        "badge": "Essai Gratuit",
+        "info": "7 jours d'essai gratuit, aucune carte bancaire requise"
+      }
+    },
+    "whyUs": {
+      "subtitle": "Pourquoi Nous Choisir",
+      "title": "Découvrez la Différence",
+      "description": "Découvrez pourquoi des milliers font confiance à TaskAI pour leur productivité",
+      "features": {
+        "userFriendly": {
+          "title": "Interface Conviviale",
+          "description": "Simple, intuitive, conçue pour tous"
+        },
+        "secure": {
+          "title": "Sécurité de Niveau Entreprise",
+          "description": "Vos données sont protégées avec un chiffrement de pointe"
+        },
+        "realTime": {
+          "title": "Mises à Jour en Temps Réel",
+          "description": "Restez synchronisé sur tous vos appareils instantanément"
+        },
+        "accessible": {
+          "title": "Accessible Partout",
+          "description": "Travaillez facilement sur n'importe quel appareil, n'importe quand"
+        },
+        "comprehensive": {
+          "title": "Solutions Alimentées par l'IA",
+          "description": "Des algorithmes intelligents qui s'adaptent à votre façon de travailler"
+        }
+      }
+    },
+    "mobileApp": {
+      "subtitle": "Application Mobile",
+      "title": "Emportez Vos Tâches Partout",
+      "description": "Accédez à vos tâches en déplacement avec notre puissante application mobile. Restez productif où que vous soyez.",
+      "features": {
+        "sync": "Synchronisation en Temps Réel",
+        "offline": "Mode Hors-ligne",
+        "notification": "Notifications Intelligentes",
+        "widgets": "Widgets d'Écran d'Accueil"
+      },
+      "download": {
+        "android": "Obtenir sur Android",
+        "ios": "Télécharger sur iOS",
+        "direct": {
+          "title": "Téléchargement Direct",
+          "button": "Télécharger l'APK"
+        }
+      }
+    },
+    "contact": {
+      "subtitle": "Contactez-nous",
+      "title": "Entrer en Contact",
+      "description": "Vous avez des questions ? Nous sommes là pour vous aider. Envoyez-nous un message et nous vous répondrons dès que possible.",
+      "form": {
+        "name": {
+          "label": "Votre Nom",
+          "placeholder": "Entrez votre nom"
+        },
+        "email": {
+          "label": "Adresse Email",
+          "placeholder": "vous@exemple.com"
+        },
+        "message": {
+          "label": "Votre Message",
+          "placeholder": "Comment pouvons-nous vous aider ?"
+        },
+        "submit": "Envoyer le Message"
+      },
+      "info": {
+        "support": {
+          "title": "Support",
+          "description": "Besoin d'aide technique ?",
+          "email": "support@taskflow.com"
+        },
+        "sales": {
+          "title": "Commercial",
+          "description": "Intéressé par l'offre entreprise ?",
+          "email": "sales@taskflow.com"
+        },
+        "phone": {
+          "title": "Téléphone",
+          "description": "Lun-Ven 9h-18h",
+          "number": "+1 (555) 000-0000"
+        }
+      }
     }
   },
   "footer": {

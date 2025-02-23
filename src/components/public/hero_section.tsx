@@ -1,31 +1,46 @@
+"use client";
 import { Link } from "@/i18n/routing";
 import React from "react";
 import { Button, buttonVariants } from "../ui/button";
-import { ArrowRight, CompassIcon } from "lucide-react";
+import { ArrowRight, CompassIcon, Sparkles } from "lucide-react";
 import { consts } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { motion } from "motion/react";
 
 const HeroSection = () => {
   const t = useTranslations("HomePage");
   return (
-    <div className="container flex max-w-screen flex-col items-center gap-5 text-center ">
-      <Link
-        href=""
-        className={cn(
-          buttonVariants({ variant: "outline", size: "sm", rounded: "full" }),
-          "px-4"
-        )}
+    <div id="home" className="container flex max-w-screen flex-col items-center gap-5 text-center ">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <span className="mr-3">🎉</span>
-        <span>{t("announcement", { appName: consts.appName })}</span>
-        <span className="ml-3">🎉</span>
-      </Link>
+        <Link
+          href=""
+          className={cn(
+            buttonVariants({ variant: "outline", size: "sm", rounded: "full" }),
+            "px-4"
+          )}
+        >
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <span>{t("announcement", { appName: consts.appName })}</span>
+          </div>
+        </Link>
+      </motion.div>
 
       <h1 className="text-balance text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-[66px]">
         {t("hero.title")}{" "}
-        <span className="text-primary">{t("hero.titleHighlight")}</span>
+        <span className="text-primary tracking-tight relative">
+          <span className="relative z-10">{t("hero.titleHighlight")}</span>
+          <span
+            className="absolute inset-0 bg-primary/10 -skew-y-2 transform"
+            aria-hidden="true"
+          ></span>
+        </span>
       </h1>
 
       <p

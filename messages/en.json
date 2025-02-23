@@ -133,10 +133,203 @@
   "HomePage": {
     "announcement": "Welcome to {appName}!",
     "hero": {
-      "title": "Empowering Your Digital",
-      "titleHighlight": "Journey",
-      "description": "Transform your online presence with our cutting-edge solutions. Built for creators, entrepreneurs, and visionaries.",
+      "title": "AI-Powered Task",
+      "titleHighlight": "Management",
+      "description": "Stay organized, plan efficiently, and accomplish more with AI-generated tasks tailored to your workflow.",
       "getStarted": "Get Started"
+    },
+    "aboutUs": {
+      "subtitle": "About Us",
+      "mainTitle": "Redefining Productivity",
+      "story": {
+        "title": "Our Story",
+        "description": "At TaskAI, we believe productivity should be effortless and engaging. Our mission is to help individuals and teams organize, optimize, and accomplish more with the power of AI."
+      },
+      "vision": {
+        "title": "Our Vision",
+        "description": "We designed this platform to eliminate overwhelm, making task management smarter and more intuitive. Whether you're tackling daily to-dos, managing long-term projects, or looking to boost efficiency, our AI-driven system adapts to your workflow."
+      },
+      "highlights": {
+        "ai": "Intelligent Automation",
+        "workflow": "Seamless Integration",
+        "focus": "Enhanced Focus",
+        "team": "Team Collaboration"
+      },
+      "cta": "Join us and redefine the way you work—one optimized task at a time."
+    },
+    "features": {
+      "subtitle": "Features",
+      "title": "Everything you need",
+      "description": "Discover how our AI-powered features can transform your productivity",
+      "ai": {
+        "title": "AI-Powered Task Management",
+        "description": "Let AI handle the heavy lifting! Get intelligent task recommendations, automated scheduling, and optimized workflows tailored to your productivity style."
+      },
+      "smart": {
+        "title": "Smart Task Creation & Editing",
+        "description": "Manually add tasks or let AI generate them for you. Modify, regenerate, or accept AI-suggested tasks effortlessly to match your needs."
+      },
+      "gamified": {
+        "title": "Gamified Productivity",
+        "description": "Stay motivated with streaks, achievements, and rewards as you complete tasks and hit your goals. Productivity has never been this fun!"
+      },
+      "sync": {
+        "title": "Cross-Platform Sync",
+        "description": "Seamlessly access your tasks from any device—whether you're on desktop or mobile, your progress is always in sync."
+      },
+      "auth": {
+        "title": "Secure & Seamless Authentication",
+        "description": "Sign in easily with multiple providers while keeping your data safe. One account, total access."
+      },
+      "insights": {
+        "title": "Insights & Progress Tracking",
+        "description": "Get real-time analytics on your productivity. Track your habits, monitor performance, and improve your workflow with data-driven insights."
+      }
+    },
+    "whyUs": {
+      "subtitle": "Why Choose Us",
+      "title": "Experience the Difference",
+      "description": "Discover why thousands trust TaskAI for their productivity needs",
+      "features": {
+        "userFriendly": {
+          "title": "User-Friendly Interface",
+          "description": "Simple, intuitive, designed for everyone"
+        },
+        "secure": {
+          "title": "Enterprise-Grade Security",
+          "description": "Your data is protected with state-of-the-art encryption"
+        },
+        "realTime": {
+          "title": "Real-Time Updates",
+          "description": "Stay synchronized across all your devices instantly"
+        },
+        "accessible": {
+          "title": "Accessible Anywhere",
+          "description": "Work seamlessly on any device, anytime, anywhere"
+        },
+        "comprehensive": {
+          "title": "AI-Powered Solutions",
+          "description": "Smart algorithms that learn and adapt to your workflow"
+        }
+      }
+    },
+    "mobileApp": {
+      "subtitle": "Mobile App",
+      "title": "Take Your Tasks Anywhere",
+      "description": "Access your tasks on the go with our powerful mobile app. Stay productive wherever you are.",
+      "features": {
+        "sync": "Real-time Sync",
+        "offline": "Offline Mode",
+        "notification": "Smart Notifications",
+        "widgets": "Home Screen Widgets"
+      },
+      "download": {
+        "android": "Get it on Android",
+        "ios": "Download on iOS",
+        "direct": {
+          "title": "Direct Download",
+          "button": "Download APK"
+        }
+      }
+    },
+    "pricing": {
+      "subtitle": "Pricing",
+      "title": "Choose Your Plan",
+      "description": "Choose a plan that maximizes your productivity. Whether you're an individual or a team, our AI-powered system adapts to your workflow and helps you stay ahead.",
+      "popular": "Most Popular",
+      "billing": {
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "saveText": "Save 20%"
+      },
+      "plans": {
+        "pro": {
+          "title": "Pro",
+          "highlight": "For individuals who want more",
+          "price": "$9",
+          "yearlyPrice": "$90",
+          "features": {
+            "ai": "AI-powered task generation & optimization",
+            "scheduling": "Smart scheduling & prioritization",
+            "analytics": "Advanced analytics & reports",
+            "goals": "Customizable productivity goals",
+            "access": "Web & mobile access",
+            "support": "Priority support"
+          }
+        },
+        "team": {
+          "title": "Team",
+          "highlight": "For teams & businesses",
+          "price": "$19",
+          "yearlyPrice": "$190",
+          "features": {
+            "pro": "Everything in Pro, plus:",
+            "collaboration": "Team collaboration & task sharing",
+            "roles": "Role-based access control",
+            "insights": "Team performance insights",
+            "integration": "Integration with external tools",
+            "admin": "Admin dashboard"
+          }
+        },
+        "enterprise": {
+          "title": "Enterprise",
+          "highlight": "For organizations with custom needs",
+          "priceLabel": "Contact Us",
+          "features": {
+            "team": "Everything in Team, plus:",
+            "automations": "Custom AI automations & workflows",
+            "manager": "Dedicated account manager",
+            "sla": "SLA-backed priority support",
+            "deployment": "On-premise deployment options",
+            "api": "API access for custom integrations"
+          }
+        }
+      },
+      "getStarted": "Get Started",
+      "contactUs": "Contact Us",
+      "monthly": "/mo",
+      "yearly": "/yr",
+      "freeTrial": {
+        "badge": "Free Trial",
+        "info": "7 days free trial, no credit card required"
+      }
+    },
+    "contact": {
+      "subtitle": "Contact Us",
+      "title": "Get in Touch",
+      "description": "Have questions? We're here to help. Send us a message and we'll respond as soon as possible.",
+      "form": {
+        "name": {
+          "label": "Your Name",
+          "placeholder": "Enter your name"
+        },
+        "email": {
+          "label": "Email Address",
+          "placeholder": "you@example.com"
+        },
+        "message": {
+          "label": "Your Message",
+          "placeholder": "How can we help you?"
+        },
+        "submit": "Send Message"
+      },
+      "info": {
+        "support": {
+          "title": "Support",
+          "description": "Need technical help?",
+          "email": "support@taskflow.com"
+        },
+        "sales": {
+          "title": "Sales",
+          "description": "Interested in enterprise?",
+          "email": "sales@taskflow.com"
+        },
+        "phone": {
+          "title": "Phone",
+          "description": "Mon-Fri 9am-6pm",
+          "number": "+1 (555) 000-0000"
+        }
+      }
     }
   }
 }

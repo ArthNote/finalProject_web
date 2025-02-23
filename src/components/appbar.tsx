@@ -25,6 +25,7 @@ import { consts } from "@/lib/constants";
 import { useTranslations } from "next-intl";
 import { CombinedToggle } from "@/components/combined_toggle";
 import { FaTasks } from "react-icons/fa";
+import { HiMenu, HiOutlineMenuAlt1 } from "react-icons/hi";
 
 interface NavBarProps {
   scroll?: boolean;
@@ -42,39 +43,17 @@ export default function NavBar({ scroll = true }: NavBarProps) {
     setMounted(true);
   }, []);
 
-  const handleNavigation = async (id: string) => {
-    if (pathname !== "/") {
-      await router.push("/");
-      // Wait for navigation to complete
-      setTimeout(() => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
-        }
-      }, 100);
-      return;
-    }
-
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   const links = [
-    { title: t("sections.home"), id: "home" },
-    { title: t("sections.about"), id: "about" },
-    { title: t("sections.features"), id: "features" },
-    { title: t("sections.pricing"), id: "pricing" },
-    { title: t("sections.whyUs"), id: "why-us" },
-    { title: t("sections.contact"), id: "contact" },
+    { title: t("sections.home"), link: "/" },
+    { title: t("sections.pricing"), link: "/pricing" },
+    { title: t("sections.contact"), link: "/contact" },
   ];
 
   // Prevent hydration mismatch by not rendering until mounted
   if (!mounted) {
     return (
       <div
-        className={`flex min-w-full fixed justify-between p-2 border-b z-10 sm:px-24 md:px-32 lg:px-48 xl:px-64 px-2 bg-background/60 backdrop-blur-xl transition-all ${
+        className={`flex min-w-full fixed justify-between p-2 border-b z-10 sm:px-24 md:px-32 lg:px-48 xl:px-64 px-2 bg-background/60 h-14 backdrop-blur-xl transition-all ${
           scroll ? "border-b" : ""
         }`}
       />
@@ -83,69 +62,87 @@ export default function NavBar({ scroll = true }: NavBarProps) {
 
   return (
     <div
-      className={`flex w-full fixed justify-between p-2 border-b z-50  md:px-16 lg:px-24 xl:px-36 2xl:px-64 px-2 bg-background/60 backdrop-blur-xl transition-all ${
+      className={`flex w-full fixed flex-row justify-between p-2 border-b z-50  md:px-16 lg:px-24 xl:px-36 2xl:px-64 px-2 bg-background/60 backdrop-blur-xl transition-all ${
         scroll ? (scrolled ? "border-b" : "bg-transparent") : "border-b"
       }`}
     >
-      <div className="flex w-full items-center lg:hidden">
+      <div className="flex w-fit items-center lg:hidden">
         <Sheet>
           <SheetTrigger asChild>
             <Button
               size="icon"
               variant="ghost"
-              className="w-8 h-8 p-1"
+              className="relative w-9 h-9 rounded-lg group flex items-center justify-center lg:hidden"
               aria-label={t("navbar.menu")}
             >
-              <MenuIcon className="h-5 w-5" />
+              <div className="flex flex-col gap-1">
+                <div className="w-4 h-0.5 bg-foreground rounded-full transition-all duration-200 group-hover:w-5" />
+                <div className="w-5 h-0.5 bg-foreground rounded-full" />
+                <div className="w-4 h-0.5 bg-foreground rounded-full transition-all duration-200 group-hover:w-5" />
+              </div>
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
             <SheetHeader>
               <SheetTitle>
                 <Link href="/" className="pl-2 flex items-center gap-2">
-                  <FaTasks className="text-primary" />
-                  <h1 className="text-md font-medium">{consts.appName}</h1>
+                  {/* <FaTasks className="text-primary" /> */}
+                  <h1 className="text-md font-medium">{consts.appName}.</h1>
                 </Link>
               </SheetTitle>
             </SheetHeader>
             <div className="flex flex-col space-y-3 mt-[1rem]">
               {links.map((link) => (
-                <SheetClose asChild key={link.id}>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => handleNavigation(link.id)}
-                  >
-                    {link.title}
-                  </Button>
+                <SheetClose asChild key={link.link}>
+                  <Link href={link.link} className="w-full">
+                    <Button variant="outline" className="w-full">
+                      {link.title}
+                    </Button>
+                  </Link>
                 </SheetClose>
               ))}
+              <SheetClose asChild>
+                <Link href="/signin" className="w-full">
+                  <Button variant="default" className="w-full">
+                    {t("signin")}
+                  </Button>
+                </Link>
+              </SheetClose>
             </div>
           </SheetContent>
         </Sheet>
-        <Link href="/" className="pl-2 flex items-center gap-2">
-          <FaTasks className="text-primary" />
-          <h1 className="text-md font-medium">{consts.appName}</h1>
-        </Link>
       </div>
 
-      <Link href="/" className="pl-2 hidden items-center gap-2 group lg:flex">
-        <FaTasks
+      <Link
+        href="/"
+        className="pl-2 items-center gap-2 flex flex-row group lg:hidden"
+      >
+        {/* <FaTasks
           aria-hidden="true"
           className="text-primary group-hover:-rotate-12 transition-all duration-300"
-        />
+        /> */}
         <h1 className="text-md font-medium group-hover:translate-x-0.5 transition-all duration-300">
-          {consts.appName}
+          {consts.appName}.
         </h1>
       </Link>
 
-      <NavigationMenu className="gap-2 w-full flex justify-between items-center">
-        <NavigationMenuList className="hidden gap-3 justify-between lg:flex ">
+      <Link href="/" className="pl-2 hidden items-center gap-2 group lg:flex">
+        {/* <FaTasks
+          aria-hidden="true"
+          className="text-primary group-hover:-rotate-12 transition-all duration-300"
+        /> */}
+        <h1 className="text-md font-medium group-hover:translate-x-0.5 transition-all duration-300">
+          {consts.appName}.
+        </h1>
+      </Link>
+
+      <NavigationMenu className="gap-2 w-full flex justify-between items-center hidden lg:flex">
+        <NavigationMenuList className=" gap-3 justify-between ">
           {links.map((link) => (
             <NavigationMenuItem key={link.title}>
-              <Button variant="ghost" onClick={() => handleNavigation(link.id)}>
-                {link.title}
-              </Button>
+              <Link href={link.link} className="hidden lg:inline-flex">
+                <Button variant="ghost">{link.title}</Button>
+              </Link>
             </NavigationMenuItem>
           ))}
         </NavigationMenuList>
@@ -153,7 +150,7 @@ export default function NavBar({ scroll = true }: NavBarProps) {
 
       <div className="flex items-center gap-2">
         <CombinedToggle />
-        <Link href="/signin" legacyBehavior passHref>
+        <Link href="/signin" className="hidden lg:inline-flex">
           <Button>{t("signin")}</Button>
         </Link>
       </div>

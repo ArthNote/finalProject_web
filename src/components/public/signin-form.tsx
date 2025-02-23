@@ -58,7 +58,7 @@ export function SigninForm({
 
   return (
     <div
-      className={cn("flex flex-col gap-6 w-full max-w-[500px]", className)}
+      className={cn("flex flex-col gap-6 w-full sm:w-[500px]", className)}
       {...props}
     >
       <Card className="w-full">

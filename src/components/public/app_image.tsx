@@ -15,7 +15,7 @@ const AppImage = () => {
             height={1000}
             priority={true}
           />
-          <BorderBeam size={250} delay={9} duration={15} />
+          {/* <BorderBeam size={250} delay={9} duration={15} /> */}
         </div>
       </div>
     </div>

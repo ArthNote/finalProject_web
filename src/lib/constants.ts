@@ -1,3 +1,3 @@
 export const consts = {
-  appName: "TaskFlow",
+  appName: "taskflow",
 };

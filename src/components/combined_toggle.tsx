@@ -19,6 +19,7 @@ export function CombinedToggle() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = useLocale();
+
   const t = useTranslations("navigation");
 
   const handleLanguageChange = (locale: string) => {
