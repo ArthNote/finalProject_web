@@ -323,6 +323,34 @@
       ]
     }
   },
+  "breadcrumb": {
+    "segments": {
+      "dashboard": "Tableau de bord",
+      "tasks": "Tâches",
+      "projects": "Projets",
+      "calendar": "Calendrier",
+      "goals": "Objectifs & Étapes",
+      "team": "Équipe & Collaboration"
+    }
+  },
+  "nav": {
+    "user": {
+      "account": "Compte",
+      "prefrences": "Préférences",
+      "settings": "Paramètres",
+      "signout": "Déconnexion",
+      "plan": "Mon Forfait"
+    },
+    "sidebar": {
+      "dashboard": "Tableau de bord",
+      "tasks": "Mes Tâches",
+      "projects": "Projets",
+      "calendar": "Calendrier",
+      "goals": "Objectifs & Étapes",
+      "team": "Équipe & Collaboration",
+      "latestProjects": "Projets Récents"
+    }
+  },
   "footer": {
     "newsletter": {
       "title": "Abonnez-vous à notre newsletter",

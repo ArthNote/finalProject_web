@@ -358,5 +358,33 @@
         }
       ]
     }
+  },
+  "breadcrumb": {
+    "segments": {
+      "dashboard": "Dashboard",
+      "tasks": "Tasks",
+      "projects": "Projects",
+      "calendar": "Calendar",
+      "goals": "Goals & Milestones",
+      "team": "Team & Collaboration"
+    }
+  },
+  "nav": {
+    "user": {
+      "account": "Account",
+      "prefrences": "Preferences",
+      "settings": "Settings",
+      "signout": "Sign out",
+      "plan": "My Plan"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "tasks": "My Tasks",
+      "projects": "Projects",
+      "calendar": "Calendar",
+      "goals": "Goals & Milestones",
+      "team": "Team & Collaboration",
+      "latestProjects": "Latest Projects"
+    }
   }
 }
