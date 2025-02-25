@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { CompassIcon, Computer } from "lucide-react";
+import {
+  AudioWaveform,
+  Command,
+  CompassIcon,
+  Computer,
+  GalleryVerticalEnd,
+} from "lucide-react";
 import { NavMain } from "./nav_main";
 import {
   Sidebar,
@@ -14,6 +20,7 @@ import {
 import { NavUser } from "./nav_user";
 import { consts } from "@/lib/constants";
 import { type NavItem } from "@/types/navigation";
+import { WorkspaceSwitcher } from "./workspace_switcher";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   navItems: NavItem[];
@@ -29,19 +36,28 @@ export function AppSidebar({ navItems, ...props }: AppSidebarProps) {
     avatar: "https://github.com/shadcn.png",
   };
 
+  const teams = [
+    {
+      name: "Acme Inc",
+      logo: GalleryVerticalEnd,
+      plan: "Enterprise",
+    },
+    {
+      name: "Acme Corp.",
+      logo: AudioWaveform,
+      plan: "Startup",
+    },
+    {
+      name: "Evil Corp.",
+      logo: Command,
+      plan: "Free",
+    },
+  ];
+
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="flex items-center gap-2 p-4">
-        {state === "collapsed" ? (
-          <Computer aria-hidden="true" className="text-primary" />
-        ) : (
-          <div className="flex items-center gap-2 transition-[opacity,transform] duration-200">
-            <Computer aria-hidden="true" className="text-primary" />
-            <h1 className="text-md font-medium whitespace-nowrap">
-              {consts.appName}.
-            </h1>
-          </div>
-        )}
+      <SidebarHeader>
+        <WorkspaceSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItems} />

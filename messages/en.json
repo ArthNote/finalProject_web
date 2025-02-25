@@ -366,7 +366,8 @@
       "projects": "Projects",
       "calendar": "Calendar",
       "goals": "Goals & Milestones",
-      "team": "Team & Collaboration"
+      "team": "Team & Collaboration",
+      "chats": "Chats"
     }
   },
   "nav": {
@@ -384,7 +385,25 @@
       "calendar": "Calendar",
       "goals": "Goals & Milestones",
       "team": "Team & Collaboration",
-      "latestProjects": "Latest Projects"
+      "latestProjects": "Latest Projects",
+      "chats": "Chats"
+    },
+    "workspace": {
+      "title": "Workspaces",
+      "switch": "Switch Workspaces",
+      "create": "Create Workspace"
+    }
+  },
+  "chat": {
+    "selectChat": "No chat selected",
+    "selectChatDescription": "Choose a conversation to start messaging",
+    "search": "Search chats...",
+    "you": "You",
+    "typeMessage": "Type a message...",
+    "timeAgo": {
+      "minutes": "{count} min",
+      "hours": "{count}h",
+      "days": "{count}d"
     }
   }
 }

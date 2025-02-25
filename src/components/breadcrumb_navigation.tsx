@@ -39,8 +39,24 @@ const BreadcrumbNavigation = () => {
     return string.charAt(0).toUpperCase() + string.slice(1).replace(/-/g, " ");
   };
 
+  // Function to check if a segment is an ID
+  const isId = (segment: string) => {
+    // Check for numeric IDs or UUID format
+    return (
+      /^\d+$/.test(segment) ||
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        segment
+      )
+    );
+  };
+
   // Function to translate and capitalize segment
   const translateSegment = (segment: string) => {
+    // If the segment is an ID, return it as-is
+    if (isId(segment)) {
+      return segment;
+    }
+
     try {
       return t(`segments.${segment}`);
     } catch {

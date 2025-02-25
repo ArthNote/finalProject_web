@@ -2,12 +2,13 @@
 
 import { AppSidebar } from "./sidebar";
 import {
-    Calendar,
+  Calendar,
   CheckSquare,
   Folder,
   Folders,
   GoalIcon,
   LayoutDashboard,
+  MessageSquareMore,
   Users,
 } from "lucide-react";
 import { type NavItem } from "@/types/navigation";
@@ -56,6 +57,13 @@ export function MySidebar() {
       title: t("team"),
       url: "/team",
       icon: Users,
+      type: "",
+      isActive: false,
+    },
+    {
+      title: t("chats"),
+      url: "/chats",
+      icon: MessageSquareMore,
       type: "",
       isActive: false,
     },

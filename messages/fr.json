@@ -330,7 +330,8 @@
       "projects": "Projets",
       "calendar": "Calendrier",
       "goals": "Objectifs & Étapes",
-      "team": "Équipe & Collaboration"
+      "team": "Équipe & Collaboration",
+      "chats": "Discussions"
     }
   },
   "nav": {
@@ -348,7 +349,13 @@
       "calendar": "Calendrier",
       "goals": "Objectifs & Étapes",
       "team": "Équipe & Collaboration",
-      "latestProjects": "Projets Récents"
+      "latestProjects": "Projets Récents",
+      "chats": "Discussions"
+    },
+    "workspace": {
+      "title": "Espaces de travail",
+      "switch": "Changer d'espace de travail",
+      "create": "Créer un espace de travail"
     }
   },
   "footer": {
@@ -385,6 +392,18 @@
     "password": {
       "min": "Le mot de passe doit contenir au moins 8 caractères",
       "match": "Les mots de passe doivent correspondre"
+    }
+  },
+  "chat": {
+    "selectChat": "Aucune discussion sélectionnée",
+    "selectChatDescription": "Choisissez une conversation pour commencer à discuter",
+    "search": "Rechercher des discussions...",
+    "you": "Vous",
+    "typeMessage": "Écrivez un message...",
+    "timeAgo": {
+      "minutes": "il y a {count} min",
+      "hours": "il y a {count}h",
+      "days": "il y a {count}j"
     }
   }
 }

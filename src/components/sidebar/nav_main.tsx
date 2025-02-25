@@ -39,7 +39,10 @@ export function NavMain({ items }: { items: NavItem[] }) {
     <>
       {Object.entries(groupedItems).map(([groupName, groupItems]) => (
         <SidebarGroup key={groupName}>
-          <SidebarGroupLabel>{capitalizeWords(groupName)}</SidebarGroupLabel>
+          {capitalizeWords(groupName) ? (
+            <SidebarGroupLabel>{capitalizeWords(groupName)}</SidebarGroupLabel>
+          ) : null}
+
           <SidebarMenu>
             {groupItems.map((item) => (
               <Collapsible
