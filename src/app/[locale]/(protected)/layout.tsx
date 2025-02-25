@@ -22,7 +22,7 @@ export default async function AdminLayout({
           <Separator orientation="vertical" className="h-4" />
           <BreadcrumbNavigation />
         </div>
-        <section className="p-4 mt-14">{children}</section>
+        <section className="p-4 pt-2 mt-14">{children}</section>
       </main>
     </SidebarProvider>
   );

@@ -405,5 +405,16 @@
       "hours": "il y a {count}h",
       "days": "il y a {count}j"
     }
+  },
+  "chats": {
+    "title": "Discussions",
+    "newChat": "Nouvelle Discussion",
+    "searchPlaceholder": "Rechercher des discussions...",
+    "noChatsFound": "Aucune discussion trouvée",
+    "noSelectedChat": "Aucune discussion sélectionnée",
+    "selectChatPrompt": "Sélectionnez une discussion dans la liste pour commencer à échanger",
+    "messagePlaceholder": "Tapez un message...",
+    "participants": "Participants",
+    "showChatList": "Afficher la liste des discussions"
   }
 }

@@ -405,5 +405,16 @@
       "hours": "{count}h",
       "days": "{count}d"
     }
+  },
+  "chats": {
+    "title": "Chats",
+    "newChat": "New Chat",
+    "searchPlaceholder": "Search chats...",
+    "noChatsFound": "No chats found",
+    "noSelectedChat": "No chat selected",
+    "selectChatPrompt": "Select a chat from the list to start messaging",
+    "messagePlaceholder": "Type a message...",
+    "participants": "Participants",
+    "showChatList": "Show Chat List"
   }
 }
