@@ -1,13 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  AudioWaveform,
-  Command,
-  CompassIcon,
-  Computer,
-  GalleryVerticalEnd,
-} from "lucide-react";
+import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react";
 import { NavMain } from "./nav_main";
 import {
   Sidebar,
@@ -15,10 +9,8 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { NavUser } from "./nav_user";
-import { consts } from "@/lib/constants";
 import { type NavItem } from "@/types/navigation";
 import { WorkspaceSwitcher } from "./workspace_switcher";
 
@@ -27,7 +19,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ navItems, ...props }: AppSidebarProps) {
-  const { state } = useSidebar();
   //   const { data: session } = authClient.useSession();
 
   const userData = {

@@ -31,7 +31,8 @@ const BreadcrumbNavigation = () => {
       allSegments[0] === "en" || allSegments[0] === "fr"
         ? allSegments[0]
         : "en";
-    return `/${locale}/${allSegments.slice(segmentIndex + 1).join("/")}`;
+        return `/${allSegments.slice(1, segmentIndex + 1).join("/")}`;
+
   };
 
   // Function to capitalize first letter

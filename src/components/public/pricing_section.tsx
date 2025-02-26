@@ -2,11 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import { Check, Rocket, Users, Building, Sparkles } from "lucide-react";
+import { Check, Rocket, Users, Building, Sparkles, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+interface PriceCardProps {
+  plan: "individual" | "team" | "enterprise";
+  icon: LucideIcon;
+  featured?: boolean;
+}
 
 const PricingSection = () => {
   const t = useTranslations("HomePage.pricing");
@@ -14,7 +20,7 @@ const PricingSection = () => {
     "monthly"
   );
 
-  const PriceCard = ({ plan, icon: Icon, featured = false }: any) => {
+  const PriceCard = ({ plan, icon: Icon, featured = false }: PriceCardProps) => {
     const isEnterprise = plan === "enterprise";
 
     const PriceDisplay = () => {

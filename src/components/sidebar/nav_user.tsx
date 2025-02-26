@@ -1,17 +1,14 @@
 "use client";
 
 import {
-  BadgeCheck,
-  Bell,
+
   ChevronsUpDown,
   CreditCard,
   LogOut,
   Settings,
-  Sparkles,
+
   User,
-  Moon,
-  Sun,
-  LaptopIcon,
+
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,11 +18,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -34,12 +27,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useTheme } from "next-themes";
-import { useState } from "react";
-import { ro } from "date-fns/locale";
-import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { useToast } from "@/hooks/use-toast";
 
 export function NavUser({
   user,
@@ -52,10 +40,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
 
-  const { setTheme, resolvedTheme } = useTheme();
-  const router = useRouter();
   const t = useTranslations("nav");
-  const { toast } = useToast();
 
   return (
     <SidebarMenu>

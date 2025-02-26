@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { type NavItem } from "@/types/navigation";
 import { useTranslations } from "next-intl";
-import { FaTasks } from "react-icons/fa";
 
 export function MySidebar() {
   const t = useTranslations("nav.sidebar");
