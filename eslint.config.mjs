@@ -17,6 +17,7 @@ const eslintConfig = [
       "@next/next/no-page-custom-font": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "import/no-anonymous-default-export": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
     },
   }),
 ];
