@@ -5,8 +5,6 @@ import AboutUs from "@/components/public/about_us";
 import FeatureSection from "@/components/public/features_section";
 import WhyChooseUs from "@/components/public/why_us";
 import MobileAppSection from "@/components/public/mobile_app_section";
-import PricingSection from "@/components/public/pricing_section";
-import ContactSection from "@/components/public/contact_section";
 import ReviewsSection from "@/components/public/reviews_section";
 
 const page = () => {

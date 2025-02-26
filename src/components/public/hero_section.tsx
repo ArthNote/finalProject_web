@@ -2,10 +2,9 @@
 import { Link } from "@/i18n/routing";
 import React from "react";
 import { Button, buttonVariants } from "../ui/button";
-import { ArrowRight, CompassIcon, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { consts } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 

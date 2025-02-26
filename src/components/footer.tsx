@@ -6,6 +6,10 @@ import { Input } from "@/components/ui/input";
 import { consts } from "@/lib/constants";
 import { useTranslations } from "next-intl";
 
+type NewsletterFormData = {
+  email: string;
+};
+
 export default function Footer() {
   const t = useTranslations("footer");
   const {
@@ -13,10 +17,11 @@ export default function Footer() {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm<NewsletterFormData>();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: NewsletterFormData) => {
     // Newsletter subscription logic here
+    console.log('Newsletter subscription:', data.email);
   };
 
   return (

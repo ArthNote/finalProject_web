@@ -3,10 +3,18 @@
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
-import { Star, Quote } from "lucide-react";
 import Image from "next/image";
 
-const UserReviewCard = ({ name, title, message, avatar, index }: any) => {
+interface UserReviewCardProps {
+  name: string;
+  title: string;
+  message: string;
+  avatar: string;
+  index: number;
+  gradientClass?: string;
+}
+
+const UserReviewCard = ({ name, title, message, avatar, index }: UserReviewCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

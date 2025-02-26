@@ -9,14 +9,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
 import { ReactNode } from "react";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
-
-type WrapperProps = {
-  children: ReactNode; // Allows any React component or JSX as a child
-};
 
 const AlertDialogDelete = ({
   title,

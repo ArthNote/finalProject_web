@@ -5,7 +5,6 @@ import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wifi, WifiOff, Bell, LayoutGrid, Download } from "lucide-react";
-import Image from "next/image";
 import { FaAppStoreIos, FaGooglePlay } from "react-icons/fa";
 
 const MobileAppSection = () => {

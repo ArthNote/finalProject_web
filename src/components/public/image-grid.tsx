@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const IMAGES = [
   "/authGrid/1.jpg",
@@ -30,9 +30,11 @@ export function ImageGrid() {
       <div className="flex flex-col animate-scroll-up py-4">
         {COLUMN_1.map((src, i) => (
           <div key={`col1-${i}`} className="relative w-full overflow-hidden">
-            <img
+            <Image
               src={src}
               alt={`Task preview ${i + 1}`}
+              width={400}
+              height={300}
               className="h-full w-full object-cover brightness-75 transition-all duration-300 hover:brightness-100"
             />
           </div>
@@ -41,9 +43,11 @@ export function ImageGrid() {
       <div className="flex flex-col animate-scroll-down py-4">
         {COLUMN_2.map((src, i) => (
           <div key={`col2-${i}`} className="relative w-full overflow-hidden">
-            <img
+            <Image
               src={src}
               alt={`Task preview ${i + 1}`}
+              width={400}
+              height={300}
               className="h-full w-full object-cover brightness-75 transition-all duration-300 hover:brightness-100"
             />
           </div>

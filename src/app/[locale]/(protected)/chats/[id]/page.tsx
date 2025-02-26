@@ -49,6 +49,7 @@ const initialMessages: Message[] = [
 ];
 
 export default function ChatPage({ params }: { params: { id: string } }) {
+  // Note: params.id will be used when integrating with the backend
   const t = useTranslations("chat");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");

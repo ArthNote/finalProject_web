@@ -1,7 +1,6 @@
 "use client";
-import { Link, usePathname, useRouter } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/routing";
 import React, { useEffect, useState } from "react";
-import { MenuIcon } from "lucide-react"; // Add this import at the top with other lucide imports
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -11,7 +10,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { CompassIcon } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -21,11 +19,9 @@ import {
 
 import { cn } from "@/lib/utils";
 import { useScroll } from "@/hooks/use-scroll";
-import { consts } from "@/lib/constants";
 import { useTranslations } from "next-intl";
 import { CombinedToggle } from "@/components/combined_toggle";
-import { FaTasks } from "react-icons/fa";
-import { HiMenu, HiOutlineMenuAlt1 } from "react-icons/hi";
+import { consts } from "@/lib/constants";
 
 interface NavBarProps {
   scroll?: boolean;
@@ -36,7 +32,6 @@ export default function NavBar({ scroll = true }: NavBarProps) {
   const scrolled = useScroll(50);
   const t = useTranslations("navigation");
   const pathname = usePathname();
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -86,7 +81,6 @@ export default function NavBar({ scroll = true }: NavBarProps) {
             <SheetHeader>
               <SheetTitle>
                 <Link href="/" className="pl-2 flex items-center gap-2">
-                  {/* <FaTasks className="text-primary" /> */}
                   <h1 className="text-md font-medium">{consts.appName}.</h1>
                 </Link>
               </SheetTitle>
@@ -128,26 +122,18 @@ export default function NavBar({ scroll = true }: NavBarProps) {
         href="/"
         className="pl-2 items-center gap-2 flex flex-row group lg:hidden"
       >
-        {/* <FaTasks
-          aria-hidden="true"
-          className="text-primary group-hover:-rotate-12 transition-all duration-300"
-        /> */}
         <h1 className="text-md font-medium group-hover:translate-x-0.5 transition-all duration-300">
           {consts.appName}.
         </h1>
       </Link>
 
       <Link href="/" className="pl-2 hidden items-center gap-2 group lg:flex">
-        {/* <FaTasks
-          aria-hidden="true"
-          className="text-primary group-hover:-rotate-12 transition-all duration-300"
-        /> */}
         <h1 className="text-md font-medium group-hover:translate-x-0.5 transition-all duration-300">
           {consts.appName}.
         </h1>
       </Link>
 
-      <NavigationMenu className="gap-2 w-full flex justify-between items-center hidden lg:flex">
+      <NavigationMenu className="gap-2 w-full  justify-between items-center hidden lg:flex">
         <NavigationMenuList className=" gap-3 justify-between ">
           {links.map((link) => (
             <NavigationMenuItem key={link.title}>
