@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/popover";
 import ChatMessage from "@/components/chat/chat-message";
 
-const chatComponent = () => {
+const ChatComponent = () => {
   const [selectedChat, setselectedChat] = useState("");
   return (
     <div>
@@ -140,4 +140,4 @@ const chatComponent = () => {
   );
 };
 
-export default chatComponent;
+export default ChatComponent;
