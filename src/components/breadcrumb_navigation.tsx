@@ -31,8 +31,7 @@ const BreadcrumbNavigation = () => {
       allSegments[0] === "en" || allSegments[0] === "fr"
         ? allSegments[0]
         : "en";
-        return `/${allSegments.slice(1, segmentIndex + 1).join("/")}`;
-
+    return `/${allSegments.slice(1, segmentIndex + 1).join("/")}`;
   };
 
   // Function to capitalize first letter
@@ -42,12 +41,14 @@ const BreadcrumbNavigation = () => {
 
   // Function to check if a segment is an ID
   const isId = (segment: string) => {
-    // Check for numeric IDs or UUID format
+    // Check for numeric IDs, UUID format, or name-like identifiers
     return (
-      /^\d+$/.test(segment) ||
+      /^\d+$/.test(segment) || // Numeric IDs
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
         segment
-      )
+      ) || // UUID format
+      /^[a-z0-9]+-[a-z0-9-]+$/i.test(segment) || // Slug format (e.g., user-john-doe)
+      /^[a-z0-9]{8,}$/i.test(segment) // Alphanumeric ID of 8+ chars
     );
   };
 
