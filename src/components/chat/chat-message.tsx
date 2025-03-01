@@ -6,7 +6,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Copy, Reply, Trash2 } from "lucide-react";
+import { Copy, Reply, Trash2, FileText } from "lucide-react";
 
 interface ChatMessageProps {
   sender: string;
@@ -15,6 +15,11 @@ interface ChatMessageProps {
   isSender?: boolean;
   onReply?: () => void;
   onDelete?: () => void;
+  status?: "sent" | "delivered" | "read";
+  type?: "text" | "file";
+  fileType?: string;
+  fileName?: string;
+  fileSize?: string;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -24,38 +29,64 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   isSender = false,
   onReply,
   onDelete,
+  status,
+  type = "text",
+  fileType,
+  fileName,
+  fileSize,
 }) => {
   const t = useTranslations("chat");
+
+  const renderFileContent = () => {
+    return (
+      <div className="flex items-center gap-2 bg-background/50 p-2 rounded-md">
+        <div className="bg-primary/10 p-2 rounded">
+          <FileText size={24} className="text-primary" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium truncate">{fileName}</p>
+          <p className="text-xs text-muted-foreground">{fileSize}</p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderMessageStatus = () => {
+    if (!isSender || !status) return null;
+    
+    return (
+      <span className="text-xs ml-2 opacity-70">
+        {t(`message.status.${status}`)}
+      </span>
+    );
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(content);
   };
 
   return (
-    <div className={`mb-4 ${isSender ? "flex justify-end w-full" : ""}`}>
+    <div className={`mb-4 ${isSender ? "flex justify-end" : "flex"}`}>
       <ContextMenu>
-        <ContextMenuTrigger>
+        <ContextMenuTrigger asChild>
           <div
-            className={`p-3 rounded-lg ${
+            className={`p-3 rounded-lg inline-block max-w-[85%] sm:max-w-[75%] ${
               isSender
-                ? "bg-primary text-primary-foreground max-w-[85%] sm:max-w-[75%] ml-auto"
-                : "bg-slate-100 max-w-[85%] sm:max-w-[75%] w-fit"
+                ? "bg-primary text-primary-foreground"
+                : "bg-slate-100 text-slate-900"
             }`}
           >
-            <div
-              className={`font-medium text-sm ${
-                isSender ? "" : "text-slate-700"
-              }`}
-            >
-              {sender}
+            <div className={`font-medium text-sm`}>{sender}</div>
+            <div className="break-words">
+              {type === "file" ? renderFileContent() : content}
             </div>
-            <div className="break-words">{content}</div>
             <div
-              className={`text-xs mt-1 text-right ${
+              className={`text-xs mt-1 text-right flex items-center justify-end gap-1 ${
                 isSender ? "opacity-70" : "text-slate-500"
               }`}
             >
               {time}
+              {renderMessageStatus()}
             </div>
           </div>
         </ContextMenuTrigger>

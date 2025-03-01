@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
@@ -16,6 +16,7 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Send,
   Paperclip,
@@ -39,6 +40,9 @@ import {
   UserPlus,
   Settings,
   SidebarClose,
+  MessageSquare,
+  Slash,
+  AlertCircle,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -50,11 +54,43 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ChatMessage from "@/components/chat/chat-message";
 
-// Mock chat data (same as before)
-const chatData = {
+interface Message {
+  id: number;
+  sender: string;
+  content: string;
+  time: string;
+  isSender: boolean;
+  status?: "sent" | "delivered" | "read";
+  type?: "text" | "file";
+  fileType?: string;
+  fileName?: string;
+  fileSize?: string;
+}
+
+interface Member {
+  id: number;
+  name: string;
+  status: "online" | "offline" | "idle";
+  role: string;
+}
+
+interface Chat {
+  name: string;
+  type: "group" | "individual";
+  unreadCount?: number;
+  status?: "online" | "offline";
+  lastSeen?: string;
+  description: string;
+  members: Member[];
+  messages: Message[];
+}
+
+// Mock chat data
+const chatData: Record<string, Chat> = {
   "1": {
     name: "Project Alpha",
     type: "group",
+    unreadCount: 3,
     description: "Team collaboration for Project Alpha development",
     members: [
       { id: 1, name: "John Doe", status: "online", role: "Admin" },
@@ -111,66 +147,97 @@ const chatData = {
           "I can help with the modal updates. I'm free this afternoon to work on it. 💪",
         time: "9:15 AM",
         isSender: true,
-      },
-      {
-        id: 7,
-        sender: "Lisa Johnson",
-        content:
-          "Just a heads up - found a small bug in the dropdown menu on Safari. Sending you the screen recording.",
-        time: "9:20 AM",
-        isSender: false,
-      },
-      {
-        id: 8,
-        sender: "You",
-        content:
-          "Thanks for catching that Lisa! Could you add it to our bug tracking sheet? I'll prioritize fixing it today.",
-        time: "9:22 AM",
-        isSender: true,
-      },
-      {
-        id: 9,
-        sender: "Alex Kim",
-        content:
-          "Great progress everyone! The new UI is looking much cleaner. 🎨",
-        time: "9:25 AM",
-        isSender: false,
-      },
-      {
-        id: 10,
-        sender: "Sarah Wilson",
-        content:
-          "Just finished testing on mobile devices. Everything looks good! Found some minor spacing issues on smaller screens though.",
-        time: "9:30 AM",
-        isSender: false,
-      },
-      {
-        id: 11,
-        sender: "John Doe",
-        content:
-          "Perfect timing! We have our daily standup in 30 minutes. We can discuss all these points then. Keep up the great work team! 🌟",
-        time: "9:35 AM",
-        isSender: false,
-      },
-      {
-        id: 12,
-        sender: "You",
-        content:
-          "Sounds good! I'll prepare a quick demo of the latest changes for the standup.",
-        time: "9:37 AM",
-        isSender: true,
-      },
-    ],
+      }
+    ]
   },
+  "2": {
+    name: "Sarah Wilson",
+    type: "individual",
+    status: "online",
+    lastSeen: "2 minutes ago",
+    description: "UI/UX Designer",
+    members: [{ id: 1, name: "Sarah Wilson", status: "online", role: "Member" }],
+    messages: [
+      {
+        id: 1,
+        sender: "Sarah Wilson",
+        content: "Hi! I've just finished the design mockups for the new feature.",
+        time: "10:00 AM",
+        isSender: false,
+        status: "read"
+      },
+      {
+        id: 2,
+        sender: "You",
+        content: "Great! Can you share them with me?",
+        time: "10:02 AM",
+        isSender: true,
+        status: "read"
+      },
+      {
+        id: 3,
+        sender: "Sarah Wilson",
+        content: "Sure! Here they are:",
+        time: "10:05 AM",
+        isSender: false,
+        status: "read"
+      },
+      {
+        id: 4,
+        sender: "Sarah Wilson",
+        content: "[Design Mockup.fig]",
+        time: "10:05 AM",
+        isSender: false,
+        type: "file",
+        fileType: "fig",
+        fileName: "Design Mockup.fig",
+        fileSize: "2.4 MB",
+        status: "read"
+      },
+      {
+        id: 5,
+        sender: "You",
+        content: "These look amazing! The color scheme works really well.",
+        time: "10:10 AM",
+        isSender: true,
+        status: "delivered"
+      }
+    ]
+  },
+  "3": {
+    name: "Mike Chen",
+    type: "individual",
+    status: "offline",
+    lastSeen: "1 hour ago",
+    description: "Backend Developer",
+    members: [{ id: 1, name: "Mike Chen", status: "offline", role: "Member" }],
+    messages: []
+  }
 };
 
 export default function ChatPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const [newMessage, setNewMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<boolean>(false);
   const messageEndRef = useRef<HTMLDivElement>(null);
   const chat = chatData[params.id as keyof typeof chatData];
   const t = useTranslations("chat");
+  
+  // Add current user to members list for individual chats
+  const currentUser: Member = { id: 0, name: "You", status: "online", role: "Member" };
+  const members = chat?.type === "individual" 
+    ? [currentUser, ...chat.members]
+    : chat?.members;
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
@@ -178,6 +245,81 @@ export default function ChatPage() {
     setNewMessage("");
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  if (error) {
+    return (
+      <div className="flex h-[calc(100vh-5rem)] items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-lg font-semibold">{t("states.error.title")}</h2>
+          <p className="text-muted-foreground mb-4">
+            {t("states.error.description")}
+          </p>
+          <Button onClick={() => setError(false)}>
+            {t("states.error.retry")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[calc(100vh-5rem)] gap-4">
+        <div className="flex-1">
+          <Card className="h-full">
+            <CardHeader className="border-b space-y-0">
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-4 w-24 mt-1" />
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`flex items-start gap-2 ${
+                    i % 2 === 0 ? "" : "justify-end"
+                  }`}
+                >
+                  {i % 2 === 0 && <Skeleton className="h-8 w-8 rounded-full" />}
+                  <div
+                    className={`space-y-2 ${i % 2 === 0 ? "w-1/2" : "w-1/3"}`}
+                  >
+                    <Skeleton className="h-4" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </div>
+                  {i % 2 !== 0 && <Skeleton className="h-8 w-8 rounded-full" />}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+        <div className="w-[320px] hidden lg:block">
+          <Card className="h-full">
+            <CardHeader className="border-b">
+              <Skeleton className="h-20 w-20 rounded-full mx-auto" />
+              <div className="space-y-2 text-center">
+                <Skeleton className="h-6 w-32 mx-auto" />
+                <Skeleton className="h-4 w-48 mx-auto" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              <Skeleton className="h-4 w-24" />
+              <div className="space-y-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <div className="space-y-1 flex-1">
+                      <Skeleton className="h-4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[calc(100vh-5rem)] gap-4">
@@ -204,18 +346,13 @@ export default function ChatPage() {
                   <div className="flex items-center gap-2">
                     <h2 className="font-semibold">{chat?.name}</h2>
                     {chat?.type === "group" && (
-                      <Badge
-                        variant="secondary"
-                        className="h-5 hidden md:block"
-                      >
-                        {t("status.membersCount", {
-                          count: chat.members.length,
-                        })}
+                      <Badge variant="secondary" className="h-5 hidden md:block">
+                        {t("status.membersCount", { count: members?.length })}
                       </Badge>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {chat?.members.filter((m) => m.status === "online").length}{" "}
+                    {members?.filter((m) => m.status === "online").length}{" "}
                     {t("status.online")}
                   </p>
                 </div>
@@ -229,7 +366,7 @@ export default function ChatPage() {
                       size="icon"
                       className="hidden md:flex"
                     >
-                      <Search className="h-4 w-4 " />
+                      <Search className="h-4 w-4" />
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="right">
@@ -299,8 +436,17 @@ export default function ChatPage() {
                       {t("details.actions.archiveChat")}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-destructive">
-                      <Trash className="mr-2 h-4 w-4" />{" "}
-                      {t("details.actions.deleteGroup")}
+                      {chat?.type === "group" ? (
+                        <>
+                          <Trash className="mr-2 h-4 w-4" />{" "}
+                          {t("details.actions.deleteGroup")}
+                        </>
+                      ) : (
+                        <>
+                          <AlertCircle className="mr-2 h-4 w-4" />
+                          {t("details.actions.reportUser")}
+                        </>
+                      )}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -320,7 +466,9 @@ export default function ChatPage() {
                   >
                     <div className="p-4 border-b">
                       <h3 className="text-lg font-semibold">
-                        {t("details.groupDetails")}
+                        {chat?.type === "group" 
+                          ? t("details.groupDetails")
+                          : t("details.chatDetails")}
                       </h3>
                     </div>
                     <ScrollArea className="flex-1">
@@ -338,15 +486,14 @@ export default function ChatPage() {
                             {chat?.description}
                           </p>
                         </div>
-
                         <div className="py-4 space-y-4">
-                          <div>
-                            <h4 className="text-sm font-medium mb-2 mt-4">
-                              {t("details.members")}
-                            </h4>
-                            <ScrollArea className="h-[280px] pr-4">
+                          <div className="py-4 space-y-4">
+                            <div>
+                              <h4 className="text-sm font-medium mb-2 mt-4">
+                                {chat?.type === "group" ? t("details.members") : t("details.participants")}
+                              </h4>
                               <div className="space-y-2">
-                                {chat?.members.map((member) => (
+                                {members?.map((member) => (
                                   <div
                                     key={member.id}
                                     className="flex items-center justify-between p-2 rounded-lg hover:bg-accent"
@@ -358,9 +505,7 @@ export default function ChatPage() {
                                         </AvatarFallback>
                                       </Avatar>
                                       <div>
-                                        <p className="text-sm font-medium">
-                                          {member.name}
-                                        </p>
+                                        <p className="text-sm font-medium">{member.name}</p>
                                         <p className="text-xs text-muted-foreground">
                                           {member.role}
                                         </p>
@@ -378,35 +523,55 @@ export default function ChatPage() {
                                   </div>
                                 ))}
                               </div>
-                            </ScrollArea>
-                          </div>
+                            </div>
 
-                          <div className="space-y-2 mt-4">
-                            <h4 className="text-sm font-medium">
-                              {t("details.actions.title")}
-                            </h4>
-                            <div className="space-y-1">
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-start"
-                              >
-                                <Edit className="mr-2 h-4 w-4" />{" "}
-                                {t("details.actions.editGroup")}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-start"
-                              >
-                                <UserPlus className="mr-2 h-4 w-4" />{" "}
-                                {t("details.actions.addMembers")}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-start text-destructive"
-                              >
-                                <Trash className="mr-2 h-4 w-4" />{" "}
-                                {t("details.actions.deleteGroup")}
-                              </Button>
+                            <div className="space-y-2">
+                              <h4 className="text-sm font-medium">
+                                {t("details.actions.title")}
+                              </h4>
+                              <div className="space-y-1">
+                                {chat?.type === "group" ? (
+                                  <>
+                                    <Button variant="ghost" className="w-full justify-start">
+                                      <Edit className="mr-2 h-4 w-4" />{" "}
+                                      {t("details.actions.editGroup")}
+                                    </Button>
+                                    <Button variant="ghost" className="w-full justify-start">
+                                      <UserPlus className="mr-2 h-4 w-4" />{" "}
+                                      {t("details.actions.addMembers")}
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      className="w-full justify-start text-destructive"
+                                    >
+                                      <Trash className="mr-2 h-4 w-4" />{" "}
+                                      {t("details.actions.deleteGroup")}
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Button variant="ghost" className="w-full justify-start">
+                                      <Volume2 className="mr-2 h-4 w-4" />
+                                      {t("details.actions.muteNotifications")}
+                                    </Button>
+                                    <Button variant="ghost" className="w-full justify-start">
+                                      <Archive className="mr-2 h-4 w-4" />
+                                      {t("details.actions.archiveChat")}
+                                    </Button>
+                                    <Button variant="ghost" className="w-full justify-start">
+                                      <Slash className="mr-2 h-4 w-4" />
+                                      {t("details.actions.blockUser")}
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      className="w-full justify-start text-destructive"
+                                    >
+                                      <AlertCircle className="mr-2 h-4 w-4" />
+                                      {t("details.actions.reportUser")}
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -420,12 +585,26 @@ export default function ChatPage() {
 
           {/* Messages Section */}
           <ScrollArea className="flex-1 px-4 py-6">
-            <div className="space-y-8">
-              {chat?.messages.map((message) => (
-                <ChatMessage key={message.id} {...message} />
-              ))}
-              <div ref={messageEndRef} className="h-4" />
-            </div>
+            {chat?.messages.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center">
+                <div className="p-4 rounded-full bg-primary/10">
+                  <MessageSquare className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold">
+                  {t("states.empty.title")}
+                </h3>
+                <p className="text-muted-foreground">
+                  {t("states.empty.description")}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {chat?.messages.map((message) => (
+                  <ChatMessage key={message.id} {...message} />
+                ))}
+                <div ref={messageEndRef} className="h-4" />
+              </div>
+            )}
           </ScrollArea>
 
           {/* Message Input */}
@@ -475,6 +654,7 @@ export default function ChatPage() {
           </CardFooter>
         </Card>
       </div>
+
       {/* Right Sidebar - Info Panel */}
       <div className="hidden lg:block w-[320px]">
         <Card className="flex flex-col h-full border rounded-xl overflow-hidden">
@@ -492,11 +672,11 @@ export default function ChatPage() {
           <CardContent className="flex-1 space-y-6 overflow-auto">
             <div>
               <h4 className="text-sm font-medium mb-2 mt-4">
-                {t("details.members")}
+                {chat?.type === "group" ? t("details.members") : t("details.participants")}
               </h4>
               <ScrollArea className="h-[280px] pr-4">
                 <div className="space-y-2">
-                  {chat?.members.map((member) => (
+                  {members?.map((member) => (
                     <div
                       key={member.id}
                       className="flex items-center justify-between p-2 rounded-lg hover:bg-accent"
@@ -534,21 +714,47 @@ export default function ChatPage() {
                 {t("details.actions.title")}
               </h4>
               <div className="space-y-1">
-                <Button variant="ghost" className="w-full justify-start">
-                  <Edit className="mr-2 h-4 w-4" />{" "}
-                  {t("details.actions.editGroup")}
-                </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  <UserPlus className="mr-2 h-4 w-4" />{" "}
-                  {t("details.actions.addMembers")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-destructive"
-                >
-                  <Trash className="mr-2 h-4 w-4" />{" "}
-                  {t("details.actions.deleteGroup")}
-                </Button>
+                {chat?.type === "group" ? (
+                  <>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Edit className="mr-2 h-4 w-4" />{" "}
+                      {t("details.actions.editGroup")}
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <UserPlus className="mr-2 h-4 w-4" />{" "}
+                      {t("details.actions.addMembers")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-destructive"
+                    >
+                      <Trash className="mr-2 h-4 w-4" />{" "}
+                      {t("details.actions.deleteGroup")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Volume2 className="mr-2 h-4 w-4" />
+                      {t("details.actions.muteNotifications")}
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Archive className="mr-2 h-4 w-4" />
+                      {t("details.actions.archiveChat")}
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Slash className="mr-2 h-4 w-4" />
+                      {t("details.actions.blockUser")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-destructive"
+                    >
+                      <AlertCircle className="mr-2 h-4 w-4" />
+                      {t("details.actions.reportUser")}
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </CardContent>

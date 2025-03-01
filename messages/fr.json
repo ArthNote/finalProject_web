@@ -307,9 +307,9 @@
     }
   },
   "chat": {
-    "selectChat": "Aucune discussion sélectionnée",
-    "selectChatDescription": "Choisissez une conversation pour commencer à discuter",
-    "search": "Rechercher des discussions...",
+    "selectChat": "Aucune conversation sélectionnée",
+    "selectChatDescription": "Choisissez une conversation pour commencer",
+    "search": "Rechercher des conversations...",
     "you": "Vous",
     "typeMessage": "Écrivez un message...",
     "timeAgo": {
@@ -319,7 +319,9 @@
     },
     "details": {
       "groupDetails": "Détails du groupe",
+      "chatDetails": "Détails de la conversation",
       "members": "Membres",
+      "participants": "Participants",
       "actions": {
         "title": "Actions",
         "editGroup": "Modifier les infos du groupe",
@@ -328,7 +330,9 @@
         "pinChat": "Épingler la discussion",
         "addToFavorites": "Ajouter aux favoris",
         "muteNotifications": "Désactiver les notifications",
-        "archiveChat": "Archiver la discussion"
+        "archiveChat": "Archiver la discussion",
+        "blockUser": "Bloquer l'utilisateur",
+        "reportUser": "Signaler l'utilisateur"
       },
       "search": {
         "title": "Rechercher dans la conversation",
@@ -343,16 +347,45 @@
     },
     "status": {
       "online": "en ligne",
+      "offline": "hors ligne",
+      "lastSeen": "vu(e) {time}",
+      "typing": "écrit...",
       "membersCount": "{count} membres"
+    },
+    "states": {
+      "empty": {
+        "title": "Aucun message",
+        "description": "Commencez la conversation en envoyant un message"
+      },
+      "error": {
+        "title": "Une erreur est survenue",
+        "description": "Impossible de charger les messages. Veuillez réessayer.",
+        "retry": "Réessayer"
+      },
+      "loading": {
+        "title": "Chargement des messages",
+        "description": "Veuillez patienter pendant le chargement de vos messages"
+      }
     },
     "message": {
       "actions": {
         "copy": "Copier",
         "reply": "Répondre",
         "delete": "Supprimer"
+      },
+      "status": {
+        "sent": "Envoyé",
+        "delivered": "Distribué",
+        "read": "Lu"
+      },
+      "types": {
+        "image": "Image",
+        "file": "Fichier",
+        "voice": "Message vocal"
       }
     }
   },
+
   "chats": {
     "title": "Discussions",
     "subtitle": "Conversations récentes",

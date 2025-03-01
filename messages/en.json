@@ -407,7 +407,9 @@
     },
     "details": {
       "groupDetails": "Group Details",
+      "chatDetails": "Chat Details",
       "members": "Members",
+      "participants": "Participants",
       "actions": {
         "title": "Actions",
         "editGroup": "Edit Group Info",
@@ -416,7 +418,9 @@
         "pinChat": "Pin Chat",
         "addToFavorites": "Add to Favorites",
         "muteNotifications": "Mute Notifications",
-        "archiveChat": "Archive Chat"
+        "archiveChat": "Archive Chat",
+        "blockUser": "Block User",
+        "reportUser": "Report User"
       },
       "search": {
         "title": "Search in Conversation",
@@ -431,13 +435,41 @@
     },
     "status": {
       "online": "online",
+      "offline": "offline",
+      "lastSeen": "last seen {time}",
+      "typing": "typing...",
       "membersCount": "{count} members"
+    },
+    "states": {
+      "empty": {
+        "title": "No messages yet",
+        "description": "Start the conversation by sending a message"
+      },
+      "error": {
+        "title": "Something went wrong",
+        "description": "Unable to load messages. Please try again.",
+        "retry": "Retry"
+      },
+      "loading": {
+        "title": "Loading messages",
+        "description": "Please wait while we fetch your messages"
+      }
     },
     "message": {
       "actions": {
         "copy": "Copy",
         "reply": "Reply",
         "delete": "Delete"
+      },
+      "status": {
+        "sent": "Sent",
+        "delivered": "Delivered",
+        "read": "Read"
+      },
+      "types": {
+        "image": "Image",
+        "file": "File",
+        "voice": "Voice Message"
       }
     }
   },
