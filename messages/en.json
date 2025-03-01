@@ -404,17 +404,70 @@
       "minutes": "{count} min",
       "hours": "{count}h",
       "days": "{count}d"
+    },
+    "details": {
+      "groupDetails": "Group Details",
+      "members": "Members",
+      "actions": {
+        "title": "Actions",
+        "editGroup": "Edit Group Info",
+        "addMembers": "Add Members",
+        "deleteGroup": "Delete Group",
+        "pinChat": "Pin Chat",
+        "addToFavorites": "Add to Favorites",
+        "muteNotifications": "Mute Notifications",
+        "archiveChat": "Archive Chat"
+      },
+      "search": {
+        "title": "Search in Conversation",
+        "placeholder": "Search messages..."
+      }
+    },
+    "attachments": {
+      "title": "Attach",
+      "image": "Send Image",
+      "file": "Send File",
+      "voice": "Voice Message"
+    },
+    "status": {
+      "online": "online",
+      "membersCount": "{count} members"
+    },
+    "message": {
+      "actions": {
+        "copy": "Copy",
+        "reply": "Reply",
+        "delete": "Delete"
+      }
     }
   },
   "chats": {
     "title": "Chats",
+    "subtitle": "Recent conversations",
     "newChat": "New Chat",
-    "searchPlaceholder": "Search chats...",
+    "newChatOptions": {
+      "individual": "Individual Chat",
+      "group": "Group Chat"
+    },
+    "searchPlaceholder": "Search messages or contacts...",
     "noChatsFound": "No chats found",
     "noSelectedChat": "No chat selected",
     "selectChatPrompt": "Select a chat from the list to start messaging",
     "messagePlaceholder": "Type a message...",
     "participants": "Participants",
-    "showChatList": "Show Chat List"
+    "showChatList": "Show Chat List",
+    "filters": {
+      "all": "All",
+      "direct": "Direct",
+      "groups": "Groups",
+      "teams": "Teams",
+      "contacts": "Contacts"
+    },
+    "contacts": {
+      "title": "Contacts",
+      "activeNow": "{count} active now",
+      "online": "online",
+      "offline": "offline"
+    }
   }
 }

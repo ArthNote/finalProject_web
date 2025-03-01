@@ -1,20 +1,20 @@
 import React from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useTranslations } from "next-intl";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
-  ContextMenuSeparator,
 } from "@/components/ui/context-menu";
-import { Copy, Reply, Trash, Forward } from "lucide-react";
+import { Copy, Reply, Trash2 } from "lucide-react";
 
 interface ChatMessageProps {
   sender: string;
   content: string;
   time: string;
   isSender?: boolean;
-  avatar?: string;
+  onReply?: () => void;
+  onDelete?: () => void;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -22,68 +22,67 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   content,
   time,
   isSender = false,
-  avatar,
+  onReply,
+  onDelete,
 }) => {
+  const t = useTranslations("chat");
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content);
+  };
+
   return (
-    <ContextMenu>
-      <ContextMenuTrigger>
-        <div className={`flex gap-3 ${isSender ? "flex-row-reverse" : ""}`}>
-          {!isSender && (
-            <Avatar className="h-8 w-8 flex-shrink-0">
-              {avatar ? (
-                <img src={avatar} alt={sender} className="rounded-full" />
-              ) : (
-                <AvatarFallback>{sender[0].toUpperCase()}</AvatarFallback>
-              )}
-            </Avatar>
-          )}
+    <div className={`mb-4 ${isSender ? "flex justify-end w-full" : ""}`}>
+      <ContextMenu>
+        <ContextMenuTrigger>
           <div
-            className={`group flex flex-col ${
-              isSender ? "items-end" : "items-start"
+            className={`p-3 rounded-lg ${
+              isSender
+                ? "bg-primary text-primary-foreground max-w-[85%] sm:max-w-[75%] ml-auto"
+                : "bg-slate-100 max-w-[85%] sm:max-w-[75%] w-fit"
             }`}
           >
-            {!isSender && (
-              <span className="text-sm font-medium mb-1">{sender}</span>
-            )}
             <div
-              className={`rounded-2xl px-4 py-2.5 max-w-[480px] ${
-                isSender
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted"
+              className={`font-medium text-sm ${
+                isSender ? "" : "text-slate-700"
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap break-words">{content}</p>
+              {sender}
             </div>
-            <span
-              className={`text-xs mt-1 text-muted-foreground ${
-                isSender ? "text-right" : ""
+            <div className="break-words">{content}</div>
+            <div
+              className={`text-xs mt-1 text-right ${
+                isSender ? "opacity-70" : "text-slate-500"
               }`}
             >
               {time}
-            </span>
+            </div>
           </div>
-        </div>
-      </ContextMenuTrigger>
-      <ContextMenuContent className="w-64">
-        <ContextMenuItem>
-          <Reply className="mr-2 h-4 w-4" />
-          Reply
-        </ContextMenuItem>
-        <ContextMenuItem>
-          <Forward className="mr-2 h-4 w-4" />
-          Forward
-        </ContextMenuItem>
-        <ContextMenuItem>
-          <Copy className="mr-2 h-4 w-4" />
-          Copy Text
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem className="text-destructive">
-          <Trash className="mr-2 h-4 w-4" />
-          Delete
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem
+            onClick={handleCopy}
+            className="flex gap-2 cursor-pointer"
+          >
+            <Copy size={16} /> {t("message.actions.copy")}
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={onReply}
+            className="flex gap-2 cursor-pointer"
+          >
+            <Reply size={16} /> {t("message.actions.reply")}
+          </ContextMenuItem>
+          {isSender && (
+            <ContextMenuItem
+              onClick={onDelete}
+              className="flex gap-2 cursor-pointer text-destructive"
+            >
+              <Trash2 size={16} /> {t("message.actions.delete")}
+            </ContextMenuItem>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
+    </div>
   );
 };
 

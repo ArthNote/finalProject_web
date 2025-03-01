@@ -1,420 +1,396 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
+import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  PlusCircle,
+  Users,
+  User,
+  Search,
+  Filter,
+  MessageSquare,
+  Hash,
+} from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  MessageSquare,
-  Search,
-  PlusCircle,
-  ChevronLeft,
-  Users,
-  Paperclip,
-  Image,
-  FileText,
-  Mic,
-  MoreVertical,
-  ChevronRight,
-} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
-type Chat = {
-  id: string;
-  title: string;
-  lastMessage: string;
-  timestamp: string;
-  isGroup: boolean;
-  unreadCount: number;
-  members?: string[];
-};
+const contacts = [
+  { id: 1, name: "Sarah Wilson", status: "online", avatar: null },
+  { id: 2, name: "Mike Chen", status: "online", avatar: null },
+  { id: 3, name: "Alex Kim", status: "offline", avatar: null },
+  { id: 4, name: "Emma Thompson", status: "online", avatar: null },
+  { id: 5, name: "James Rodriguez", status: "offline", avatar: null },
+  { id: 6, name: "Lisa Wang", status: "offline", avatar: null },
+  { id: 7, name: "David Park", status: "online", avatar: null },
+  { id: 8, name: "Sophie Martin", status: "offline", avatar: null },
+];
 
-const initialChats: Chat[] = [
+const recentChats = [
   {
     id: "1",
-    title: "Project Brainstorming",
-    lastMessage: "Let's schedule a follow-up meeting.",
-    timestamp: "2h ago",
-    isGroup: true,
-    unreadCount: 3,
-    members: ["Alice", "Bob", "Charlie"],
+    name: "Project Alpha",
+    type: "group",
+    lastMessage: "Meeting at 3 PM tomorrow",
+    timestamp: "2:30 PM",
+    unread: 3,
+    members: 5,
   },
   {
     id: "2",
-    title: "Task Prioritization",
-    lastMessage: "I've updated the priority levels as suggested.",
-    timestamp: "1d ago",
-    isGroup: false,
-    unreadCount: 0,
+    name: "Sarah Wilson",
+    type: "direct",
+    lastMessage: "Could you review the design?",
+    timestamp: "11:20 AM",
+    unread: 1,
   },
   {
     id: "3",
-    title: "Weekly Planning",
-    lastMessage: "Don't forget to add the new project to your schedule.",
-    timestamp: "2d ago",
-    isGroup: true,
-    unreadCount: 5,
-    members: ["David", "Eva", "Frank"],
+    name: "Development Team",
+    type: "team",
+    lastMessage: "New deployment completed",
+    timestamp: "Yesterday",
+    unread: 0,
+    members: 8,
   },
   {
     id: "4",
-    title: "Productivity Tips",
-    lastMessage: "Try the Pomodoro technique for better focus.",
-    timestamp: "1w ago",
-    isGroup: false,
-    unreadCount: 1,
+    name: "Marketing Group",
+    type: "group",
+    lastMessage: "Campaign updates for Q1",
+    timestamp: "Yesterday",
+    unread: 2,
+    members: 6,
+  },
+  {
+    id: "5",
+    name: "Mike Chen",
+    type: "direct",
+    lastMessage: "Thanks for the help!",
+    timestamp: "2 days ago",
+    unread: 0,
   },
 ];
 
-type Message = {
-  id: string;
-  content: string;
-  sender: string;
-  timestamp: string;
-};
-
-const initialMessages: Record<string, Message[]> = {
-  "1": [
-    {
-      id: "1",
-      content: "Hey team, let's brainstorm for the new project!",
-      sender: "Alice",
-      timestamp: "10:00 AM",
-    },
-    {
-      id: "2",
-      content: "Great idea! I have some thoughts to share.",
-      sender: "Bob",
-      timestamp: "10:05 AM",
-    },
-    {
-      id: "3",
-      content: "I've prepared a document with initial concepts.",
-      sender: "Charlie",
-      timestamp: "10:10 AM",
-    },
-  ],
-  "2": [
-    {
-      id: "1",
-      content: "Hi, can you help me prioritize my tasks?",
-      sender: "You",
-      timestamp: "2:00 PM",
-    },
-    {
-      id: "2",
-      content: "Of course! Let's go through your list together.",
-      sender: "AI Assistant",
-      timestamp: "2:02 PM",
-    },
-  ],
-  "3": [
-    {
-      id: "1",
-      content: "Weekly planning session starts in 10 minutes!",
-      sender: "David",
-      timestamp: "9:50 AM",
-    },
-    {
-      id: "2",
-      content: "I'll be there. Bringing my project updates.",
-      sender: "Eva",
-      timestamp: "9:52 AM",
-    },
-    {
-      id: "3",
-      content: "Great, see you all soon.",
-      sender: "Frank",
-      timestamp: "9:55 AM",
-    },
-  ],
-  "4": [
-    {
-      id: "1",
-      content: "Do you have any productivity tips to share?",
-      sender: "You",
-      timestamp: "11:00 AM",
-    },
-    {
-      id: "2",
-      content: "Have you tried the Pomodoro technique?",
-      sender: "AI Assistant",
-      timestamp: "11:02 AM",
-    },
-  ],
-};
-
-export function ChatPage() {
-  const [chats, setChats] = useState<Chat[]>(initialChats);
+export default function ChatComponent() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [isChatListVisible, setIsChatListVisible] = useState(true);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isMobileView, setIsMobileView] = useState(false);
+  const [selectedType, setSelectedType] = useState("all");
+  const t = useTranslations("chats");
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768);
-    };
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  function handleChatSelect(chatId: string) {
+    router.push(`/chats/${chatId}`);
+  }
 
-  const filteredChats = chats.filter(
-    (chat) =>
-      chat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+  function handleTypeSelect(type: string) {
+    setSelectedType(type);
+  }
+
+  const getStatusColor = (status: string) =>
+    status === "online" ? "bg-green-500" : "bg-gray-400";
+
+  const filteredChats = recentChats.filter(
+    (chat) => selectedType === "all" || chat.type === selectedType
   );
 
-  const handleNewChat = () => {
-    const newChat: Chat = {
-      id: (chats.length + 1).toString(),
-      title: "New Chat",
-      lastMessage: "Start a new conversation",
-      timestamp: "Just now",
-      isGroup: false,
-      unreadCount: 0,
-    };
-    setChats([newChat, ...chats]);
-    setSelectedChatId(newChat.id);
-  };
-
-  const toggleChatList = () => {
-    setIsChatListVisible(!isChatListVisible);
-    if (isMobileView && selectedChatId) {
-      setSelectedChatId(null);
-    }
-  };
-
-  const handleChatSelect = (chatId: string) => {
-    setSelectedChatId(chatId);
-    setMessages(initialMessages[chatId] || []);
-    setChats(
-      chats.map((chat) =>
-        chat.id === chatId ? { ...chat, unreadCount: 0 } : chat
-      )
-    );
-    if (isMobileView) {
-      setIsChatListVisible(false);
-    }
-  };
-
-  const handleSend = () => {
-    if (input.trim() && selectedChatId) {
-      const newMessage: Message = {
-        id: (messages.length + 1).toString(),
-        content: input,
-        sender: "You",
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
-      setMessages([...messages, newMessage]);
-      setInput("");
-
-      // Update last message in chat list
-      setChats(
-        chats.map((chat) =>
-          chat.id === selectedChatId
-            ? {
-                ...chat,
-                lastMessage:
-                  input.slice(0, 30) + (input.length > 30 ? "..." : ""),
-                timestamp: "Just now",
-              }
-            : chat
-        )
-      );
-    }
-  };
-
-  const selectedChat = chats.find((chat) => chat.id === selectedChatId);
+  const onlineCount = contacts.filter((c) => c.status === "online").length;
+  const contactsCount = contacts.length;
 
   return (
-    <Card className="h-full flex flex-col md:flex-row">
-      <CardContent
-        className={`${
-          isChatListVisible ? "w-full md:w-1/3" : "w-0"
-        } p-4 border-r transition-all duration-300 overflow-hidden ${
-          !isChatListVisible ? "px-0" : ""
-        }`}
-      >
-        {isChatListVisible && (
-          <>
-            <div className="flex space-x-2 mb-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  className="pl-8"
-                  placeholder="Search chats..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+    <main className="h-[calc(100vh-5rem)] ">
+      <Card className="flex h-full overflow-hidden">
+        {/* Mobile and Desktop Layout */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Header */}
+          <header className="p-3 sm:p-4 md:p-6 border-b">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-semibold">{t("title")}</h1>
+                <p className="text-sm text-muted-foreground">
+                  {t("subtitle")}
+                </p>
               </div>
-              <Button onClick={handleNewChat}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                New Chat
-              </Button>
-            </div>
-            <ScrollArea className="h-[calc(100vh-200px)]">
-              {filteredChats.map((chat) => (
-                <div
-                  key={chat.id}
-                  className={`p-2 mb-2 cursor-pointer hover:bg-accent rounded-md ${
-                    selectedChatId === chat.id ? "bg-accent" : ""
-                  }`}
-                  onClick={() => handleChatSelect(chat.id)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      {chat.isGroup ? (
-                        <Users className="h-5 w-5 mr-2 text-primary" />
-                      ) : (
-                        <MessageSquare className="h-5 w-5 mr-2 text-primary" />
-                      )}
-                      <div>
-                        <h3 className="font-semibold">{chat.title}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {chat.lastMessage}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <span className="text-xs text-muted-foreground">
-                        {chat.timestamp}
-                      </span>
-                      {chat.unreadCount > 0 && (
-                        <Badge variant="destructive" className="mt-1">
-                          {chat.unreadCount}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </ScrollArea>
-          </>
-        )}
-      </CardContent>
-      <CardContent
-        className={`flex-1 p-4 flex flex-col ${
-          isChatListVisible ? "md:w-2/3" : "w-full"
-        }`}
-      >
-        <div className="flex items-center space-x-4 mb-4">
-          <Button variant="ghost" size="icon" onClick={toggleChatList}>
-            {isChatListVisible ? (
-              <ChevronLeft className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
-          <div className="flex-1">
-            <h2 className="text-xl font-bold">{selectedChat?.title}</h2>
-            {selectedChat?.isGroup && (
-              <p className="text-sm text-muted-foreground">
-                {selectedChat.members?.join(", ")}
-              </p>
-            )}
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Rename Chat</DropdownMenuItem>
-              <DropdownMenuItem>Mute Notifications</DropdownMenuItem>
-              <DropdownMenuItem>Leave Chat</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">
-                Delete Chat
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        {selectedChatId ? (
-          <>
-            <ScrollArea className="flex-1 pr-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex mb-4 ${
-                    message.sender === "You" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`rounded-lg px-4 py-2 max-w-[70%] ${
-                      message.sender === "You"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
-                    }`}
-                  >
-                    {selectedChat?.isGroup && message.sender !== "You" && (
-                      <p className="text-xs font-semibold mb-1">
-                        {message.sender}
-                      </p>
-                    )}
-                    <p>{message.content}</p>
-                    <span className="text-xs text-muted-foreground block mt-1">
-                      {message.timestamp}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </ScrollArea>
-            <Separator className="my-4" />
-            <div className="flex items-center space-x-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    <Paperclip className="h-4 w-4" />
+                  <Button variant="outline" className="w-full sm:w-auto">
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    {t("newChat")}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top">
+                <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuItem>
-                    <Image className="mr-2 h-4 w-4" />
-                    <span>Image</span>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    {t("newChatOptions.individual")}
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <FileText className="mr-2 h-4 w-4" />
-                    <span>Document</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Mic className="mr-2 h-4 w-4" />
-                    <span>Audio</span>
+                    <Users className="mr-2 h-4 w-4" />
+                    {t("newChatOptions.group")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Input
-                className="flex-1"
-                placeholder="Type your message..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSend()}
-              />
-              <Button onClick={handleSend}>Send</Button>
             </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-center text-muted-foreground">
-              Select a chat or start a new conversation
-            </p>
+
+            <div className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  placeholder={t("searchPlaceholder")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-0">
+                <Button
+                  variant={selectedType === "all" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => handleTypeSelect("all")}
+                  className="flex-none"
+                >
+                  <Hash className="h-4 w-4 mr-2" />
+                  {t("filters.all")}
+                </Button>
+                <Button
+                  variant={selectedType === "direct" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => handleTypeSelect("direct")}
+                  className="flex-none"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  {t("filters.direct")}
+                </Button>
+                <Button
+                  variant={selectedType === "group" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => handleTypeSelect("group")}
+                  className="flex-none"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  {t("filters.groups")}
+                </Button>
+                <Button
+                  variant={selectedType === "team" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => handleTypeSelect("team")}
+                  className="flex-none"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  {t("filters.teams")}
+                </Button>
+                <Separator
+                  orientation="vertical"
+                  className="h-5 block lg:hidden"
+                />
+                <Button
+                  variant={selectedType === "contacts" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => handleTypeSelect("contacts")}
+                  className="flex-none flex lg:hidden"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  {t("filters.contacts")}
+                  <Badge variant="secondary" className="ml-2 h-5 min-w-[20px]">
+                    {contactsCount}
+                  </Badge>
+                </Button>
+              </div>
+            </div>
+          </header>
+
+          {/* Main Content Area */}
+          <div className="overflow-y-auto flex-1">
+            {selectedType === "contacts" ? (
+              // Contacts View
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12"></TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead className="text-right">Status</TableHead>
+                      <TableHead className="w-12 text-right">
+                        <MessageSquare className="h-4 w-4 ml-auto" />
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {contacts.map((contact) => (
+                      <TableRow
+                        key={contact.id}
+                        onClick={() => handleChatSelect(`user-${contact.id}`)}
+                        className="cursor-pointer hover:bg-accent"
+                      >
+                        <TableCell className="p-2">
+                          <div className="relative">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="bg-primary/10 text-primary">
+                                {contact.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span
+                              className={cn(
+                                "absolute bottom-0 right-0 h-2 w-2 rounded-full ring-2 ring-background",
+                                getStatusColor(contact.status)
+                              )}
+                            />
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {contact.name}
+                        </TableCell>
+                        <TableCell
+                          className={cn(
+                            "text-right text-xs capitalize",
+                            contact.status === "online"
+                              ? "text-green-500"
+                              : "text-muted-foreground/70"
+                          )}
+                        >
+                          {t(`contacts.${contact.status}`)}
+                        </TableCell>
+                        <TableCell className="p-2 text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              // Chat List View
+              <div className="overflow-y-auto">
+                {filteredChats.map((chat) => (
+                  <div
+                    key={chat.id}
+                    onClick={() => handleChatSelect(chat.id)}
+                    className="p-3 mx-2 my-1 flex items-center gap-3 rounded-lg hover:bg-accent cursor-pointer"
+                  >
+                    <div className="relative shrink-0">
+                      <Avatar>
+                        {chat.type !== "direct" ? (
+                          <div className="h-full w-full bg-primary/10 text-primary flex items-center justify-center">
+                            <Hash className="h-5 w-5" />
+                          </div>
+                        ) : (
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            {chat.name.charAt(0)}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      {chat.type !== "direct" && (
+                        <div className="absolute -bottom-0.5 -right-0.5 bg-background rounded-full p-0.5 shadow-sm border">
+                          <Users className="h-3 w-3 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium truncate">
+                          {chat.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground ml-2">
+                          {chat.timestamp}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-sm text-muted-foreground truncate">
+                          {chat.lastMessage}
+                        </p>
+                        {chat.unread > 0 && (
+                          <Badge
+                            variant="default"
+                            className="h-5 min-w-[20px] flex items-center justify-center px-1 rounded-full flex-none"
+                          >
+                            {chat.unread}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+        </div>
+
+        {/* Desktop Contacts Sidebar */}
+        {selectedType !== "contacts" && (
+          <aside className="hidden lg:flex w-72 flex-col border-l">
+            <div className="p-4 border-b">
+              <h2 className="font-semibold">{t("contacts.title")}</h2>
+              <p className="text-xs text-muted-foreground">
+                {t("contacts.activeNow", { count: onlineCount })}
+              </p>
+            </div>
+            <div className="overflow-y-auto flex-1">
+              {contacts.map((contact) => (
+                <div
+                  key={contact.id}
+                  onClick={() => handleChatSelect(`user-${contact.id}`)}
+                  className="p-2 mx-2 my-1 flex items-center gap-3 rounded-lg hover:bg-accent cursor-pointer"
+                >
+                  <div className="relative flex-none">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {contact.name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span
+                      className={cn(
+                        "absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full ring-2 ring-background",
+                        getStatusColor(contact.status)
+                      )}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-sm font-medium truncate">
+                        {contact.name}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-xs capitalize",
+                          contact.status === "online"
+                            ? "text-green-500"
+                            : "text-muted-foreground/70"
+                        )}
+                      >
+                        {t(`contacts.${contact.status}`)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </aside>
         )}
-      </CardContent>
-    </Card>
+      </Card>
+    </main>
   );
 }

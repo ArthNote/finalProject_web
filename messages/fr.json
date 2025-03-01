@@ -124,30 +124,52 @@
     "features": {
       "subtitle": "Fonctionnalités",
       "title": "Tout ce dont vous avez besoin",
-      "description": "Découvrez comment nos fonctionnalités alimentées par l'IA peuvent transformer votre productivité",
-      "ai": {
-        "title": "Gestion des Tâches par IA",
-        "description": "Laissez l'IA faire le gros du travail ! Obtenez des recommandations de tâches intelligentes, une planification automatisée et des flux de travail optimisés adaptés à votre style de productivité."
+      "description": "Découvrez comment nos fonctionnalités alimentées par l'IA peuvent transformer votre productivité"
+    },
+    "whyUs": {
+      "subtitle": "Pourquoi Nous Choisir",
+      "title": "Découvrez la Différence",
+      "description": "Découvrez pourquoi des milliers font confiance à TaskFlow pour leur productivité",
+      "features": {
+        "userFriendly": {
+          "title": "Interface Conviviale",
+          "description": "Simple, intuitive, conçue pour tous"
+        },
+        "secure": {
+          "title": "Sécurité de Niveau Entreprise",
+          "description": "Vos données sont protégées avec un chiffrement de pointe"
+        },
+        "realTime": {
+          "title": "Mises à Jour en Temps Réel",
+          "description": "Restez synchronisé sur tous vos appareils instantanément"
+        },
+        "accessible": {
+          "title": "Accessible Partout",
+          "description": "Travaillez facilement sur n'importe quel appareil, n'importe quand"
+        },
+        "comprehensive": {
+          "title": "Solutions Alimentées par l'IA",
+          "description": "Des algorithmes intelligents qui s'adaptent à votre façon de travailler"
+        }
+      }
+    },
+    "mobileApp": {
+      "subtitle": "Application Mobile",
+      "title": "Emportez Vos Tâches Partout",
+      "description": "Accédez à vos tâches en déplacement avec notre puissante application mobile. Restez productif où que vous soyez.",
+      "features": {
+        "sync": "Synchronisation en Temps Réel",
+        "offline": "Mode Hors-ligne",
+        "notification": "Notifications Intelligentes",
+        "widgets": "Widgets d'Écran d'Accueil"
       },
-      "smart": {
-        "title": "Création et Édition Intelligente",
-        "description": "Ajoutez manuellement des tâches ou laissez l'IA les générer pour vous. Modifiez, régénérez ou acceptez les tâches suggérées par l'IA sans effort pour répondre à vos besoins."
-      },
-      "gamified": {
-        "title": "Productivité Ludique",
-        "description": "Restez motivé avec des séries, des réalisations et des récompenses lorsque vous complétez des tâches et atteignez vos objectifs. La productivité n'a jamais été aussi amusante !"
-      },
-      "sync": {
-        "title": "Synchronisation Multi-Plateformes",
-        "description": "Accédez facilement à vos tâches depuis n'importe quel appareil - que vous soyez sur ordinateur ou mobile, votre progression est toujours synchronisée."
-      },
-      "auth": {
-        "title": "Authentification Sécurisée",
-        "description": "Connectez-vous facilement avec plusieurs fournisseurs tout en gardant vos données sécurisées. Un compte, accès total."
-      },
-      "insights": {
-        "title": "Analyses et Suivi des Progrès",
-        "description": "Obtenez des analyses en temps réel de votre productivité. Suivez vos habitudes, surveillez vos performances et améliorez votre flux de travail avec des insights basés sur les données."
+      "download": {
+        "android": "Obtenir sur Android",
+        "ios": "Télécharger sur iOS",
+        "direct": {
+          "title": "Téléchargement Direct",
+          "button": "Télécharger l'APK"
+        }
       }
     },
     "pricing": {
@@ -211,151 +233,6 @@
         "badge": "7 Jours d'Essai",
         "info": "7 jours d'essai gratuit, carte bancaire requise"
       }
-    },
-    "whyUs": {
-      "subtitle": "Pourquoi Nous Choisir",
-      "title": "Découvrez la Différence",
-      "description": "Découvrez pourquoi des milliers font confiance à TaskFlow pour leur productivité",
-      "features": {
-        "userFriendly": {
-          "title": "Interface Conviviale",
-          "description": "Simple, intuitive, conçue pour tous"
-        },
-        "secure": {
-          "title": "Sécurité de Niveau Entreprise",
-          "description": "Vos données sont protégées avec un chiffrement de pointe"
-        },
-        "realTime": {
-          "title": "Mises à Jour en Temps Réel",
-          "description": "Restez synchronisé sur tous vos appareils instantanément"
-        },
-        "accessible": {
-          "title": "Accessible Partout",
-          "description": "Travaillez facilement sur n'importe quel appareil, n'importe quand"
-        },
-        "comprehensive": {
-          "title": "Solutions Alimentées par l'IA",
-          "description": "Des algorithmes intelligents qui s'adaptent à votre façon de travailler"
-        }
-      }
-    },
-    "mobileApp": {
-      "subtitle": "Application Mobile",
-      "title": "Emportez Vos Tâches Partout",
-      "description": "Accédez à vos tâches en déplacement avec notre puissante application mobile. Restez productif où que vous soyez.",
-      "features": {
-        "sync": "Synchronisation en Temps Réel",
-        "offline": "Mode Hors-ligne",
-        "notification": "Notifications Intelligentes",
-        "widgets": "Widgets d'Écran d'Accueil"
-      },
-      "download": {
-        "android": "Obtenir sur Android",
-        "ios": "Télécharger sur iOS",
-        "direct": {
-          "title": "Téléchargement Direct",
-          "button": "Télécharger l'APK"
-        }
-      }
-    },
-    "contact": {
-      "subtitle": "Contactez-nous",
-      "title": "Entrer en Contact",
-      "description": "Vous avez des questions ? Nous sommes là pour vous aider. Envoyez-nous un message et nous vous répondrons dès que possible.",
-      "form": {
-        "name": {
-          "label": "Votre Nom",
-          "placeholder": "Entrez votre nom"
-        },
-        "email": {
-          "label": "Adresse Email",
-          "placeholder": "vous@exemple.com"
-        },
-        "message": {
-          "label": "Votre Message",
-          "placeholder": "Comment pouvons-nous vous aider ?"
-        },
-        "submit": "Envoyer le Message"
-      },
-      "info": {
-        "support": {
-          "title": "Support",
-          "description": "Besoin d'aide technique ?",
-          "email": "support@taskflow.com"
-        },
-        "sales": {
-          "title": "Commercial",
-          "description": "Intéressé par l'offre entreprise ?",
-          "email": "sales@taskflow.com"
-        },
-        "phone": {
-          "title": "Téléphone",
-          "description": "Lun-Ven 9h-18h",
-          "number": "+1 (555) 000-0000"
-        }
-      }
-    },
-    "reviews": {
-      "subtitle": "Avis Utilisateurs",
-      "title": "Ce Que Disent Nos Utilisateurs",
-      "description": "Découvrez comment TaskFlow transforme la façon dont les gens travaillent et gèrent leurs tâches.",
-      "reviews": [
-        {
-          "name": "Sarah Johnson",
-          "title": "Chef de Produit",
-          "message": "TaskFlow a complètement transformé la façon dont notre équipe gère les projets. Les suggestions de l'IA sont pertinentes et nous font gagner des heures de planification chaque semaine."
-        },
-        {
-          "name": "Michael Chen",
-          "title": "Développeur Freelance",
-          "message": "En tant que freelance jonglant avec plusieurs projets, la planification intelligente de TaskFlow a changé la donne. C'est comme avoir un assistant personnel qui sait exactement comment je travaille."
-        },
-        {
-          "name": "Emily Rodriguez",
-          "title": "Directrice Marketing",
-          "message": "La synchronisation multi-plateforme est parfaite, et les insights basés sur l'IA ont aidé notre équipe à optimiser notre flux de travail d'une manière que nous n'aurions jamais imaginée."
-        },
-        {
-          "name": "David Kim",
-          "title": "Fondateur de Startup",
-          "message": "Les fonctionnalités entreprise de TaskFlow ont parfaitement évolué avec notre équipe en croissance. Les options de personnalisation et les intégrations sont exactement ce dont nous avions besoin."
-        }
-      ]
-    }
-  },
-  "breadcrumb": {
-    "segments": {
-      "dashboard": "Tableau de bord",
-      "tasks": "Tâches",
-      "projects": "Projets",
-      "calendar": "Calendrier",
-      "goals": "Objectifs & Étapes",
-      "team": "Équipe & Collaboration",
-      "chats": "Discussions"
-    }
-  },
-  "nav": {
-    "user": {
-      "account": "Compte",
-      "prefrences": "Préférences",
-      "settings": "Paramètres",
-      "signout": "Déconnexion",
-      "plan": "Mon Forfait"
-    },
-    "sidebar": {
-      "dashboard": "Tableau de bord",
-      "tasks": "Mes Tâches",
-      "projects": "Projets",
-      "calendar": "Calendrier",
-      "goals": "Objectifs & Étapes",
-      "team": "Équipe & Collaboration",
-      "latestProjects": "Projets Récents",
-      "chats": "Discussions"
-    },
-    "workspace": {
-      "title": "Espaces de travail",
-      "switch": "Changer d'espace de travail",
-      "create": "Créer un espace de travail"
     }
   },
   "footer": {
@@ -394,6 +271,41 @@
       "match": "Les mots de passe doivent correspondre"
     }
   },
+  "breadcrumb": {
+    "segments": {
+      "dashboard": "Tableau de bord",
+      "tasks": "Tâches",
+      "projects": "Projets",
+      "calendar": "Calendrier",
+      "goals": "Objectifs & Étapes",
+      "team": "Équipe & Collaboration",
+      "chats": "Discussions"
+    }
+  },
+  "nav": {
+    "user": {
+      "account": "Compte",
+      "prefrences": "Préférences",
+      "settings": "Paramètres",
+      "signout": "Déconnexion",
+      "plan": "Mon Forfait"
+    },
+    "sidebar": {
+      "dashboard": "Tableau de bord",
+      "tasks": "Mes Tâches",
+      "projects": "Projets",
+      "calendar": "Calendrier",
+      "goals": "Objectifs & Étapes",
+      "team": "Équipe & Collaboration",
+      "latestProjects": "Projets Récents",
+      "chats": "Discussions"
+    },
+    "workspace": {
+      "title": "Espaces de travail",
+      "switch": "Changer d'espace de travail",
+      "create": "Créer un espace de travail"
+    }
+  },
   "chat": {
     "selectChat": "Aucune discussion sélectionnée",
     "selectChatDescription": "Choisissez une conversation pour commencer à discuter",
@@ -404,17 +316,70 @@
       "minutes": "il y a {count} min",
       "hours": "il y a {count}h",
       "days": "il y a {count}j"
+    },
+    "details": {
+      "groupDetails": "Détails du groupe",
+      "members": "Membres",
+      "actions": {
+        "title": "Actions",
+        "editGroup": "Modifier les infos du groupe",
+        "addMembers": "Ajouter des membres",
+        "deleteGroup": "Supprimer le groupe",
+        "pinChat": "Épingler la discussion",
+        "addToFavorites": "Ajouter aux favoris",
+        "muteNotifications": "Désactiver les notifications",
+        "archiveChat": "Archiver la discussion"
+      },
+      "search": {
+        "title": "Rechercher dans la conversation",
+        "placeholder": "Rechercher des messages..."
+      }
+    },
+    "attachments": {
+      "title": "Joindre",
+      "image": "Envoyer une image",
+      "file": "Envoyer un fichier",
+      "voice": "Message vocal"
+    },
+    "status": {
+      "online": "en ligne",
+      "membersCount": "{count} membres"
+    },
+    "message": {
+      "actions": {
+        "copy": "Copier",
+        "reply": "Répondre",
+        "delete": "Supprimer"
+      }
     }
   },
   "chats": {
     "title": "Discussions",
+    "subtitle": "Conversations récentes",
     "newChat": "Nouvelle Discussion",
-    "searchPlaceholder": "Rechercher des discussions...",
+    "newChatOptions": {
+      "individual": "Discussion individuelle",
+      "group": "Discussion de groupe"
+    },
+    "searchPlaceholder": "Rechercher des messages ou des contacts...",
     "noChatsFound": "Aucune discussion trouvée",
     "noSelectedChat": "Aucune discussion sélectionnée",
     "selectChatPrompt": "Sélectionnez une discussion dans la liste pour commencer à échanger",
     "messagePlaceholder": "Tapez un message...",
     "participants": "Participants",
-    "showChatList": "Afficher la liste des discussions"
+    "showChatList": "Afficher la liste des discussions",
+    "filters": {
+      "all": "Tout",
+      "direct": "Direct",
+      "groups": "Groupes",
+      "teams": "Équipes",
+      "contacts": "Contacts"
+    },
+    "contacts": {
+      "title": "Contacts",
+      "activeNow": "{count} actif(s) maintenant",
+      "online": "en ligne",
+      "offline": "hors ligne"
+    }
   }
 }
