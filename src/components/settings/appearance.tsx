@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Separator } from "../ui/separator";
 import { fontOptions, FontSetting } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import {
@@ -33,13 +34,11 @@ const AppearanceTab = () => {
   const [tempLocale, setTempLocale] = useState(locale);
   const [tempFont, setTempFont] = useState<FontSetting>(font);
   const [isSaving, setIsSaving] = useState(false);
-
   useEffect(() => {
     setTempTheme(theme || "system");
     setTempLocale(locale);
     setTempFont(font);
   }, [theme, locale, font]);
-
   const handleSave = () => {
     setIsSaving(true);
 
@@ -66,144 +65,133 @@ const AppearanceTab = () => {
       });
     }, 1000);
   };
-
   return (
-    <div className="py-8 px-10">
-      <div className="grid gap-12">
-        {/* Main Section */}
-        <section className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-medium">{t("title")}</h2>
-            <p className="text-muted-foreground mt-2">{t("description")}</p>
-          </div>
-
-          {/* Language Section */}
-          <div className="space-y-6 rounded-lg bg-muted/40 p-6">
-            <div className="space-y-1">
-              <h3 className="text-xl font-medium">{t("language.title")}</h3>
-              <p className="text-muted-foreground">
-                {t("language.description")}
-              </p>
-            </div>
-            <div className="px-4">
-              <Select value={tempLocale} onValueChange={setTempLocale}>
-                <SelectTrigger className="w-[240px]">
-                  <SelectValue placeholder="Select Language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">{t("language.english")}</SelectItem>
-                  <SelectItem value="fr">{t("language.french")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </section>
-
-        {/* Font Section */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-medium">{t("font.title")}</h2>
-          <div className="space-y-6 rounded-lg bg-muted/40 p-6">
-            <div className="space-y-1">
-              <p className="text-muted-foreground">
-                {t("font.description")}
-              </p>
-            </div>
-            <div className="space-y-6 px-4">
-              <Select
-                value={tempFont}
-                onValueChange={(value) => setTempFont(value as FontSetting)}
-              >
-                <SelectTrigger className="w-[240px]">
-                  <SelectValue placeholder="Select font" />
-                </SelectTrigger>
-                <SelectContent>
-                  {fontOptions.map((font) => (
-                    <SelectItem
-                      key={font.value}
-                      value={font.value}
-                      className={`font-${font.value}`}
-                    >
-                      {font.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <div
-                className={cn(
-                  "p-6 bg-background rounded-lg text-base leading-relaxed border transition-colors",
-                  `font-${tempFont}`
-                )}
-              >
-                {t("font.preview")}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Theme Section */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-medium">{t("theme.title")}</h2>
-          <div className="space-y-6 rounded-lg bg-muted/40 p-6">
-            <div className="space-y-1">
-              <p className="text-muted-foreground">
-                {t("theme.description")}
-              </p>
-            </div>
-            <div className="px-4">
-              <TooltipProvider delayDuration={200}>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                        <ThemeCard
-                          theme="light"
-                          selectedTheme={tempTheme}
-                          onSelect={setTempTheme}
-                        />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>{t("theme.light")}</TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                        <ThemeCard
-                          theme="dark"
-                          selectedTheme={tempTheme}
-                          onSelect={setTempTheme}
-                        />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>{t("theme.dark")}</TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                        <ThemeCard
-                          theme="system"
-                          selectedTheme={tempTheme}
-                          onSelect={setTempTheme}
-                        />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>{t("theme.system")}</TooltipContent>
-                  </Tooltip>
-                </div>
-              </TooltipProvider>
-            </div>
-          </div>
-        </section>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-medium tracking-tight">{t("title")}</h2>
+        <p className="text-sm text-muted-foreground mt-2">{t("description")}</p>
       </div>
 
-      <div className="mt-12 flex justify-end">
+      {/* Language Section */}
+      <div className="space-y-4 border-0 p-0">
+        <div>
+          <h3 className="font-medium mb-1">{t("language.title")}</h3>
+          <p className="text-sm text-muted-foreground">
+            {t("language.description")}
+          </p>
+        </div>
+        <Select value={tempLocale} onValueChange={setTempLocale}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Select Language" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="en">{t("language.english")}</SelectItem>
+            <SelectItem value="fr">{t("language.french")}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Separator className="my-6" />
+
+      {/* Font Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="font-medium mb-1">{t("font.title")}</h3>
+          <p className="text-sm text-muted-foreground">
+            {t("font.description")}
+          </p>
+        </div>
+        <div className="space-y-4">
+          <Select
+            value={tempFont}
+            onValueChange={(value) => setTempFont(value as FontSetting)}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select font" />
+            </SelectTrigger>
+            <SelectContent>
+              {fontOptions.map((font) => (
+                <SelectItem
+                  key={font.value}
+                  value={font.value}
+                  className={`font-${font.value}`}
+                >
+                  {font.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div
+            className={cn(
+              "p-4 bg-muted rounded-md text-base leading-relaxed border",
+              `font-${tempFont}`
+            )}
+          >
+            {t("font.preview")}
+          </div>
+        </div>
+      </div>
+
+      <Separator className="my-6" />
+
+      {/* Theme Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="font-medium mb-1">{t("theme.title")}</h3>
+          <p className="text-sm text-muted-foreground">
+            {t("theme.description")}
+          </p>
+        </div>
+        <TooltipProvider delayDuration={200}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                  <ThemeCard
+                    theme="light"
+                    selectedTheme={tempTheme}
+                    onSelect={setTempTheme}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{t("theme.light")}</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                  <ThemeCard
+                    theme="dark"
+                    selectedTheme={tempTheme}
+                    onSelect={setTempTheme}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{t("theme.dark")}</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                  <ThemeCard
+                    theme="system"
+                    selectedTheme={tempTheme}
+                    onSelect={setTempTheme}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{t("theme.system")}</TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+      </div>
+
+      <div className="flex items-center justify-end pt-6">
         <Button
-          size="lg"
           onClick={handleSave}
           disabled={isSaving}
-          className="min-w-[120px]"
+          className="min-w-[100px]"
         >
           {isSaving ? (
             <>
