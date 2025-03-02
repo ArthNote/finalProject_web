@@ -2,7 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import { Check, Rocket, Users, Building, Sparkles, LucideIcon } from "lucide-react";
+import {
+  Check,
+  Rocket,
+  Users,
+  Building,
+  Sparkles,
+  LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -20,7 +27,11 @@ const PricingSection = () => {
     "monthly"
   );
 
-  const PriceCard = ({ plan, icon: Icon, featured = false }: PriceCardProps) => {
+  const PriceCard = ({
+    plan,
+    icon: Icon,
+    featured = false,
+  }: PriceCardProps) => {
     const isEnterprise = plan === "enterprise";
 
     const PriceDisplay = () => {
@@ -180,11 +191,14 @@ const PricingSection = () => {
               onValueChange={(v) => setBillingCycle(v as "monthly" | "yearly")}
               className="mt-4"
             >
-              <TabsList className="grid w-full max-w-[320px] grid-cols-2 h-11">
-                <TabsTrigger value="monthly" className="text-sm">
+              <TabsList className="grid w-full max-w-[320px] grid-cols-2 h-11 rounded-4xl">
+                <TabsTrigger value="monthly" className="text-sm rounded-4xl">
                   {t("billing.monthly")}
                 </TabsTrigger>
-                <TabsTrigger value="yearly" className="relative text-sm">
+                <TabsTrigger
+                  value="yearly"
+                  className="relative text-sm rounded-4xl"
+                >
                   {t("billing.yearly")}
                   <span className="absolute -top-6 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary whitespace-nowrap">
                     {t("billing.saveText")}

@@ -359,6 +359,203 @@
       ]
     }
   },
+  "settings": {
+    "title": "Settings",
+   
+    "notifications": {
+      "title": "Notification Settings",
+      "description": "Manage your notification preferences and settings.",
+      "toast": {
+        "success": {
+          "title": "Settings saved",
+          "description": "Your notification preferences have been updated"
+        },
+        "mute": {
+          "title": "Temporary mute updated",
+          "description": "Your temporary mute duration has been updated."
+        }
+      },
+      "preferences": {
+        "title": "Notification Preferences",
+        "email": "Email Notifications",
+        "emailDescription": "Receive notifications via email",
+        "push": "Push Notifications",
+        "pushDescription": "Receive push notifications on your mobile device",
+        "inApp": "In-App Notifications",
+        "inAppDescription": "Show notifications within the application"
+      },
+      "categories": {
+        "title": "Notification Categories",
+        "tasks": "Task Updates",
+        "tasksDescription": "Assigned tasks, due dates, status changes",
+        "mentions": "Mentions & Comments",
+        "mentionsDescription": "When someone tags you or replies to your comments",
+        "team": "Team Activity",
+        "teamDescription": "Team invites, role changes, shared project updates"
+      },
+      "dnd": {
+        "title": "Do Not Disturb",
+        "description": "Temporarily pause all notifications",
+        "temporary": "Temporary Mute",
+        "placeholder": "Select duration",
+        "options": {
+          "1h": "1 hour",
+          "2h": "2 hours",
+          "4h": "4 hours",
+          "8h": "8 hours",
+          "24h": "24 hours"
+        }
+      }
+    },
+    "plan": {
+      "title": "Plan Settings",
+      "description": "View and manage your current plan details",
+      "currentSubscription": {
+        "title": "Current Subscription",
+        "teamPlan": "Team Plan",
+        "renewalInfo": "$49/month • Renews on April 1, 2025",
+        "changePlan": "Change Plan"
+      },
+      "features": {
+        "title": "Plan Features & Limits",
+        "unlimited": "Unlimited tasks and projects",
+        "team": "Team members",
+        "storage": "Storage",
+        "ai": "AI Assistant credits",
+        "values": {
+          "members": "Up to 10",
+          "storage": "100GB",
+          "credits": "1000/mo"
+        }
+      },
+      "payment": {
+        "title": "Payment Method",
+        "update": "Update",
+        "expires": "Expires {date}",
+        "billingHistory": "Billing History",
+        "download": "Download"
+      },
+      "manage": {
+        "title": "Manage Subscription",
+        "upgrade": "Upgrade Plan",
+        "cancel": "Cancel Subscription"
+      },
+      "promotions": {
+        "title": "Promotions",
+        "yearlyPromo": "Get 2 months free by switching to yearly billing",
+        "switchYearly": "Switch to Yearly"
+      },
+      "support": {
+        "title": "Need Help?",
+        "description": "Having issues with billing? Our support team is here to help",
+        "contact": "Contact Support"
+      }
+    },
+    "account": {
+      "title": "Account Settings",
+      "description": "Manage your account settings and preferences",
+      "toast": {
+        "avatar": {
+          "success": {
+            "title": "Avatar updated",
+            "description": "Your profile picture has been updated"
+          }
+        },
+        "provider": {
+          "connected": {
+            "title": "Provider connected",
+            "description": "Your account has been successfully connected to {provider}"
+          },
+          "disconnected": {
+            "title": "Provider disconnected",
+            "description": "Your account has been successfully disconnected from {provider}"
+          }
+        }
+      },
+      "profile": {
+        "title": "Profile",
+        "description": "Manage how your profile appears to others and update your personal information",
+        "changePhoto": "Change Photo",
+        "name": "Name",
+        "email": "Email",
+        "username": "Username",
+        "save": "Save Changes",
+        "saving": "Saving..."
+      },
+      "security": {
+        "title": "Security",
+        "description": "Manage your password, two-factor authentication, and connected accounts",
+        "password": {
+          "title": "Change Password",
+          "description": "Update your password to maintain account security",
+          "button": "Change Password"
+        },
+        "twoFactor": {
+          "title": "Two-Factor Authentication",
+          "description": "Add an extra layer of security to your account"
+        },
+        "connectedAccounts": {
+          "title": "Connected Accounts",
+          "connected": "Connected",
+          "notConnected": "Not connected",
+          "connect": "Connect",
+          "disconnect": "Disconnect"
+        }
+      },
+      "sessions": {
+        "title": "Active Sessions",
+        "description": "View and manage your active sessions across different devices",
+        "current": "Current",
+        "logout": "Logout",
+        "device": {
+          "current": "Current Device",
+          "mobile": "Mobile Device"
+        }
+      },
+      "deleteAccount": {
+        "title": "Delete Account",
+        "description": "Permanently remove your account and all associated data from our platform",
+        "button": "Delete Account",
+        "confirmTitle": "Are you absolutely sure?",
+        "confirmDescription": "This action cannot be undone. This will permanently delete your account and remove all associated data from our servers.",
+        "cancel": "Cancel",
+        "confirm": "Delete Account"
+      }
+    },
+    "appearance": {
+      "title": "Appearance Settings",
+      "description": "Customize the appearance of your application",
+      "language": {
+        "title": "Language",
+        "description": "Select your preferred language",
+        "english": "English",
+        "french": "French"
+      },
+      "font": {
+        "title": "Font",
+        "description": "Choose your preferred font family",
+        "preview": "The quick brown fox jumps over the lazy dog. 1234567890"
+      },
+      "theme": {
+        "title": "Theme",
+        "description": "Choose your preferred color theme",
+        "light": "Light theme",
+        "dark": "Dark theme",
+        "system": "System theme"
+      },
+      "actions": {
+        "save": "Save Changes",
+        "saving": "Saving...",
+        "cancel": "Cancel"
+      },
+      "toast": {
+        "success": {
+          "title": "Settings saved",
+          "description": "Your preferences have been updated"
+        }
+      }
+    }
+  },
   "breadcrumb": {
     "segments": {
       "dashboard": "Dashboard",
@@ -367,7 +564,8 @@
       "calendar": "Calendar",
       "goals": "Goals & Milestones",
       "team": "Team & Collaboration",
-      "chats": "Chats"
+      "chats": "Chats",
+      "settings": "Settings"
     }
   },
   "nav": {

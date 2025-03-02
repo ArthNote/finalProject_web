@@ -279,7 +279,207 @@
       "calendar": "Calendrier",
       "goals": "Objectifs & Étapes",
       "team": "Équipe & Collaboration",
-      "chats": "Discussions"
+      "chats": "Discussions",
+      "settings": "Paramètres"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+
+    "plan": {
+      "title": "Paramètres du Forfait",
+      "description": "Consultez et gérez les détails de votre forfait",
+      "currentSubscription": {
+        "title": "Abonnement Actuel",
+        "teamPlan": "Forfait Équipe",
+        "renewalInfo": "49€/mois • Renouvellement le 1er avril 2025",
+        "changePlan": "Changer de Forfait"
+      },
+      "features": {
+        "title": "Fonctionnalités et Limites",
+        "unlimited": "Tâches et projets illimités",
+        "team": "Membres de l'équipe",
+        "storage": "Stockage",
+        "ai": "Crédits Assistant IA",
+        "values": {
+          "members": "Jusqu'à 10",
+          "storage": "100 Go",
+          "credits": "1000/mois"
+        }
+      },
+      "payment": {
+        "title": "Moyen de Paiement",
+        "update": "Mettre à jour",
+        "expires": "Expire le {date}",
+        "billingHistory": "Historique de Facturation",
+        "download": "Télécharger"
+      },
+      "manage": {
+        "title": "Gérer l'Abonnement",
+        "upgrade": "Améliorer le Forfait",
+        "cancel": "Annuler l'Abonnement"
+      },
+      "promotions": {
+        "title": "Promotions",
+        "yearlyPromo": "Obtenez 2 mois gratuits en passant à la facturation annuelle",
+        "switchYearly": "Passer à l'Annuel"
+      },
+      "support": {
+        "title": "Besoin d'Aide ?",
+        "description": "Problèmes de facturation ? Notre équipe support est là pour vous aider",
+        "contact": "Contacter le Support"
+      }
+    },
+
+    "account": {
+      "title": "Paramètres du compte",
+      "description": "Gérez les paramètres et préférences de votre compte",
+      "toast": {
+        "avatar": {
+          "success": {
+            "title": "Avatar mis à jour",
+            "description": "Votre photo de profil a été mise à jour"
+          }
+        },
+        "provider": {
+          "connected": {
+            "title": "Fournisseur connecté",
+            "description": "Votre compte a été connecté avec succès à {provider}"
+          },
+          "disconnected": {
+            "title": "Fournisseur déconnecté",
+            "description": "Votre compte a été déconnecté avec succès de {provider}"
+          }
+        }
+      },
+      "profile": {
+        "title": "Profil",
+        "description": "Gérez l'apparence de votre profil et mettez à jour vos informations personnelles",
+        "changePhoto": "Changer la photo",
+        "name": "Nom",
+        "email": "Email",
+        "username": "Nom d'utilisateur",
+        "save": "Enregistrer les modifications",
+        "saving": "Enregistrement..."
+      },
+      "security": {
+        "title": "Sécurité",
+        "description": "Gérez votre mot de passe, l'authentification à deux facteurs et les comptes connectés",
+        "password": {
+          "title": "Changer le mot de passe",
+          "description": "Mettez à jour votre mot de passe pour maintenir la sécurité de votre compte",
+          "button": "Changer le mot de passe"
+        },
+        "twoFactor": {
+          "title": "Authentification à deux facteurs",
+          "description": "Ajoutez une couche de sécurité supplémentaire à votre compte"
+        },
+        "connectedAccounts": {
+          "title": "Comptes connectés",
+          "connected": "Connecté",
+          "notConnected": "Non connecté",
+          "connect": "Connecter",
+          "disconnect": "Déconnecter"
+        }
+      },
+      "sessions": {
+        "title": "Sessions actives",
+        "description": "Consultez et gérez vos sessions actives sur différents appareils",
+        "current": "Actuel",
+        "logout": "Déconnexion",
+        "device": {
+          "current": "Appareil actuel",
+          "mobile": "Appareil mobile"
+        }
+      },
+      "deleteAccount": {
+        "title": "Supprimer le compte",
+        "description": "Supprimez définitivement votre compte et toutes les données associées de notre plateforme",
+        "button": "Supprimer le compte",
+        "confirmTitle": "Êtes-vous absolument sûr ?",
+        "confirmDescription": "Cette action est irréversible. Cela supprimera définitivement votre compte et toutes les données associées de nos serveurs.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer le compte"
+      }
+    },
+
+    "appearance": {
+      "title": "Paramètres d'apparence",
+      "description": "Personnalisez l'apparence de votre application",
+      "language": {
+        "title": "Langue",
+        "description": "Sélectionnez votre langue préférée",
+        "english": "Anglais",
+        "french": "Français"
+      },
+      "font": {
+        "title": "Police",
+        "description": "Choisissez votre police préférée",
+        "preview": "Le vif renard brun saute par-dessus le chien paresseux. 1234567890"
+      },
+      "theme": {
+        "title": "Thème",
+        "description": "Choisissez votre thème de couleur préféré",
+        "light": "Thème clair",
+        "dark": "Thème sombre",
+        "system": "Thème système"
+      },
+      "actions": {
+        "save": "Enregistrer les modifications",
+        "saving": "Enregistrement...",
+        "cancel": "Annuler"
+      },
+      "toast": {
+        "success": {
+          "title": "Paramètres enregistrés",
+          "description": "Vos préférences ont été mises à jour"
+        }
+      }
+    },
+    "notifications": {
+      "title": "Paramètres de notifications",
+      "description": "Gérez vos préférences et paramètres de notifications.",
+      "toast": {
+        "success": {
+          "title": "Préférences mises à jour",
+          "description": "Vos préférences de notifications ont été mises à jour"
+        },
+        "mute": {
+          "title": "Mise en sourdine temporaire mise à jour",
+          "description": "La durée de votre mise en sourdine temporaire a été mise à jour."
+        }
+      },
+      "preferences": {
+        "title": "Préférences de notifications",
+        "email": "Notifications par email",
+        "emailDescription": "Recevoir des notifications par email",
+        "push": "Notifications push",
+        "pushDescription": "Recevoir des notifications push sur votre appareil mobile",
+        "inApp": "Notifications dans l'application",
+        "inAppDescription": "Afficher les notifications dans l'application"
+      },
+      "categories": {
+        "title": "Catégories de notifications",
+        "tasks": "Mises à jour des tâches",
+        "tasksDescription": "Tâches assignées, échéances, changements de statut",
+        "mentions": "Mentions et commentaires",
+        "mentionsDescription": "Lorsque quelqu'un vous mentionne ou répond à vos commentaires",
+        "team": "Activité d'équipe",
+        "teamDescription": "Invitations d'équipe, changements de rôle, mises à jour de projets partagés"
+      },
+      "dnd": {
+        "title": "Ne pas déranger",
+        "description": "Mettre en pause temporairement toutes les notifications",
+        "temporary": "Mise en sourdine temporaire",
+        "placeholder": "Sélectionnez la durée",
+        "options": {
+          "1h": "1 heure",
+          "2h": "2 heures",
+          "4h": "4 heures",
+          "8h": "8 heures",
+          "24h": "24 heures"
+        }
+      }
     }
   },
   "nav": {
