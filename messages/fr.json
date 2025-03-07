@@ -1,11 +1,20 @@
 {
+  "success": {
+    "subscription": {
+      "title": "Abonnement réussi",
+      "description": "Vous vous êtes abonné avec succès à notre plateforme.",
+      "message": "Merci de nous rejoindre ! Nous sommes ravis de vous compter parmi nous.",
+      "cta": "Aller au Tableau de bord"
+    }
+  },
   "auth": {
     "signin": {
       "title": "Bon retour",
+      "rememberMe": "Se souvenir de moi",
       "description": "Connectez-vous à votre compte",
-      "email": {
-        "label": "Email",
-        "placeholder": "m@exemple.com"
+      "username": {
+        "label": "Nom d'utilisateur",
+        "placeholder": "Entrez votre nom d'utilisateur"
       },
       "password": {
         "label": "Mot de passe",
@@ -13,6 +22,7 @@
         "placeholder": "Entrez votre mot de passe"
       },
       "submit": "Se connecter",
+      "submitting": "Connexion...",
       "or": "Ou continuer avec",
       "noAccount": "Vous n'avez pas de compte ?",
       "signup": "S'inscrire",
@@ -23,7 +33,23 @@
       "providers": {
         "apple": "Se connecter avec Apple",
         "google": "Se connecter avec Google",
-        "facebook": "Se connecter avec Facebook"
+        "facebook": "Se connecter avec Facebook",
+        "github": "S'inscrire avec GitHub",
+        "discord": "S'inscrire avec Discord"
+      },
+      "toast": {
+        "success": {
+          "title": "Connexion réussie",
+          "description": "Bienvenue ! Vous vous êtes connecté avec succès"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la connexion"
+        },
+        "signing": {
+          "title": "Connexion en cours",
+          "description": "Veuillez patienter pendant que nous vous connectons"
+        }
       }
     },
     "signup": {
@@ -37,6 +63,10 @@
         "label": "Email",
         "placeholder": "m@exemple.com"
       },
+      "username": {
+        "label": "Nom d'utilisateur",
+        "placeholder": "johndoe"
+      },
       "password": {
         "label": "Mot de passe",
         "placeholder": "Créer un mot de passe"
@@ -46,6 +76,7 @@
         "placeholder": "Confirmez votre mot de passe"
       },
       "submit": "S'inscrire",
+      "submitting": "Création du compte...",
       "or": "Ou continuer avec",
       "hasAccount": "Vous avez déjà un compte ?",
       "signin": "Se connecter",
@@ -56,7 +87,98 @@
       "providers": {
         "apple": "S'inscrire avec Apple",
         "google": "S'inscrire avec Google",
-        "facebook": "S'inscrire avec Facebook"
+        "facebook": "S'inscrire avec Facebook",
+        "github": "S'inscrire avec GitHub",
+        "discord": "S'inscrire avec Discord"
+      },
+      "toast": {
+        "success": {
+          "title": "Compte créé",
+          "description": "Votre compte a été créé avec succès"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la création de votre compte"
+        },
+        "signing": {
+          "title": "Connexion en cours",
+          "description": "Veuillez patienter pendant que nous vous créons un compte"
+        }
+      }
+    },
+    "twoFactor": {
+      "title": "Authentification à deux facteurs",
+      "description": "Entrez le code d'authentification de votre application",
+      "code": {
+        "label": "Code d'authentification",
+        "placeholder": "123456"
+      },
+      "submit": "Vérifier",
+      "trustDevice": "Faire confiance à cet appareil pendant 60 jours",
+      "submitting": "Vérification...",
+      "resendCode": "Renvoyer le code",
+      "toast": {
+        "success": {
+          "title": "Authentifié",
+          "description": "Vous avez été authentifié avec succès"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de l'authentification"
+        }
+      }
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "description": "Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+      "email": {
+        "label": "Email",
+        "placeholder": "Entrez votre adresse email"
+      },
+      "submit": "Envoyer le lien",
+      "submitting": "Envoi en cours...",
+      "backToSignIn": "Vous vous souvenez de votre mot de passe ?",
+      "signIn": "Se connecter",
+      "toast": {
+        "success": {
+          "title": "Email envoyé",
+          "description": "Si votre email est enregistré chez nous, vous recevrez un lien de réinitialisation de mot de passe"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite. Veuillez réessayer plus tard"
+        }
+      }
+    },
+    "resetPassword": {
+      "title": "Réinitialiser votre mot de passe",
+      "description": "Entrez votre nouveau mot de passe ci-dessous",
+      "password": {
+        "label": "Nouveau mot de passe",
+        "placeholder": "Entrez votre nouveau mot de passe"
+      },
+      "confirmPassword": {
+        "label": "Confirmer le mot de passe",
+        "placeholder": "Confirmez votre nouveau mot de passe"
+      },
+      "submit": "Réinitialiser le mot de passe",
+      "submitting": "Réinitialisation...",
+      "backToSignIn": "Vous vous souvenez de votre mot de passe ?",
+      "signIn": "Se connecter",
+      "toast": {
+        "success": {
+          "title": "Mot de passe réinitialisé",
+          "description": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la réinitialisation de votre mot de passe. Veuillez réessayer"
+        }
+      },
+      "errors": {
+        "title": "Échec de la réinitialisation",
+        "noToken": "Jeton de réinitialisation invalide ou manquant. Veuillez demander un nouveau lien de réinitialisation de mot de passe",
+        "backToReset": "Demander un nouveau lien"
       }
     }
   },
@@ -260,6 +382,11 @@
     }
   },
   "validation": {
+    "username": {
+      "min": "Le nom d'utilisateur doit contenir au moins 3 caractères",
+      "max": "Le nom d'utilisateur ne peut pas dépasser 20 caractères",
+      "invalid": "Le nom d'utilisateur peut uniquement contenir des lettres, des chiffres et des tirets bas"
+    },
     "name": {
       "min": "Le nom doit contenir au moins 2 caractères"
     },
@@ -268,7 +395,11 @@
     },
     "password": {
       "min": "Le mot de passe doit contenir au moins 8 caractères",
-      "match": "Les mots de passe doivent correspondre"
+      "match": "Les mots de passe doivent correspondre",
+      "different": "Le nouveau mot de passe doit être différent de votre mot de passe actuel"
+    },
+    "twoFactor": {
+      "length": "Le code d'authentification doit comporter 6 chiffres"
     }
   },
   "breadcrumb": {
@@ -291,7 +422,11 @@
       "description": "Consultez et gérez les détails de votre forfait",
       "currentSubscription": {
         "title": "Abonnement Actuel",
-        "teamPlan": "Forfait Équipe",
+
+        "individual": "Forfait Individuel",
+        "team": "Forfait Équipe",
+        "enterprise": "Forfait Entreprise",
+
         "renewalInfo": "49€/mois • Renouvellement le 1er avril 2025",
         "changePlan": "Changer de Forfait"
       },
@@ -335,6 +470,45 @@
       "title": "Paramètres du compte",
       "description": "Gérez les paramètres et préférences de votre compte",
       "toast": {
+        "connected": {
+          "success": {
+            "title": "Connecté",
+            "description": "Votre compte a été connecté avec succès"
+          },
+          "error": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la connexion de votre compte "
+          }
+        },
+        "disconnected": {
+          "success": {
+            "title": "Déconnecté",
+            "description": "Votre compte a été déconnecté avec succès "
+          },
+          "error": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la déconnexion de votre compte"
+          }
+        },
+        "noChanges": {
+          "title": "Aucune modification",
+          "description": "Aucune modification n'a été apportée à votre profil"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de l'enregistrement de vos modifications"
+        },
+        "profile": {
+          "success": {
+            "title": "Profil mis à jour",
+            "description": "Les informations de votre profil ont été mises à jour"
+          },
+          "error": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la mise à jour de votre profil",
+            "imageUploadError": "Une erreur s'est produite lors du téléchargement de l'image"
+          }
+        },
         "avatar": {
           "success": {
             "title": "Avatar mis à jour",
@@ -356,6 +530,7 @@
         "title": "Profil",
         "description": "Gérez l'apparence de votre profil et mettez à jour vos informations personnelles",
         "changePhoto": "Changer la photo",
+        "imageRequirements": "PNG, JPG ou GIF (max. 2 Mo)",
         "name": "Nom",
         "email": "Email",
         "username": "Nom d'utilisateur",
@@ -364,32 +539,180 @@
       },
       "security": {
         "title": "Sécurité",
-        "description": "Gérez votre mot de passe, l'authentification à deux facteurs et les comptes connectés",
+        "description": "Gérez votre mot de passe, l'authentification à deux facteurs, la vérification par e-mail et les comptes connectés",
+        "verification": {
+          "title": "Vérification de l'e-mail",
+          "description": "Vérifiez votre adresse e-mail pour renforcer la sécurité de votre compte",
+          "verify": "Vérifier l'e-mail",
+          "verifying": "Vérification en cours...",
+          "verified": "E-mail Vérifié",
+          "unverify": "Annuler la vérification",
+          "unverifying": "Annulation de la vérification...",
+          "toast": {
+            "sent": {
+              "title": "Vérification envoyée",
+              "description": "Un e-mail de vérification a été envoyé à votre adresse e-mail"
+            },
+            "verified": {
+              "title": "E-mail vérifié",
+              "description": "Votre adresse e-mail a été vérifiée"
+            },
+            "unverified": {
+              "title": "E-mail non vérifié",
+              "description": "Votre adresse e-mail n'est pas vérifiée. Veuillez vérifier votre adresse e-mail pour renforcer la sécurité de votre compte"
+            }
+          }
+        },
         "password": {
           "title": "Changer le mot de passe",
           "description": "Mettez à jour votre mot de passe pour maintenir la sécurité de votre compte",
-          "button": "Changer le mot de passe"
+          "button": "Changer le mot de passe",
+          "requiresCredential": {
+            "title": "Connecter des identifiants",
+            "description": "Vous devez connecter des identifiants pour mettre à jour votre mot de passe"
+          },
+          "form": {
+            "currentPassword": {
+              "label": "Mot de passe actuel",
+              "placeholder": "Entrez votre mot de passe actuel"
+            },
+            "newPassword": {
+              "label": "Nouveau mot de passe",
+              "placeholder": "Entrez votre nouveau mot de passe"
+            },
+            "confirmNewPassword": {
+              "label": "Confirmer le nouveau mot de passe",
+              "placeholder": "Confirmez votre nouveau mot de passe"
+            },
+            "submit": "Mettre à jour le mot de passe",
+            "submitting": "Mise à jour...",
+            "cancel": "Annuler"
+          },
+          "toast": {
+            "success": {
+              "title": "Mot de passe mis à jour",
+              "description": "Votre mot de passe a été mis à jour avec succès"
+            },
+            "error": {
+              "title": "Erreur",
+              "description": "Une erreur s'est produite lors de la mise à jour de votre mot de passe"
+            }
+          }
         },
         "twoFactor": {
-          "title": "Authentification à deux facteurs",
-          "description": "Ajoutez une couche de sécurité supplémentaire à votre compte"
+          "title": "Authentification à Deux Facteurs",
+          "description": "Ajoutez une couche de sécurité supplémentaire à votre compte",
+          "requiresCredential": {
+            "title": "Connecter des identifiants",
+            "description": "Vous devez connecter des identifiants pour activer l'authentification à deux facteurs"
+          },
+          "password": {
+            "title": "Mot de passe",
+            "description": "Entrez votre mot de passe pour activer l'authentification à deux facteurs",
+            "form": {
+              "password": {
+                "label": "Mot de passe",
+                "placeholder": "Entrez votre mot de passe"
+              },
+              "confirm": "Confirmer",
+              "confirming": "Confirmation...",
+              "cancel": "Annuler"
+            }
+          },
+          "qrcode": {
+            "title": "Scanner le Code QR",
+            "description": "Scannez le code QR avec votre application d'authentification pour activer l'authentification à deux facteurs",
+            "scanInstructions": "Scannez le code QR avec votre application d'authentification",
+            "form": {
+              "code": {
+                "label": "Code d'authentification",
+                "placeholder": "Entrez le code depuis votre application"
+              },
+              "back": "Retour",
+              "enable": "Activer l'A2F",
+              "enabling": "Activation...",
+              "cancel": "Annuler"
+            }
+          },
+          "toast": {
+            "success": {
+              "title": "Authentification à deux facteurs activée",
+              "description": "Votre compte est maintenant sécurisé avec l'authentification à deux facteurs"
+            },
+            "codeError": {
+              "title": "Code invalide",
+              "description": "Le code d'authentification que vous avez saisi est invalide"
+            },
+            "error": {
+              "title": "Erreur",
+              "description": "Une erreur s'est produite lors de la mise à jour de vos paramètres d'authentification à deux facteurs"
+            }
+          },
+          "disable": {
+            "title": "Désactiver l'Authentification à Deux Facteurs",
+            "description": "Entrez votre mot de passe pour désactiver l'authentification à deux facteurs",
+            "form": {
+              "password": {
+                "label": "Mot de passe",
+                "placeholder": "Entrez votre mot de passe"
+              },
+              "disable": "Désactiver",
+              "disabling": "Désactivation...",
+              "cancel": "Annuler"
+            },
+            "toast": {
+              "success": {
+                "title": "Authentification à deux facteurs désactivée",
+                "description": "Votre compte n'est plus sécurisé avec l'authentification à deux facteurs"
+              },
+              "error": {
+                "title": "Erreur",
+                "description": "Une erreur s'est produite lors de la désactivation de votre authentification à deux facteurs"
+              }
+            }
+          }
         },
         "connectedAccounts": {
           "title": "Comptes connectés",
           "connected": "Connecté",
           "notConnected": "Non connecté",
           "connect": "Connecter",
-          "disconnect": "Déconnecter"
+          "disconnect": "Déconnecter",
+          "disconnecting": "Déconnexion...",
+          "connecting": "Connexion...",
+          "primary": "(Principal)"
+        },
+        "dialog": {
+          "title": "Connecter les identifiants",
+          "description": "Remplissez les détails pour connecter votre compte",
+          "username": {
+            "label": "Nom d'utilisateur",
+            "placeholder": "Entrez votre nom d'utilisateur"
+          },
+          "password": {
+            "label": "Mot de passe",
+            "placeholder": "Entrez votre mot de passe"
+          },
+          "cancel": "Annuler",
+          "connect": "Connecter",
+          "connecting": "Connexion en cours..."
         }
       },
       "sessions": {
         "title": "Sessions actives",
         "description": "Consultez et gérez vos sessions actives sur différents appareils",
         "current": "Actuel",
-        "logout": "Déconnexion",
+        "other": "Autre",
+        "revoke": "Déconnexion",
+        "revoking": "Déconnexion en cours...",
+        "logoutError": "Erreur lors de la déconnexion",
+        "logoutSuccess": "Déconnexion réussie",
+        "logoutErrorDescription": "Une erreur s'est produite lors de la déconnexion.",
+        "logoutSuccessDescription": "Vous vous êtes déconnecté avec succès.",
         "device": {
           "current": "Appareil actuel",
-          "mobile": "Appareil mobile"
+          "mobile": "Appareil mobile",
+          "other": "Autre"
         }
       },
       "deleteAccount": {
@@ -398,8 +721,23 @@
         "button": "Supprimer le compte",
         "confirmTitle": "Êtes-vous absolument sûr ?",
         "confirmDescription": "Cette action est irréversible. Cela supprimera définitivement votre compte et toutes les données associées de nos serveurs.",
+        "passwordConfirmation": "Entrez votre mot de passe pour confirmer",
+        "passwordPlaceholder": "Entrez votre mot de passe actuel",
         "cancel": "Annuler",
-        "confirm": "Supprimer le compte"
+        "confirm": "Envoyer le lien de suppression",
+        "deleting": "Envoi en cours...",
+        "emailNotVerified": {
+          "title": "E-mail non vérifié",
+          "description": "Veuillez vérifier votre adresse e-mail avant de supprimer votre compte"
+        },
+        "success": {
+          "title": "Lien de suppression du compte envoyé",
+          "description": "Un lien pour supprimer votre compte a été envoyé à votre adresse e-mail"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la suppression de votre compte"
+        }
       }
     },
 
@@ -488,7 +826,19 @@
       "prefrences": "Préférences",
       "settings": "Paramètres",
       "signout": "Déconnexion",
-      "plan": "Mon Forfait"
+      "plan": "Mon Forfait",
+      "toast": {
+        "signout": {
+          "loading": {
+            "title": "Déconnexion en cours...",
+            "description": "Veuillez patienter pendant votre déconnexion."
+          },
+          "success": {
+            "title": "Déconnecté",
+            "description": "Vous avez été déconnecté avec succès."
+          }
+        }
+      }
     },
     "sidebar": {
       "dashboard": "Tableau de bord",

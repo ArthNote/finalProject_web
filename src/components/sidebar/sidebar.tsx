@@ -13,6 +13,7 @@ import {
 import { NavUser } from "./nav_user";
 import { type NavItem } from "@/types/navigation";
 import { WorkspaceSwitcher } from "./workspace_switcher";
+import { authClient } from "@/lib/auth-client";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   navItems: NavItem[];
@@ -21,10 +22,12 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ navItems, ...props }: AppSidebarProps) {
   //   const { data: session } = authClient.useSession();
 
+  const { data: session } = authClient.useSession();
+
   const userData = {
-    name: "John data",
-    email: "johndoe@gmail.com",
-    avatar: "https://github.com/shadcn.png",
+    name: session?.user.username || session?.user.name || "John data",
+    email: session?.user.email || "johndoe@gmail.com",
+    avatar: session?.user.image || "https://github.com/shadcn.png",
   };
 
   const teams = [

@@ -23,8 +23,19 @@ export function CombinedToggle() {
   const t = useTranslations("navigation");
 
   const handleLanguageChange = (locale: string) => {
+    // Get the new pathname by replacing the current locale with the new one
     const newPathname = pathname.replace(`/${currentLocale}`, `/${locale}`);
-    router.push(newPathname);
+
+    // Extract search parameters from the current URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const searchString = searchParams.toString();
+
+    // Append search parameters to the new path if they exist
+    const newPath = searchString
+      ? `${newPathname}?${searchString}`
+      : newPathname;
+
+    router.push(newPath);
   };
 
   return (

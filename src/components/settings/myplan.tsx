@@ -3,9 +3,30 @@ import React from "react";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { CreditCardIcon, Rocket } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { useQuery } from "@tanstack/react-query";
 
 const MyPlanTab = () => {
   const t = useTranslations("settings.plan");
+  const { data } = authClient.useSession();
+
+  const {
+    data: subscription,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["subscription"],
+    queryFn: async () => {
+      const { data: subscriptions, error } =
+        await authClient.subscription.list();
+      if (!subscriptions) {
+        throw new Error("Failed to fetch subscriptions");
+      }
+      return subscriptions[0];
+    },
+  });
+
   return (
     <div className="space-y-6">
       <div>
@@ -21,7 +42,9 @@ const MyPlanTab = () => {
         <div className="space-y-6 pl-1">
           <div className="flex justify-between items-center">
             <div>
-              <p className="font-medium">{t("currentSubscription.teamPlan")}</p>
+              <p className="font-medium">
+                {t(`currentSubscription.${subscription?.plan}`)}
+              </p>
               <p className="text-sm text-muted-foreground">
                 {t("currentSubscription.renewalInfo")}
               </p>
@@ -151,9 +174,7 @@ const MyPlanTab = () => {
       {/* Promotions & Support */}
       <div className="grid gap-10 md:grid-cols-2">
         <div className="space-y-6">
-          <h3 className="text-base font-medium">
-            {t("promotions.title")}
-          </h3>
+          <h3 className="text-base font-medium">{t("promotions.title")}</h3>
           <div className="space-y-4 pl-1">
             <p className="text-sm text-muted-foreground">
               {t("promotions.yearlyPromo")}

@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "@/i18n/routing";
 
 interface PriceCardProps {
   plan: "individual" | "team" | "enterprise";
@@ -151,12 +152,26 @@ const PricingSection = () => {
             ))}
           </div>
 
-          <Button
-            className="mt-8 w-full transition-all duration-300 bg-primary hover:bg-primary/90 shadow-sm hover:shadow-lg"
-            size="lg"
+          <Link
+            href={
+              plan === "enterprise"
+                ? "/contact"
+                : {
+                    pathname: "/signup",
+                    query: {
+                      plan: plan,
+                      billing: billingCycle,
+                    },
+                  }
+            }
           >
-            {plan === "enterprise" ? t("contactUs") : t("getStarted")}
-          </Button>
+            <Button
+              className="mt-8 w-full transition-all duration-300 bg-primary hover:bg-primary/90 shadow-sm hover:shadow-lg"
+              size="lg"
+            >
+              {plan === "enterprise" ? t("contactUs") : t("getStarted")}
+            </Button>
+          </Link>
         </div>
       </motion.div>
     );

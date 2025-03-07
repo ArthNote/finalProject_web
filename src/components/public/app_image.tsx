@@ -9,7 +9,7 @@ const AppImage = () => {
         <div className="relative aspect-video overflow-hidden rounded-xl border md:rounded-lg">
           <Image
             className="size-full object-cover object-center dark:opacity-85"
-            src="/seoulpic.svg"
+            src="https://images.pexels.com/photos/3243/pen-calendar-to-do-checklist.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
             alt="preview landing"
             width={2000}
             height={1000}

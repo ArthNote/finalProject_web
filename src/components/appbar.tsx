@@ -22,6 +22,10 @@ import { useScroll } from "@/hooks/use-scroll";
 import { useTranslations } from "next-intl";
 import { CombinedToggle } from "@/components/combined_toggle";
 import { consts } from "@/lib/constants";
+import Image from "next/image";
+import lightLogo from "../../public/lightLogo.svg";
+import darkLogo from "../../public/darkLogo.svg";
+import { useTheme } from "next-themes";
 
 interface NavBarProps {
   scroll?: boolean;
@@ -33,6 +37,7 @@ export default function NavBar({ scroll = true }: NavBarProps) {
   const t = useTranslations("navigation");
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -81,6 +86,12 @@ export default function NavBar({ scroll = true }: NavBarProps) {
             <SheetHeader>
               <SheetTitle>
                 <Link href="/" className="pl-2 flex items-center gap-2">
+                  <Image
+                    src={resolvedTheme === "dark" ? darkLogo : lightLogo}
+                    alt={"logo"}
+                    width={40}
+                    height={40}
+                  />
                   <h1 className="text-md font-medium">{consts.appName}.</h1>
                 </Link>
               </SheetTitle>
@@ -122,12 +133,26 @@ export default function NavBar({ scroll = true }: NavBarProps) {
         href="/"
         className="pl-2 items-center gap-2 flex flex-row group lg:hidden"
       >
+        <Image
+          src={resolvedTheme === "dark" ? darkLogo : lightLogo}
+          alt={"logo"}
+          width={40}
+          height={40}
+          className="group-hover:-rotate-12 transition-all duration-300"
+        />
         <h1 className="text-md font-medium group-hover:translate-x-0.5 transition-all duration-300">
           {consts.appName}.
         </h1>
       </Link>
 
-      <Link href="/" className="pl-2 hidden items-center gap-2 group lg:flex">
+      <Link href="/" className="pl-2 hidden items-center gap-1 group lg:flex">
+        <Image
+          src={resolvedTheme === "dark" ? darkLogo : lightLogo}
+          alt={"logo"}
+          width={40}
+          height={40}
+          className="group-hover:-rotate-12 transition-all duration-300"
+        />
         <h1 className="text-md font-medium group-hover:translate-x-0.5 transition-all duration-300">
           {consts.appName}.
         </h1>

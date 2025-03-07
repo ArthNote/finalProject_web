@@ -1,11 +1,20 @@
 {
+  "success": {
+    "subscription": {
+      "title": "Subscription successful",
+      "description": "You have successfully subscribed to our platform.",
+      "message": "Thank you for joining us! We are excited to have you on board.",
+      "cta": "Go to Dashboard"
+    }
+  },
   "auth": {
     "signin": {
       "title": "Welcome back",
       "description": "Sign In to your account",
-      "email": {
-        "label": "Email",
-        "placeholder": "m@example.com"
+      "rememberMe": "Remember me",
+      "username": {
+        "label": "Username",
+        "placeholder": "Enter your username"
       },
       "password": {
         "label": "Password",
@@ -13,6 +22,7 @@
         "placeholder": "Enter your password"
       },
       "submit": "Sign In",
+      "submitting": "Signing in...",
       "or": "Or continue with",
       "noAccount": "Don't have an account?",
       "signup": "Sign up",
@@ -23,7 +33,23 @@
       "providers": {
         "apple": "Sign in with Apple",
         "google": "Sign in with Google",
-        "facebook": "Sign in with Facebook"
+        "facebook": "Sign in with Facebook",
+        "github": "Sign in with GitHub",
+        "discord": "Sign in with Discord"
+      },
+      "toast": {
+        "success": {
+          "title": "Signed in",
+          "description": "Welcome back! You have successfully signed in"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred while signing in"
+        },
+        "signing": {
+          "title": "Signing in",
+          "description": "Please wait while we sign you in"
+        }
       }
     },
     "signup": {
@@ -32,6 +58,10 @@
       "name": {
         "label": "Full name",
         "placeholder": "John Doe"
+      },
+      "username": {
+        "label": "Username",
+        "placeholder": "johndoe"
       },
       "email": {
         "label": "Email",
@@ -46,6 +76,7 @@
         "placeholder": "Confirm your password"
       },
       "submit": "Sign up",
+      "submitting": "Creating account...",
       "or": "Or continue with",
       "hasAccount": "Already have an account?",
       "signin": "Sign in",
@@ -56,7 +87,98 @@
       "providers": {
         "apple": "Sign up with Apple",
         "google": "Sign up with Google",
-        "facebook": "Sign up with Facebook"
+        "facebook": "Sign up with Facebook",
+        "github": "Sign in with GitHub",
+        "discord": "Sign in with Discord"
+      },
+      "toast": {
+        "success": {
+          "title": "Account created",
+          "description": "Your account has been successfully created"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred while creating your account"
+        },
+        "signing": {
+          "title": "Signing in",
+          "description": "Please wait while we sign you up"
+        }
+      }
+    },
+    "twoFactor": {
+      "title": "Two-Factor Authentication",
+      "description": "Enter the authentication code from your app",
+      "code": {
+        "label": "Authentication Code",
+        "placeholder": "123456"
+      },
+      "trustDevice": "Trust this device for 60 days",
+      "submit": "Verify",
+      "submitting": "Verifying...",
+      "resendCode": "Resend code",
+      "toast": {
+        "success": {
+          "title": "Authenticated",
+          "description": "You have successfully authenticated"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred while authenticating"
+        }
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "description": "Enter your email and we'll send you a link to reset your password",
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter your email address"
+      },
+      "submit": "Send Reset Link",
+      "submitting": "Sending...",
+      "backToSignIn": "Remember your password?",
+      "signIn": "Sign in",
+      "toast": {
+        "success": {
+          "title": "Email sent",
+          "description": "If your email is registered with us, you'll receive a password reset link"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred. Please try again later"
+        }
+      }
+    },
+    "resetPassword": {
+      "title": "Reset Your Password",
+      "description": "Enter your new password below",
+      "password": {
+        "label": "New Password",
+        "placeholder": "Enter your new password"
+      },
+      "confirmPassword": {
+        "label": "Confirm Password",
+        "placeholder": "Confirm your new password"
+      },
+      "submit": "Reset Password",
+      "submitting": "Resetting...",
+      "backToSignIn": "Remember your password?",
+      "signIn": "Sign in",
+      "toast": {
+        "success": {
+          "title": "Password reset",
+          "description": "Your password has been reset successfully. You can now sign in with your new password"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred while resetting your password. Please try again"
+        }
+      },
+      "errors": {
+        "title": "Reset Failed",
+        "noToken": "Invalid or missing reset token. Please request a new password reset link",
+        "backToReset": "Request New Link"
       }
     }
   },
@@ -119,6 +241,11 @@
     }
   },
   "validation": {
+    "username": {
+      "min": "Username must be at least 3 characters",
+      "max": "Username must be at most 20 characters",
+      "invalid": "Username can only contain letters, numbers, and underscores"
+    },
     "name": {
       "min": "Name must be at least 2 characters"
     },
@@ -127,7 +254,11 @@
     },
     "password": {
       "min": "Password must be at least 8 characters",
-      "match": "Passwords must match"
+      "match": "Passwords must match",
+      "different": "New password must be different from your current password"
+    },
+    "twoFactor": {
+      "length": "Authentication code must be 6 digits"
     }
   },
   "HomePage": {
@@ -361,7 +492,6 @@
   },
   "settings": {
     "title": "Settings",
-   
     "notifications": {
       "title": "Notification Settings",
       "description": "Manage your notification preferences and settings.",
@@ -412,7 +542,9 @@
       "description": "View and manage your current plan details",
       "currentSubscription": {
         "title": "Current Subscription",
-        "teamPlan": "Team Plan",
+        "individual": "Individual Plan",
+        "team": "Team Plan",
+        "enterprise": "Enterprise Plan",
         "renewalInfo": "$49/month • Renews on April 1, 2025",
         "changePlan": "Change Plan"
       },
@@ -455,6 +587,45 @@
       "title": "Account Settings",
       "description": "Manage your account settings and preferences",
       "toast": {
+        "connected": {
+          "success": {
+            "title": "Connected",
+            "description": "Your account has been successfully connected"
+          },
+          "error": {
+            "title": "Error",
+            "description": "An error occurred while connecting your account"
+          }
+        },
+        "disconnected": {
+          "success": {
+            "title": "Disconnected",
+            "description": "Your account has been successfully disconnected"
+          },
+          "error": {
+            "title": "Error",
+            "description": "An error occurred while disconnecting your account"
+          }
+        },
+        "noChanges": {
+          "title": "No changes made",
+          "description": "No changes were made to your profile details"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred while saving your changes"
+        },
+        "profile": {
+          "success": {
+            "title": "Profile updated",
+            "description": "Your profile details have been updated"
+          },
+          "error": {
+            "title": "Error",
+            "description": "An error occurred while updating your profile",
+            "imageUploadError": "An error occurred while uploading the image"
+          }
+        },
         "avatar": {
           "success": {
             "title": "Avatar updated",
@@ -476,6 +647,7 @@
         "title": "Profile",
         "description": "Manage how your profile appears to others and update your personal information",
         "changePhoto": "Change Photo",
+        "imageRequirements": "PNG, JPG or GIF (max. 2MB)",
         "name": "Name",
         "email": "Email",
         "username": "Username",
@@ -484,32 +656,181 @@
       },
       "security": {
         "title": "Security",
-        "description": "Manage your password, two-factor authentication, and connected accounts",
+        "description": "Manage your password, two-factor authentication, email verification and connected accounts",
+        "verification": {
+          "title": "Email Verification",
+          "description": "Verify your email address to enhance account security",
+          "verify": "Verify Email",
+          "verifying": "Verifying...",
+          "verified": "Email Verified",
+          "unverify": "Unverify Email",
+          "unverifying": "Unverifying...",
+          "toast": {
+            "sent": {
+              "title": "Verification email sent",
+              "description": "A verification email has been sent to your email address"
+            },
+            "verified": {
+              "title": "Email Verified",
+              "description": "Your email address has been verified"
+            },
+            "unverified": {
+              "title": "Email Unverified",
+              "description": "Your email address is unverified. Please verify your email address to enhance account security"
+            }
+          }
+        },
         "password": {
           "title": "Change Password",
           "description": "Update your password to maintain account security",
-          "button": "Change Password"
+          "button": "Change Password",
+          "form": {
+            "currentPassword": {
+              "label": "Current Password",
+              "placeholder": "Enter your current password"
+            },
+            "newPassword": {
+              "label": "New Password",
+              "placeholder": "Enter your new password"
+            },
+            "confirmNewPassword": {
+              "label": "Confirm New Password",
+              "placeholder": "Confirm your new password"
+            },
+            "submit": "Update Password",
+            "submitting": "Updating...",
+            "cancel": "Cancel"
+          },
+          "requiresCredential": {
+            "title": "Connect Credential",
+            "description": "You need to connect a credential to update your password"
+          },
+          "toast": {
+            "success": {
+              "title": "Password updated",
+              "description": "Your password has been updated successfully"
+            },
+            "error": {
+              "title": "Error",
+              "description": "An error occurred while updating your password"
+            }
+          }
         },
         "twoFactor": {
           "title": "Two-Factor Authentication",
-          "description": "Add an extra layer of security to your account"
+          "description": "Add an extra layer of security to your account",
+          "requiresCredential": {
+            "title": "Connect Credential",
+            "description": "You need to connect a credential to enable two-factor authentication"
+          },
+          "password": {
+            "title": "Password",
+            "description": "Enter your password to enable two-factor authentication",
+            "form": {
+              "password": {
+                "label": "Password",
+                "placeholder": "Enter your password"
+              },
+              "confirm": "Confirm",
+              "confirming": "Confirming...",
+              "cancel": "Cancel"
+            }
+          },
+          "qrcode": {
+            "title": "Scan QR Code",
+            "description": "Scan the QR code with your authentication app to enable two-factor authentication",
+            "scanInstructions": "Scan the QR code with your authentication app",
+            "form": {
+              "code": {
+                "label": "Authentication Code",
+                "placeholder": "Enter the code from your app"
+              },
+              "back": "Back",
+              "enable": "Enable 2FA",
+              "enabling": "Enabling...",
+              "cancel": "Cancel"
+            }
+          },
+
+          "toast": {
+            "success": {
+              "title": "Two-factor authentication enabled",
+              "description": "Your account is now secured with two-factor authentication"
+            },
+            "codeError": {
+              "title": "Invalid code",
+              "description": "The authentication code you entered is invalid"
+            },
+            "error": {
+              "title": "Error",
+              "description": "An error occurred while updating your two-factor authentication settings"
+            }
+          },
+          "disable": {
+            "title": "Disable Two-Factor Authentication",
+            "description": "Enter your password to disable two-factor authentication",
+            "form": {
+              "password": {
+                "label": "Password",
+                "placeholder": "Enter your password"
+              },
+              "disable": "Disable",
+              "disabling": "Disabling...",
+              "cancel": "Cancel"
+            },
+            "toast": {
+              "success": {
+                "title": "Two-factor authentication disabled",
+                "description": "Your account is no longer secured with two-factor authentication"
+              },
+              "error": {
+                "title": "Error",
+                "description": "An error occurred while disabling your two-factor authentication"
+              }
+            }
+          }
         },
         "connectedAccounts": {
           "title": "Connected Accounts",
           "connected": "Connected",
           "notConnected": "Not connected",
           "connect": "Connect",
-          "disconnect": "Disconnect"
+          "disconnect": "Disconnect",
+          "disconnecting": "Disconnecting...",
+          "connecting": "Connecting...",
+          "primary": "(Primary)"
+        },
+        "dialog": {
+          "title": "Connect Credential",
+          "description": "Fill in the details to connect your account",
+          "username": {
+            "label": "Username",
+            "placeholder": "Enter your username"
+          },
+          "password": {
+            "label": "Password",
+            "placeholder": "Enter your password"
+          },
+          "cancel": "Cancel",
+          "connect": "Connect",
+          "connecting": "Connecting..."
         }
       },
       "sessions": {
         "title": "Active Sessions",
         "description": "View and manage your active sessions across different devices",
         "current": "Current",
-        "logout": "Logout",
+        "other": "Other",
+        "revoke": "Sign out",
+        "revoking": "Signing out...",
+        "logoutError": "Error signing out",
+        "logoutSuccess": "Signed out successfully",
+        "logoutErrorDescription": "An error occurred while signing out of the session",
+        "logoutSuccessDescription": "You have successfully signed out of the session",
         "device": {
           "current": "Current Device",
-          "mobile": "Mobile Device"
+          "mobile": "Mobile Device",
+          "other": "Other Device"
         }
       },
       "deleteAccount": {
@@ -518,8 +839,23 @@
         "button": "Delete Account",
         "confirmTitle": "Are you absolutely sure?",
         "confirmDescription": "This action cannot be undone. This will permanently delete your account and remove all associated data from our servers.",
+        "passwordConfirmation": "Enter your password to confirm",
+        "passwordPlaceholder": "Enter your current password",
         "cancel": "Cancel",
-        "confirm": "Delete Account"
+        "confirm": "Send Deletion Link",
+        "deleting": "Sending...",
+        "emailNotVerified": {
+          "title": "Email not verified",
+          "description": "Please verify your email address before deleting your account"
+        },
+        "success": {
+          "title": "Account deletion link sent",
+          "description": "A link to delete your account has been sent to your email address"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred while deleting your account"
+        }
       }
     },
     "appearance": {
@@ -574,7 +910,19 @@
       "prefrences": "Preferences",
       "settings": "Settings",
       "signout": "Sign out",
-      "plan": "My Plan"
+      "plan": "My Plan",
+      "toast": {
+        "signout": {
+          "loading": {
+            "title": "Signing out...",
+            "description": "Please wait while we sign you out."
+          },
+          "success": {
+            "title": "Signed out",
+            "description": "You have been signed out successfully."
+          }
+        }
+      }
     },
     "sidebar": {
       "dashboard": "Dashboard",

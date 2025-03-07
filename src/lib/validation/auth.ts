@@ -9,6 +9,17 @@ export const createAuthValidators = (
       name: z.string().min(2, {
         message: t("validation.name.min"),
       }),
+      username: z
+        .string()
+        .min(3, {
+          message: t("validation.username.min"),
+        })
+        .max(20, {
+          message: t("validation.username.max"),
+        })
+        .regex(/^[a-zA-Z0-9_]+$/, {
+          message: t("validation.username.invalid"),
+        }),
       email: z.string().email({
         message: t("validation.email.invalid"),
       }),
@@ -23,12 +34,21 @@ export const createAuthValidators = (
     });
 
   const signinSchema = z.object({
-    email: z.string().email({
-      message: t("validation.email.invalid"),
-    }),
+    username: z
+      .string()
+      .min(3, {
+        message: t("validation.username.min"),
+      })
+      .max(20, {
+        message: t("validation.username.max"),
+      })
+      .regex(/^[a-zA-Z0-9_]+$/, {
+        message: t("validation.username.invalid"),
+      }),
     password: z.string().min(8, {
       message: t("validation.password.min"),
     }),
+    rememberMe: z.boolean().default(false),
   });
 
   return { signupSchema, signinSchema };

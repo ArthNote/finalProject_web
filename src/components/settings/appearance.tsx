@@ -24,6 +24,8 @@ import { useFont } from "../wrappers/font-provider";
 import { useLocale, useTranslations } from "next-intl";
 import { redirect } from "@/i18n/routing";
 import { toast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { updateLanguage } from "@/lib/api/users";
 
 const AppearanceTab = () => {
   const { theme, setTheme } = useTheme();
@@ -39,6 +41,14 @@ const AppearanceTab = () => {
     setTempLocale(locale);
     setTempFont(font);
   }, [theme, locale, font]);
+
+  const { mutate } = useMutation({
+    mutationFn: updateLanguage,
+    onSuccess: () => {
+      console.log("Language updated successfully");
+    },
+  });
+
   const handleSave = () => {
     setIsSaving(true);
 
@@ -47,6 +57,7 @@ const AppearanceTab = () => {
     }
 
     if (tempLocale !== locale) {
+      mutate(tempLocale);
       redirect({
         href: `/settings?tab=appearance`,
         locale: tempLocale,

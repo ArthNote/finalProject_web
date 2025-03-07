@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -9,7 +9,13 @@ import {
 } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { FaGoogle, FaApple, FaFacebookF } from "react-icons/fa";
+import {
+  FaGoogle,
+  FaApple,
+  FaFacebookF,
+  FaGithub,
+  FaDiscord,
+} from "react-icons/fa";
 import {
   Card,
   CardContent,
@@ -33,8 +39,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Link } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useTransition } from "react";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@/hooks/use-toast";
+import { useSearchParams } from "next/navigation";
+import { getAuthErrorMessage } from "@/lib/auth-translations";
 
 export function SignupForm({
   className,
@@ -43,19 +54,117 @@ export function SignupForm({
   const t = useTranslations("auth.signup");
   const tValidation = useTranslations();
   const { signupSchema } = createAuthValidators(tValidation);
+  const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const locale = useLocale() as "en" | "fr";
+  const callbackUrl = searchParams.get("callbackUrl");
+  const plan = searchParams.get("plan");
+  const billing = searchParams.get("billing");
+  const router = useRouter();
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  function onSubmit(values: SignupFormData) {
-    console.log(values);
+  async function onSubmit(values: SignupFormData) {
+    const validatedFields = signupSchema.safeParse(values);
+
+    if (!validatedFields.success) {
+      return { error: "Invalid fields!" };
+    }
+
+    const { username, password, name, email } = validatedFields.data;
+
+    startTransition(async () => {
+      const { error } = await authClient.signUp.email(
+        {
+          username: username,
+          password: password,
+          email: email,
+          name: name,
+          lang: locale,
+          image: "https://github.com/shadcn.png",
+        },
+        {
+          onRequest: () => {
+            toast({
+              title: t("toast.signing.title"),
+              description: t("toast.signing.description"),
+            });
+          },
+          onSuccess: async () => {
+            console.log("Success");
+            toast({
+              title: t("toast.success.title"),
+              description: t("toast.success.description"),
+            });
+
+            if (plan || billing) {
+              console.log("Plan or billing detected ", plan, billing);
+              const { data, error } = await authClient.subscription.upgrade({
+                plan: plan || "individual",
+                successUrl: `http://localhost:3000/${locale}/success?type=subscription`,
+                uiMode: "hosted",
+                cancelUrl: `http://localhost:3000/${locale}/pricing`,
+                annual: billing === "yearly",
+              });
+            }
+          },
+        }
+      );
+
+      // Use error directly from the response
+      if (error) {
+        console.error(error);
+        toast({
+          title: t("toast.error.title"),
+          description: getAuthErrorMessage(error.code, locale),
+          variant: "destructive",
+        });
+      }
+    });
+  }
+
+  function onProviderSignIn(provider: "discord" | "github" | "google") {
+    startTransition(async () => {
+      const { data, error } = await authClient.signIn.social({
+        provider: provider,
+        callbackURL: `http://localhost:3000/${locale}/dashboard`,
+        fetchOptions: {
+          onRequest: () => {
+            toast({
+              title: t("toast.signing.title"),
+              description: t("toast.signing.description"),
+            });
+          },
+          onSuccess: async () => {
+            console.log("Success");
+
+            toast({
+              title: t("toast.success.title"),
+              description: t("toast.success.description"),
+            });
+            router.push(callbackUrl || "/dashboard");
+          },
+        },
+      });
+
+      if (error) {
+        console.error(error);
+        toast({
+          title: t("toast.error.title"),
+          description: getAuthErrorMessage(error.code, locale),
+          variant: "destructive",
+        });
+      }
+    });
   }
 
   return (
@@ -75,6 +184,7 @@ export function SignupForm({
                 <FormField
                   control={form.control}
                   name="name"
+                  disabled={isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("name.label")}</FormLabel>
@@ -85,10 +195,28 @@ export function SignupForm({
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="username"
+                  disabled={isPending}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("username.label")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t("username.placeholder")}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
                   name="email"
+                  disabled={isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("email.label")}</FormLabel>
@@ -106,6 +234,7 @@ export function SignupForm({
                 <FormField
                   control={form.control}
                   name="password"
+                  disabled={isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("password.label")}</FormLabel>
@@ -123,6 +252,7 @@ export function SignupForm({
                 <FormField
                   control={form.control}
                   name="confirmPassword"
+                  disabled={isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("confirmPassword.label")}</FormLabel>
@@ -137,8 +267,19 @@ export function SignupForm({
                   )}
                 />
 
-                <Button type="submit" className="w-full min-w-[200px]">
-                  {t("submit")}
+                <Button
+                  type="submit"
+                  className="w-full min-w-[200px]"
+                  disabled={isPending}
+                >
+                  {isPending ? (
+                    <>
+                      <div className="mr-1 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      {t("submitting")}
+                    </>
+                  ) : (
+                    t("submit")
+                  )}
                 </Button>
 
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -151,21 +292,33 @@ export function SignupForm({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                          <FaApple />
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          type="button"
+                          disabled={isPending}
+                          onClick={() => onProviderSignIn("discord")}
+                        >
+                          <FaDiscord />
                           <span className="sr-only">
-                            {t("providers.apple")}
+                            {t("providers.discord")}
                           </span>
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{t("providers.apple")}</p>
+                        <p>{t("providers.discord")}</p>
                       </TooltipContent>
                     </Tooltip>
 
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" className="w-full">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          type="button"
+                          disabled={isPending}
+                          onClick={() => onProviderSignIn("google")}
+                        >
                           <FaGoogle />
                           <span className="sr-only">
                             {t("providers.google")}
@@ -179,15 +332,21 @@ export function SignupForm({
 
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                          <FaFacebookF />
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          type="button"
+                          disabled={isPending}
+                          onClick={() => onProviderSignIn("github")}
+                        >
+                          <FaGithub />
                           <span className="sr-only">
-                            {t("providers.facebook")}
+                            {t("providers.github")}
                           </span>
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{t("providers.facebook")}</p>
+                        <p>{t("providers.github")}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -205,8 +364,8 @@ export function SignupForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-        {t("terms")} <a href="#">{t("termsLink")}</a> {t("and")}{" "}
-        <a href="#">{t("privacyLink")}</a>.
+        {t("terms")} <Link href="/terms">{t("termsLink")}</Link> {t("and")}{" "}
+        <Link href="/privacy">{t("privacyLink")}</Link>.
       </div>
     </div>
   );

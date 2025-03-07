@@ -73,7 +73,7 @@ const CardContent = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "p-6 pt-0 relative z-[1] h-full flex flex-col justify-between",
+      "p-6 pt-0 relative z-[1]  flex flex-col justify-between",
       "after:absolute after:inset-0 after:-z-10 after:bg-gradient-to-br after:from-primary/[0.03] after:to-transparent after:opacity-0 after:transition-opacity after:duration-500 group-hover:after:opacity-100",
       className
     )}

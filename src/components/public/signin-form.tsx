@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -9,7 +9,13 @@ import {
 } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { FaGoogle, FaApple, FaFacebookF } from "react-icons/fa";
+import {
+  FaGoogle,
+  FaApple,
+  FaFacebookF,
+  FaDiscord,
+  FaGithub,
+} from "react-icons/fa";
 import {
   Card,
   CardContent,
@@ -33,8 +39,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Link } from "@/i18n/routing";
+import { Link, redirect, useRouter } from "@/i18n/routing";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useTransition } from "react";
+import { useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@/hooks/use-toast";
+import { getAuthErrorMessage } from "@/lib/auth-translations";
+import { Checkbox } from "../ui/checkbox";
 
 export function SigninForm({
   className,
@@ -43,19 +55,106 @@ export function SigninForm({
   const t = useTranslations("auth.signin");
   const tValidation = useTranslations();
   const { signinSchema } = createAuthValidators(tValidation);
+  const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const locale = useLocale() as "en" | "fr";
+  const callbackUrl = searchParams.get("callbackUrl");
+  const router = useRouter();
 
   const form = useForm<SigninFormData>({
     resolver: zodResolver(signinSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
+      rememberMe: false,
     },
   });
 
-  function onSubmit(values: SigninFormData) {
-    console.log(values);
+  async function onSubmit(values: SigninFormData) {
+    const validatedFields = signinSchema.safeParse(values);
+
+    if (!validatedFields.success) {
+      return { error: "Invalid fields!" };
+    }
+
+    const { username, password, rememberMe } = validatedFields.data;
+
+    startTransition(async () => {
+      const { error } = await authClient.signIn.username(
+        {
+          username: username,
+          password: password,
+          rememberMe: rememberMe,
+        },
+        {
+          onRequest: () => {
+            toast({
+              title: t("toast.signing.title"),
+              description: t("toast.signing.description"),
+            });
+          },
+          onSuccess: (context) => {
+            console.log("Success");
+            if (context.data.twoFactorRedirect) {
+              redirect({
+                href: "/2fa",
+                locale: locale,
+              });
+            }
+            toast({
+              title: t("toast.success.title"),
+              description: t("toast.success.description"),
+            });
+            router.push(callbackUrl || "/dashboard");
+          },
+        }
+      );
+
+      // Use error directly from the response
+      if (error) {
+        console.error(error);
+        toast({
+          title: t("toast.error.title"),
+          description: getAuthErrorMessage(error.code, locale),
+          variant: "destructive",
+        });
+      }
+    });
   }
 
+  function onProviderSignIn(provider: "discord" | "github" | "google") {
+    startTransition(async () => {
+      const { data, error } = await authClient.signIn.social({
+        provider: provider,
+        callbackURL: `http://localhost:3000/${locale}/dashboard`,
+        fetchOptions: {
+          onRequest: () => {
+            toast({
+              title: t("toast.signing.title"),
+              description: t("toast.signing.description"),
+            });
+          },
+          onSuccess: () => {
+            console.log("Success");
+            toast({
+              title: t("toast.success.title"),
+              description: t("toast.success.description"),
+            });
+            router.push(callbackUrl || "/dashboard");
+          },
+        },
+      });
+
+      if (error) {
+        console.error(error);
+        toast({
+          title: t("toast.error.title"),
+          description: getAuthErrorMessage(error.code, locale),
+          variant: "destructive",
+        });
+      }
+    });
+  }
   return (
     <div
       className={cn("flex flex-col gap-6 w-full sm:w-[500px]", className)}
@@ -72,13 +171,14 @@ export function SigninForm({
               <div className="flex flex-col gap-6">
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="username"
+                  disabled={isPending}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("email.label")}</FormLabel>
+                      <FormLabel>{t("username.label")}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={t("email.placeholder")}
+                          placeholder={t("username.placeholder")}
                           {...field}
                         />
                       </FormControl>
@@ -90,16 +190,17 @@ export function SigninForm({
                 <FormField
                   control={form.control}
                   name="password"
+                  disabled={isPending}
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center">
                         <FormLabel>{t("password.label")}</FormLabel>
-                        <a
-                          href="#"
+                        <Link
+                          href="/forgot-password"
                           className="ml-auto text-sm underline-offset-2 hover:underline"
                         >
                           {t("password.forgot")}
-                        </a>
+                        </Link>
                       </div>
                       <FormControl>
                         <PasswordInput
@@ -111,9 +212,37 @@ export function SigninForm({
                     </FormItem>
                   )}
                 />
-
-                <Button type="submit" className="w-full min-w-[200px]">
-                  {t("submit")}
+                <FormField
+                  control={form.control}
+                  name="rememberMe"
+                  disabled={isPending}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>{t("rememberMe")}</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="w-full min-w-[200px]"
+                  disabled={isPending}
+                >
+                  {isPending ? (
+                    <>
+                      <div className="mr-1 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      {t("submitting")}
+                    </>
+                  ) : (
+                    t("submit")
+                  )}
                 </Button>
 
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -126,21 +255,33 @@ export function SigninForm({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                          <FaApple />
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          type="button"
+                          disabled={isPending}
+                          onClick={() => onProviderSignIn("discord")}
+                        >
+                          <FaDiscord />
                           <span className="sr-only">
-                            {t("providers.apple")}
+                            {t("providers.discord")}
                           </span>
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{t("providers.apple")}</p>
+                        <p>{t("providers.discord")}</p>
                       </TooltipContent>
                     </Tooltip>
 
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" className="w-full">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          type="button"
+                          disabled={isPending}
+                          onClick={() => onProviderSignIn("google")}
+                        >
                           <FaGoogle />
                           <span className="sr-only">
                             {t("providers.google")}
@@ -154,15 +295,21 @@ export function SigninForm({
 
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                          <FaFacebookF />
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          type="button"
+                          disabled={isPending}
+                          onClick={() => onProviderSignIn("github")}
+                        >
+                          <FaGithub />
                           <span className="sr-only">
-                            {t("providers.facebook")}
+                            {t("providers.github")}
                           </span>
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{t("providers.facebook")}</p>
+                        <p>{t("providers.github")}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -180,8 +327,8 @@ export function SigninForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-        {t("terms")} <a href="#">{t("termsLink")}</a> {t("and")}{" "}
-        <a href="#">{t("privacyLink")}</a>.
+        {t("terms")} <Link href="/terms">{t("termsLink")}</Link> {t("and")}{" "}
+        <Link href="/privacy">{t("privacyLink")}</Link>.
       </div>
     </div>
   );

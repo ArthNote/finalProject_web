@@ -21,7 +21,7 @@ export default function Footer() {
 
   const onSubmit = async (data: NewsletterFormData) => {
     // Newsletter subscription logic here
-    console.log('Newsletter subscription:', data.email);
+    console.log("Newsletter subscription:", data.email);
   };
 
   return (
@@ -72,7 +72,7 @@ export default function Footer() {
                 <p className="font-medium">{t("helpfulLinks.title")}</p>
                 <ul className="mt-6 space-y-4 text-sm">
                   <li>
-                    <Link href="/" className="transition hover:opacity-75">
+                    <Link href="/contact" className="transition hover:opacity-75">
                       {t("helpfulLinks.contact")}
                     </Link>
                   </li>
