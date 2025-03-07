@@ -11,7 +11,7 @@ type ErrorTypes = Partial<
 >;
 
 export const authErrorCodes = {
-  INVALID_USERNAME_OR_PASSWORD: {
+  INVALID_EMAIL_OR_PASSWORD: {
     en: "Invalid username or password",
     fr: "Nom d'utilisateur ou mot de passe invalide",
   },
