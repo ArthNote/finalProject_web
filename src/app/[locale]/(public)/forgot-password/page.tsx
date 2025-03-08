@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
     startTransition(async () => {
       const { data, error } = await authClient.forgetPassword({
         email: values.email,
-        redirectTo: `${process.env.FRONTEND_URL}/${locale}/reset-password`,
+        redirectTo: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/reset-password`,
       });
 
       if (error) {

@@ -128,7 +128,7 @@ const AccountSecurity = () => {
     startTransition(async () => {
       const { error } = await authClient.linkSocial({
         provider: provider,
-        callbackURL: `${process.env.FRONTEND_URL}/en/dashboard`,
+        callbackURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/en/dashboard`,
       });
 
       if (error) {
@@ -189,9 +189,7 @@ const AccountSecurity = () => {
     });
     toast({
       title: t("security.verification.toast.sent.title"),
-      description: t(
-        "security.verification.toast.sent.description"
-      ),
+      description: t("security.verification.toast.sent.description"),
     });
   }
 
