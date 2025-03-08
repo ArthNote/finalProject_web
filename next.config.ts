@@ -84,7 +84,7 @@ const nextConfig: NextConfig = {
           {
             key: "Access-Control-Allow-Origin",
             // Replace with your domain
-            value: process.env.NEXT_PUBLIC_FRONTEND_URL!,
+            value: "https://taskflow-six-kohl.vercel.app",
           },
           {
             key: "Access-Control-Allow-Methods",
