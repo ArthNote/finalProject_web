@@ -7,7 +7,7 @@ import {
 import { stripeClient } from "@better-auth/stripe/client";
 
 export const authClient = createAuthClient({
-  baseURL: process.env.BACKEND_URL,
+  baseURL: process.env.BACKEND_URL!,
   plugins: [
     usernameClient(),
     twoFactorClient(),
