@@ -110,9 +110,9 @@ export function SignupForm({
               console.log("Plan or billing detected ", plan, billing);
               const { data, error } = await authClient.subscription.upgrade({
                 plan: plan || "individual",
-                successUrl: `http://localhost:3000/${locale}/success?type=subscription`,
+                successUrl: `${process.env.FRONTEND_URL}/${locale}/success?type=subscription`,
                 uiMode: "hosted",
-                cancelUrl: `http://localhost:3000/${locale}/pricing`,
+                cancelUrl: `${process.env.FRONTEND_URL}/${locale}/pricing`,
                 annual: billing === "yearly",
               });
             }
@@ -136,7 +136,7 @@ export function SignupForm({
     startTransition(async () => {
       const { data, error } = await authClient.signIn.social({
         provider: provider,
-        callbackURL: `http://localhost:3000/${locale}/dashboard`,
+        callbackURL: `${process.env.FRONTEND_URL}/${locale}/dashboard`,
         fetchOptions: {
           onRequest: () => {
             toast({

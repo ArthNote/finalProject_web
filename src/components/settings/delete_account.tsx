@@ -72,7 +72,7 @@ const DeleteAccount = () => {
       try {
         // Call the backend to delete account with password confirmation
         const { error, data } = await authClient.deleteUser({
-          callbackURL: "http://localhost:3000/" + locale + "/goodbye",
+          callbackURL: `${process.env.FRONTEND_URL}/${locale}/goodbye`,
         });
 
         if (error) {

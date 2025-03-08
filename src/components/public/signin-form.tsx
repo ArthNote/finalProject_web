@@ -126,7 +126,7 @@ export function SigninForm({
     startTransition(async () => {
       const { data, error } = await authClient.signIn.social({
         provider: provider,
-        callbackURL: `http://localhost:3000/${locale}/dashboard`,
+        callbackURL: `${process.env.FRONTEND_URL}/${locale}/dashboard`,
         fetchOptions: {
           onRequest: () => {
             toast({

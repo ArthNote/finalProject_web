@@ -128,7 +128,7 @@ const AccountSecurity = () => {
     startTransition(async () => {
       const { error } = await authClient.linkSocial({
         provider: provider,
-        callbackURL: `http://localhost:3000/en/dashboard`,
+        callbackURL: `${process.env.FRONTEND_URL}/en/dashboard`,
       });
 
       if (error) {
