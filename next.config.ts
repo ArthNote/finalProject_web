@@ -84,7 +84,7 @@ const nextConfig: NextConfig = {
           {
             key: "Access-Control-Allow-Origin",
             // Replace with your domain
-            value: "*",
+            value: process.env.NEXT_PUBLIC_FRONTEND_URL!,
           },
           {
             key: "Access-Control-Allow-Methods",
