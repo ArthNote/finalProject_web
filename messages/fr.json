@@ -4,7 +4,19 @@
       "title": "Abonnement réussi",
       "description": "Vous vous êtes abonné avec succès à notre plateforme.",
       "message": "Merci de nous rejoindre ! Nous sommes ravis de vous compter parmi nous.",
-      "cta": "Aller au Tableau de bord"
+      "cta": "Aller au tableau de bord"
+    },
+    "planChanged": {
+      "title": "Plan modifié avec succès",
+      "description": "Votre plan a été mis à jour avec succès. Vous pouvez maintenant profiter des avantages de votre nouveau plan.",
+      "message": "Vous pouvez maintenant profiter des avantages de votre nouveau plan.",
+      "cta": "Aller au tableau de bord"
+    },
+    "cancelSubscription": {
+      "title": "Abonnement annulé",
+      "description": "Nous sommes désolés de vous voir partir. Votre abonnement a été annulé avec succès et vous ne serez pas facturé pour le prochain cycle de facturation.",
+      "message": "Nous sommes désolés de vous voir partir. Si vous avez des commentaires, n'hésitez pas à nous en faire part.",
+      "cta": "Aller au tableau de bord"
     }
   },
   "auth": {
@@ -420,6 +432,45 @@
     "plan": {
       "title": "Paramètres du Forfait",
       "description": "Consultez et gérez les détails de votre forfait",
+      "changePlan": {
+        "title": "Changer de Forfait",
+        "description": "Améliorez ou réduisez votre forfait selon vos besoins",
+        "confirm": "Changer de Forfait",
+        "cancel": "Annuler",
+        "processing": "Traitement...",
+        "contactUs": "Contactez-nous",
+        "toast": {
+          "success": {
+            "title": "Forfait mis à jour",
+            "description": "Votre forfait a été mis à jour avec succès"
+          },
+          "error": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la mise à jour de votre forfait"
+          }
+        }
+      },
+      "noSubscription": {
+        "title": "Choisir un forfait",
+        "description": "Sélectionnez le forfait qui correspond le mieux à vos besoins. Tous les forfaits incluent un accès complet à notre plateforme.",
+        "action": "Confirmer la sélection",
+        "submitting": "Sélection en cours...",
+        "toast": {
+          "success": {
+            "title": "Forfait sélectionné",
+            "description": "Votre forfait a été sélectionné avec succès"
+          },
+          "error": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la sélection de votre forfait"
+          }
+        }
+      },
+      "errorState": {
+        "title": "Erreur lors du chargement de l'abonnement",
+        "description": "Une erreur s'est produite lors du chargement des détails de votre abonnement. Veuillez réessayer plus tard.",
+        "action": "Réessayer"
+      },
       "currentSubscription": {
         "title": "Abonnement Actuel",
 
@@ -427,7 +478,8 @@
         "team": "Forfait Équipe",
         "enterprise": "Forfait Entreprise",
 
-        "renewalInfo": "49€/mois • Renouvellement le 1er avril 2025",
+        "renews": "Se renouvelle le {date}",
+        "freeTrial": "L'essai gratuit se termine le {date}",
         "changePlan": "Changer de Forfait"
       },
       "features": {
@@ -450,19 +502,56 @@
         "download": "Télécharger"
       },
       "manage": {
-        "title": "Gérer l'Abonnement",
-        "upgrade": "Améliorer le Forfait",
-        "cancel": "Annuler l'Abonnement"
-      },
-      "promotions": {
-        "title": "Promotions",
-        "yearlyPromo": "Obtenez 2 mois gratuits en passant à la facturation annuelle",
-        "switchYearly": "Passer à l'Annuel"
-      },
-      "support": {
-        "title": "Besoin d'Aide ?",
-        "description": "Problèmes de facturation ? Notre équipe support est là pour vous aider",
-        "contact": "Contacter le Support"
+        "billing": {
+          "title": "Préférences de Facturation",
+          "description": "Choisissez comment vous souhaitez être facturé",
+          "save": "Enregistrer les modifications",
+          "cancel": "Annuler",
+          "saving": "Enregistrement...",
+          "update": "Préférences de Facturation",
+          "default": "Par défaut",
+          "auto": {
+            "label": "Facturation Automatique",
+            "description": "Nous débiterons automatiquement votre moyen de paiement lors du renouvellement de votre abonnement"
+          },
+          "manual": {
+            "label": "Facturation Manuelle",
+            "description": "Nous vous enverrons une facture avant le renouvellement de votre abonnement, vous avez 20 jours pour la payer"
+          },
+          "toast": {
+            "success": {
+              "title": "Préférences de facturation mises à jour",
+              "description": "Vos préférences de facturation ont été mises à jour avec succès"
+            },
+            "error": {
+              "title": "Erreur",
+              "description": "Une erreur s'est produite lors de la mise à jour de vos préférences de facturation"
+            }
+          }
+        },
+        "support": {
+          "title": "Besoin d'aide ?",
+          "description": "Des problèmes avec la facturation ? Notre équipe de support est là pour vous aider",
+          "contact": "Contacter le Support"
+        },
+        "cancel": {
+          "title": "Annuler l'Abonnement",
+          "shortDescription": "Vous pouvez annuler votre abonnement à tout moment.",
+          "description": "Vous pouvez annuler votre abonnement à tout moment. Votre abonnement restera actif jusqu'à la fin de la période de facturation.",
+          "confirm": "Annuler l'Abonnement",
+          "cancel": "Conserver l'Abonnement",
+          "processing": "Traitement...",
+          "toast": {
+            "success": {
+              "title": "Abonnement annulé",
+              "description": "Votre abonnement a été annulé avec succès"
+            },
+            "error": {
+              "title": "Erreur",
+              "description": "Une erreur s'est produite lors de l'annulation de votre abonnement"
+            }
+          }
+        }
       }
     },
 

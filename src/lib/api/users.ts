@@ -1,3 +1,4 @@
+import { SubscriptionResponse } from "@/types/subscription";
 import { consts } from "../constants";
 import { encryptData } from "../crypto";
 
@@ -61,3 +62,4 @@ export async function updateLanguage(language: string) {
 
   return response.json();
 }
+

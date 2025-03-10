@@ -19,6 +19,7 @@ const AlertDialogDelete = ({
   cancel,
   deleteT,
   onDelete,
+  isDeleting = false,
 }: {
   title: string;
   description: string;
@@ -26,6 +27,7 @@ const AlertDialogDelete = ({
   onDelete?: () => void;
   cancel?: string;
   deleteT?: string;
+  isDeleting: boolean;
 }) => {
   return (
     <AlertDialog>
@@ -39,8 +41,10 @@ const AlertDialogDelete = ({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{cancel}</AlertDialogCancel>
-          <AlertDialogAction onClick={onDelete}>{deleteT}</AlertDialogAction>
+          <AlertDialogCancel disabled={isDeleting}>{cancel}</AlertDialogCancel>
+          <AlertDialogAction onClick={onDelete} disabled={isDeleting}>
+            {deleteT}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

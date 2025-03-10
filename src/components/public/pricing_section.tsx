@@ -225,8 +225,8 @@ const PricingSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <PriceCard plan="individual" icon={Rocket} />
-          <PriceCard plan="team" icon={Users} featured />
+          <PriceCard plan="team" icon={Users} />
+          <PriceCard plan="individual" icon={Rocket} featured />
           <PriceCard plan="enterprise" icon={Building} />
         </div>
       </div>

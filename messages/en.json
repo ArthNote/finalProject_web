@@ -5,6 +5,18 @@
       "description": "You have successfully subscribed to our platform.",
       "message": "Thank you for joining us! We are excited to have you on board.",
       "cta": "Go to Dashboard"
+    },
+    "planChanged": {
+      "title": "Plan changed successfully",
+      "description": "Your plan has been updated successfully. You can now enjoy the benefits of your new plan.",
+      "message": "You can now enjoy the benefits of your new plan.",
+      "cta": "Go to Dashboard"
+    },
+    "cancelSubscription": {
+      "title": "Subscription cancelled",
+      "description": "We are sorry to see you go. Your subscription has been cancelled successfully and you will not be charged for the next billing cycle.",
+      "message": "We are sorry to see you go. If you have any feedback, please let us know.",
+      "cta": "Go to Dashboard"
     }
   },
   "auth": {
@@ -540,12 +552,52 @@
     "plan": {
       "title": "Plan Settings",
       "description": "View and manage your current plan details",
+      "changePlan": {
+        "title": "Change Plan",
+        "description": "Upgrade or downgrade your plan to suit your needs",
+        "confirm": "Change Plan",
+        "cancel": "Cancel",
+        "processing": "Processing...",
+        "contactUs": "Contact Us",
+        "toast": {
+          "success": {
+            "title": "Plan Updated",
+            "description": "Your plan has been successfully updated"
+          },
+          "error": {
+            "title": "Error",
+            "description": "An error occurred while updating your plan"
+          }
+        }
+      },
+      "noSubscription": {
+        "title": "Choose a Plan",
+        "description": "Select the plan that works best for your needs. All plans include full access to our platform.",
+        "action": "Confirm Selection",
+        "submitting": "Confirming...",
+        "toast": {
+          "success": {
+            "title": "Plan selected",
+            "description": "Your plan has been successfully selected"
+          },
+          "error": {
+            "title": "Error",
+            "description": "An error occurred while selecting your plan"
+          }
+        }
+      },
+      "errorState": {
+        "title": "Error loading subscription",
+        "description": "An error occurred while loading your subscription details. Please try again later.",
+        "action": "Retry"
+      },
       "currentSubscription": {
         "title": "Current Subscription",
         "individual": "Individual Plan",
         "team": "Team Plan",
         "enterprise": "Enterprise Plan",
-        "renewalInfo": "$49/month • Renews on April 1, 2025",
+        "renews": "Renews on {date}",
+        "freeTrial": "Free Trial ends on {date}",
         "changePlan": "Change Plan"
       },
       "features": {
@@ -568,19 +620,56 @@
         "download": "Download"
       },
       "manage": {
-        "title": "Manage Subscription",
-        "upgrade": "Upgrade Plan",
-        "cancel": "Cancel Subscription"
-      },
-      "promotions": {
-        "title": "Promotions",
-        "yearlyPromo": "Get 2 months free by switching to yearly billing",
-        "switchYearly": "Switch to Yearly"
-      },
-      "support": {
-        "title": "Need Help?",
-        "description": "Having issues with billing? Our support team is here to help",
-        "contact": "Contact Support"
+        "billing": {
+          "title": "Billing Preferences",
+          "description": "Choose how you want to be billed",
+          "save": "Save Changes",
+          "cancel": "Cancel",
+          "saving": "Saving...",
+          "update": "Billing Preferences",
+          "default": "Default",
+          "auto": {
+            "label": "Automatic Billing",
+            "description": "We'll automatically charge your payment method when your subscription renews"
+          },
+          "manual": {
+            "label": "Manual Billing",
+            "description": "We'll send you an invoice before your subscription renews, you have 20 days to pay it"
+          },
+          "toast": {
+            "success": {
+              "title": "Billing preferences updated",
+              "description": "Your billing preferences have been successfully updated"
+            },
+            "error": {
+              "title": "Error",
+              "description": "An error occurred while updating your billing preferences"
+            }
+          }
+        },
+        "support": {
+          "title": "Need Help?",
+          "description": "Having issues with billing? Our support team is here to help",
+          "contact": "Contact Support"
+        },
+        "cancel": {
+          "title": "Cancel Subscription",
+          "shortDescription": "You can cancel your subscription at any time.",
+          "description": "You can cancel your subscription at any time. Your subscription will remain active until the end of the billing period.",
+          "confirm": "Cancel Subscription",
+          "cancel": "Keep Subscription",
+          "processing": "Processing...",
+          "toast": {
+            "success": {
+              "title": "Subscription cancelled",
+              "description": "Your subscription has been successfully cancelled"
+            },
+            "error": {
+              "title": "Error",
+              "description": "An error occurred while cancelling your subscription"
+            }
+          }
+        }
       }
     },
     "account": {

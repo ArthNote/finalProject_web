@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 interface ErrorStateProps {
   title?: string;
   description?: string;
+  action?: string;
   retryAction?: () => void;
 }
 
 export function ErrorState({
   title = "Something went wrong",
   description = "An error occurred while fetching the data. Please try again.",
+  action = "Retry",
   retryAction,
 }: ErrorStateProps) {
   return (
@@ -20,7 +22,7 @@ export function ErrorState({
         <p className="mt-2 text-sm text-muted-foreground">{description}</p>
         {retryAction && (
           <Button onClick={retryAction} className="mt-4" variant="outline">
-            Try again
+            {action}
           </Button>
         )}
       </div>

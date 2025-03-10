@@ -1,5 +1,5 @@
 import { useToast } from "@/hooks/use-toast";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useTransition } from "react";
 import { Button } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
@@ -7,7 +7,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "../ui/skeleton";
 
 // Function to parse user agent string
-const parseUserAgent = (userAgent: string) => {
+const parseUserAgent = (userAgent: string, locale: string) => {
   let os = "Unknown OS";
   let browser = "Unknown Browser";
 
@@ -36,7 +36,7 @@ const parseUserAgent = (userAgent: string) => {
   }
 
   // Default location - in a real app, this would come from IP geolocation
-  const location = "Unknown Location";
+  const location = locale === "en" ? "Unknown Location" : "Emplacement inconnu";
 
   return `${os} • ${browser} • ${location}`;
 };
@@ -47,6 +47,7 @@ const SessionManagement = () => {
   const { data: currentSession } = authClient.useSession();
   const [isPending, startTransition] = useTransition();
   const queryClient = useQueryClient();
+  const locale = useLocale() as "en" | "fr";
 
   const { data, isLoading } = useQuery({
     queryKey: ["sessions"],
@@ -66,32 +67,56 @@ const SessionManagement = () => {
     });
   }, [data?.data, currentSession?.session.id]);
 
-  const handleLogout = React.useCallback(
-    (sessionToken: string) => {
-      startTransition(async () => {
-        const { error } = await authClient.revokeSession({
-          token: sessionToken,
-        });
+  // const handleLogosut = React.useCallback(
+  //   (sessionToken: string) => {
+  //     startTransition(async () => {
+  //       const { error } = await authClient.revokeSession({
+  //         token: sessionToken,
+  //       });
 
-        if (error) {
-          toast({
-            title: t("sessions.logoutError"),
-            description:
-              t("sessions.logoutErrorDescription") + " " + error.message,
-          });
-          return;
-        }
+  //       if (error) {
+  //         toast({
+  //           title: t("sessions.logoutError"),
+  //           description:
+  //             t("sessions.logoutErrorDescription") + " " + error.message,
+  //         });
+  //         return;
+  //       }
 
-        toast({
-          title: t("sessions.logoutSuccess"),
-          description: t("sessions.logoutSuccessDescription"),
-        });
+  //       toast({
+  //         title: t("sessions.logoutSuccess"),
+  //         description: t("sessions.logoutSuccessDescription"),
+  //       });
 
-        queryClient.invalidateQueries({ queryKey: ["sessions"] });
+  //       queryClient.invalidateQueries({ queryKey: ["sessions"] });
+  //     });
+  //   },
+  //   [t, toast, queryClient]
+  // );
+
+  function handleLogout(sessionToken: string) {
+    startTransition(async () => {
+      const { error } = await authClient.revokeSession({
+        token: sessionToken,
       });
-    },
-    [t, toast, queryClient]
-  );
+
+      if (error) {
+        toast({
+          title: t("sessions.logoutError"),
+          description:
+            t("sessions.logoutErrorDescription") + " " + error.message,
+        });
+        return;
+      }
+
+      toast({
+        title: t("sessions.logoutSuccess"),
+        description: t("sessions.logoutSuccessDescription"),
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["sessions"] });
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -122,7 +147,7 @@ const SessionManagement = () => {
                     : t("sessions.device.other")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {parseUserAgent(session.userAgent || "")}
+                  {parseUserAgent(session.userAgent || "", locale)}
                 </p>
               </div>
               {session.id === currentSession?.session.id ? (
