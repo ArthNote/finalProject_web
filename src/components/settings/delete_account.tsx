@@ -31,6 +31,7 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "@/hooks/use-toast";
 import { getAuthErrorMessage } from "@/lib/auth-translations";
 import { useRouter } from "@/i18n/routing";
+import { DeleteAccountSkeleton } from "./account-skeletons";
 
 const DeleteAccount = () => {
   const t = useTranslations("settings.account");
@@ -39,7 +40,7 @@ const DeleteAccount = () => {
   const { deleteAccountSchema } = createDeleteAccountValidators(tValidation);
   const [isPending, startTransition] = useTransition();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const { data } = authClient.useSession();
+  const { data, isPending: sessionPending } = authClient.useSession();
   const router = useRouter();
 
   const form = useForm<DeleteAccountFormData>({

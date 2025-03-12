@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Input } from "../ui/input";
 import { authClient } from "@/lib/auth-client";
 import { getAuthErrorMessage } from "@/lib/auth-translations";
+import { ProfileSkeleton } from "./account-skeletons";
 
 const toBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -72,7 +73,7 @@ const ManageProfile = () => {
   const tValidation = useTranslations();
   const { accountSchema } = createAuthValidators(tValidation);
   const [isPending, startTransition] = useTransition();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: sessionPending } = authClient.useSession();
   const locale = useLocale() as "en" | "fr";
 
   const form = useForm<AccountFormData>({
@@ -188,6 +189,10 @@ const ManageProfile = () => {
 
   const userAvatar = form.watch("image") || session?.user?.image || "";
   const userName = session?.user?.username || "User avatar";
+
+  if (sessionPending) {
+    return <ProfileSkeleton />;
+  }
 
   return (
     <div className="space-y-6">

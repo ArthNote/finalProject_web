@@ -4,7 +4,7 @@ import React, { useTransition } from "react";
 import { Button } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Skeleton } from "../ui/skeleton";
+import { SessionsSkeleton } from "./account-skeletons";
 
 // Function to parse user agent string
 const parseUserAgent = (userAgent: string, locale: string) => {
@@ -44,7 +44,8 @@ const parseUserAgent = (userAgent: string, locale: string) => {
 const SessionManagement = () => {
   const { toast } = useToast();
   const t = useTranslations("settings.account");
-  const { data: currentSession } = authClient.useSession();
+  const { data: currentSession, isPending: sessionPending } =
+    authClient.useSession();
   const [isPending, startTransition] = useTransition();
   const queryClient = useQueryClient();
   const locale = useLocale() as "en" | "fr";
@@ -55,6 +56,8 @@ const SessionManagement = () => {
       return authClient.listSessions();
     },
   });
+
+  // Show skeleton if either session or sessions data is loading
 
   // Sort sessions to put current session at the top
   const sortedSessions = React.useMemo(() => {
@@ -67,32 +70,9 @@ const SessionManagement = () => {
     });
   }, [data?.data, currentSession?.session.id]);
 
-  // const handleLogosut = React.useCallback(
-  //   (sessionToken: string) => {
-  //     startTransition(async () => {
-  //       const { error } = await authClient.revokeSession({
-  //         token: sessionToken,
-  //       });
-
-  //       if (error) {
-  //         toast({
-  //           title: t("sessions.logoutError"),
-  //           description:
-  //             t("sessions.logoutErrorDescription") + " " + error.message,
-  //         });
-  //         return;
-  //       }
-
-  //       toast({
-  //         title: t("sessions.logoutSuccess"),
-  //         description: t("sessions.logoutSuccessDescription"),
-  //       });
-
-  //       queryClient.invalidateQueries({ queryKey: ["sessions"] });
-  //     });
-  //   },
-  //   [t, toast, queryClient]
-  // );
+  if (sessionPending || isLoading) {
+    return <SessionsSkeleton />;
+  }
 
   function handleLogout(sessionToken: string) {
     startTransition(async () => {
@@ -130,8 +110,8 @@ const SessionManagement = () => {
         {isLoading ? (
           // Skeleton loaders while data is loading
           <>
-            <SessionSkeleton />
-            <SessionSkeleton />
+            <SessionsSkeleton />
+            <SessionsSkeleton />
           </>
         ) : (
           // Use the sorted sessions array instead of data?.data
@@ -175,19 +155,6 @@ const SessionManagement = () => {
           ))
         )}
       </div>
-    </div>
-  );
-};
-
-// Session skeleton component
-const SessionSkeleton = () => {
-  return (
-    <div className="flex justify-between items-center p-4 rounded-lg border">
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-[120px]" />
-        <Skeleton className="h-3 w-[180px]" />
-      </div>
-      <Skeleton className="h-8 w-[80px]" />
     </div>
   );
 };

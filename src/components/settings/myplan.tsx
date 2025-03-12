@@ -1,5 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { CreditCardIcon, HelpCircle, Rocket, Trash } from "lucide-react";
@@ -27,6 +27,8 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { toast } from "@/hooks/use-toast";
 import AlertDialogDelete from "../alert-dialog-delete";
+import BillingInfo from "./billing_info";
+import { PlanSkeleton } from "./plan-skeleton";
 
 const MyPlanTab = () => {
   const t = useTranslations("settings.plan");
@@ -45,11 +47,20 @@ const MyPlanTab = () => {
   } = useQuery({
     queryKey: ["subscription"],
     queryFn: getSubscription,
+    refetchOnWindowFocus: true,
   });
 
+  // Initialize with undefined and update when subscription data is available
   const [billingPreference, setBillingPreference] = useState<"auto" | "manual">(
-    subscription?.data?.autoRenew ? "auto" : "manual"
+    "auto"
   );
+
+  // Update billingPreference when subscription data changes
+  useEffect(() => {
+    if (subscription?.data) {
+      setBillingPreference(subscription.data.autoRenew ? "auto" : "manual");
+    }
+  }, [subscription?.data]);
 
   const { mutate: updateBilling, isPending: isUpdating } = useMutation({
     mutationFn: changeBillingMode,
@@ -94,7 +105,7 @@ const MyPlanTab = () => {
   });
 
   if (isLoading) {
-    return <h1>Is Loading...</h1>;
+    return <PlanSkeleton />;
   }
 
   if (error && subscription?.success === false) {
@@ -148,7 +159,7 @@ const MyPlanTab = () => {
                         "medium",
                         locale
                       ),
-                    })}
+                    })}{" "}
               </p>
             </div>
             <Button
@@ -160,24 +171,13 @@ const MyPlanTab = () => {
             </Button>
           </div>
           <Separator />
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <h4 className="text-sm font-medium">{t("features.title")}</h4>
             <div className="grid gap-2">
-              {[
-                { label: t("features.unlimited"), value: "✓" },
-                {
-                  label: t("features.team"),
-                  value: t("features.values.members"),
-                },
-                {
-                  label: t("features.storage"),
-                  value: t("features.values.storage"),
-                },
-                {
-                  label: t("features.ai"),
-                  value: t("features.values.credits"),
-                },
-              ].map((feature) => (
+              {[{ label: t("features.unlimited"), value: "✓" },
+                { label: t("features.team"), value: t("features.values.members") },
+                { label: t("features.storage"), value: t("features.values.storage") },
+                { label: t("features.ai"), value: t("features.values.credits") },].map((feature) => (
                 <div
                   key={feature.label}
                   className="flex justify-between text-sm"
@@ -186,73 +186,16 @@ const MyPlanTab = () => {
                   <span className="font-medium">{feature.value}</span>
                 </div>
               ))}
+
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
-      <Separator className="my-6" />
+      {/* <Separator className="my-6" /> */}
 
       {/* Payment & Billing Information */}
-      <div className="space-y-6">
-        <h3 className="text-base font-medium">{t("payment.title")}</h3>
-        <div className="space-y-4 pl-1">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-muted rounded">
-                <CreditCardIcon className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="font-medium">•••• 4242</p>
-                <p className="text-sm text-muted-foreground">
-                  {t("payment.expires", { date: "12/25" })}
-                </p>
-              </div>
-            </div>
-            <Button variant="ghost" size="sm">
-              {t("payment.update")}
-            </Button>
-          </div>
-          <Separator />
-          <div>
-            <h4 className="text-sm font-medium mb-3">
-              {t("payment.billingHistory")}
-            </h4>
-            <div className="space-y-3">
-              {[
-                {
-                  date: "Mar 1, 2025",
-                  amount: "$49.00",
-                  status: "Paid",
-                },
-                {
-                  date: "Feb 1, 2025",
-                  amount: "$49.00",
-                  status: "Paid",
-                },
-                {
-                  date: "Jan 1, 2025",
-                  amount: "$49.00",
-                  status: "Paid",
-                },
-              ].map((invoice) => (
-                <div
-                  key={invoice.date}
-                  className="flex items-center justify-between text-sm"
-                >
-                  <span className="text-muted-foreground">{invoice.date}</span>
-                  <div className="flex items-center gap-3">
-                    <span>{invoice.amount}</span>
-                    <Button variant="ghost" size="sm" className="h-7">
-                      {t("payment.download")}
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <BillingInfo />
 
       <Separator className="my-6" />
 
@@ -356,8 +299,12 @@ const MyPlanTab = () => {
         open={billingDialogOpen}
         onOpenChange={(open) => {
           setBillingDialogOpen(open);
-          // Reset to default value when dialog closes
-          if (!open) setBillingPreference("auto");
+          // Reset to current subscription value when dialog closes
+          if (!open && subscription?.data) {
+            setBillingPreference(
+              subscription.data.autoRenew ? "auto" : "manual"
+            );
+          }
         }}
       >
         <DialogContent className="sm:max-w-[550px]">
@@ -383,14 +330,14 @@ const MyPlanTab = () => {
                   id: "dialog-automatic-billing",
                   title: t("manage.billing.auto.label"),
                   description: t("manage.billing.auto.description"),
-                  isDefault: subscription?.data?.autoRenew === true,
+                  isDefault: subscription?.data?.autoRenew ? true : false,
                 },
                 {
                   value: "manual",
                   id: "dialog-manual-billing",
                   title: t("manage.billing.manual.label"),
                   description: t("manage.billing.manual.description"),
-                  isDefault: subscription?.data?.autoRenew === false,
+                  isDefault: subscription?.data?.autoRenew ? false : true,
                 },
               ].map((option) => (
                 <div key={option.id} className="group">

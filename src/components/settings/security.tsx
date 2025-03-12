@@ -24,6 +24,7 @@ import { authClient } from "@/lib/auth-client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { deleteAccount, linkCredentials } from "@/lib/api/users";
 import { cn } from "@/lib/utils";
+import { SecuritySkeleton } from "./account-skeletons";
 
 const AccountSecurity = () => {
   const { toast } = useToast();
@@ -36,7 +37,7 @@ const AccountSecurity = () => {
   const [disableTwoFactorDialogOpen, setDisableTwoFactorDialogOpen] =
     useState(false); // State for disable 2FA dialog
   const locale = useLocale() as "en" | "fr";
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: sessionPending } = authClient.useSession();
 
   const queryClient = useQueryClient();
 
@@ -46,6 +47,8 @@ const AccountSecurity = () => {
       return authClient.listAccounts();
     },
   });
+
+  // If either session is loading or accounts are loading, show skeleton
 
   // Count connected accounts
   const connectedAccountsCount = data?.data?.length || 0;
@@ -91,6 +94,10 @@ const AccountSecurity = () => {
       setCredentialDialogOpen(false);
     },
   });
+
+  if (sessionPending || isLoading) {
+    return <SecuritySkeleton />;
+  }
 
   const providers = [
     { name: "Google", Icon: FaGoogle, value: "google" },
@@ -297,10 +304,7 @@ const AccountSecurity = () => {
                       }
                       onClick={
                         isConnected
-                          ? () => {
-                              setPendingProvider(provider.value);
-                              removeAccount(connectedAccount?.id as string);
-                            }
+                          ? () => setPendingProvider(provider.value)
                           : provider.value === "credential"
                           ? () => setCredentialDialogOpen(true)
                           : () =>
@@ -308,18 +312,10 @@ const AccountSecurity = () => {
                                 provider.value as ProviderType
                               )
                       }
-                      title={
-                        isLastAccount
-                          ? "Cannot disconnect the last connected account"
-                          : ""
-                      }
                     >
                       {isConnected ? (
                         isProviderPending ? (
-                          <>
-                            <div className="mr-1 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                            {t("security.connectedAccounts.disconnecting")}
-                          </>
+                          <div className="mr-1 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                         ) : (
                           t("security.connectedAccounts.disconnect")
                         )
@@ -327,10 +323,7 @@ const AccountSecurity = () => {
                           provider.value === "credential") ||
                         (isProviderPending &&
                           provider.value === pendingProvider) ? (
-                        <>
-                          <div className="mr-1 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                          {t("security.connectedAccounts.connecting")}
-                        </>
+                        <></>
                       ) : (
                         t("security.connectedAccounts.connect")
                       )}

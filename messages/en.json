@@ -550,6 +550,16 @@
       }
     },
     "plan": {
+      "toast": {
+        "success": {
+          "title": "Plan updated",
+          "description": "Your plan has been successfully updated"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred while updating your plan"
+        }
+      },
       "title": "Plan Settings",
       "description": "View and manage your current plan details",
       "changePlan": {
@@ -591,6 +601,17 @@
         "description": "An error occurred while loading your subscription details. Please try again later.",
         "action": "Retry"
       },
+      "noInvoices": {
+        "title": "No Invoices Found",
+        "description": "You have no invoices available. Please check back later.",
+        "action": "Retry"
+      },
+
+      "errorStateInvoices": {
+        "title": "Error loading invoices",
+        "description": "An error occurred while loading your invoices. Please try again later.",
+        "action": "Retry"
+      },
       "currentSubscription": {
         "title": "Current Subscription",
         "individual": "Individual Plan",
@@ -617,7 +638,10 @@
         "update": "Update",
         "expires": "Expires {date}",
         "billingHistory": "Billing History",
-        "download": "Download"
+        "download": "Download",
+        "paid": "Paid",
+        "unpaid": "Unpaid",
+        "pay": "Pay Now"
       },
       "manage": {
         "billing": {
@@ -661,8 +685,8 @@
           "processing": "Processing...",
           "toast": {
             "success": {
-              "title": "Subscription cancelled",
-              "description": "Your subscription has been successfully cancelled"
+              "title": "Subscription cancel link generated",
+              "description": "A link to cancel your subscription has been generated. Please check your email."
             },
             "error": {
               "title": "Error",

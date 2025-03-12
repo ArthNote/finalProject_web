@@ -1,4 +1,10 @@
-import { ChangePlanInput, SubscriptionResponse } from "@/types/subscription";
+import {
+  CardResponse,
+  ChangePlanInput,
+  FinalizeInvoiceResponse,
+  InvoicesResponse,
+  SubscriptionResponse,
+} from "@/types/subscription";
 import { consts } from "../constants";
 import { encryptData } from "../crypto";
 
@@ -77,6 +83,79 @@ export async function cancelSubscription(): Promise<{
 
   if (!response.ok) {
     throw new Error(`Failed to cancel subscription: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function getInvoices(): Promise<InvoicesResponse> {
+  const response = await fetch(`${consts.backend}/subscriptions/invoices`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to get user invoices: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function finalizeInvoice(
+  id: string
+): Promise<FinalizeInvoiceResponse> {
+  const response = await fetch(
+    `${consts.backend}/subscriptions/invoices/finalize/${id}`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to get user invoices: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function getPaymentMethod(): Promise<CardResponse> {
+  const response = await fetch(`${consts.backend}/subscriptions/method`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to get payment method: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function changePaymentMethod(): Promise<{
+  message: string;
+  success: boolean;
+  link?: string;
+}> {
+  const response = await fetch(`${consts.backend}/subscriptions/changeMethod`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to get payment method: ${response.statusText}`);
   }
 
   return response.json();

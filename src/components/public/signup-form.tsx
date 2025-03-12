@@ -114,6 +114,7 @@ export function SignupForm({
                 uiMode: "hosted",
                 cancelUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/pricing`,
                 annual: billing === "yearly",
+                returnUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/dashboard`,
               });
             }
           },

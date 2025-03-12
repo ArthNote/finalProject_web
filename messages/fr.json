@@ -430,6 +430,16 @@
     "title": "Paramètres",
 
     "plan": {
+      "toast": {
+        "success": {
+          "title": "Forfait mis à jour",
+          "description": "Votre forfait a été mis à jour avec succès"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la mise à jour de votre forfait"
+        }
+      },
       "title": "Paramètres du Forfait",
       "description": "Consultez et gérez les détails de votre forfait",
       "changePlan": {
@@ -499,7 +509,10 @@
         "update": "Mettre à jour",
         "expires": "Expire le {date}",
         "billingHistory": "Historique de Facturation",
-        "download": "Télécharger"
+        "download": "Télécharger",
+        "paid": "Payé",
+        "unpaid": "Non payé",
+        "pay": "Payer"
       },
       "manage": {
         "billing": {
@@ -543,8 +556,8 @@
           "processing": "Traitement...",
           "toast": {
             "success": {
-              "title": "Abonnement annulé",
-              "description": "Votre abonnement a été annulé avec succès"
+            "title": "Lien d'annulation généré",
+            "description": "Un lien pour annuler votre abonnement a été généré. Veuillez consulter votre email."
             },
             "error": {
               "title": "Erreur",
