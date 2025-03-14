@@ -11,6 +11,35 @@ import {
   CalendarIcon,
   Tag,
   Users,
+  Plus,
+  Mic,
+  BrainCircuit,
+  Settings,
+  Sparkles,
+  Zap,
+  Sun,
+  CalendarDays,
+  Keyboard,
+  ArrowUpDown,
+  ListFilter,
+  Clock4,
+  PieChart,
+  Package,
+  ShieldAlert,
+  List,
+  LayoutGrid,
+  KanbanSquare,
+  BarChart2,
+  Coffee,
+  Focus,
+  Moon,
+  Timer,
+  Check,
+  PanelLeft,
+  Palette,
+  EyeIcon,
+  Undo2,
+  CalendarRange,
 } from "lucide-react";
 import {
   format,
@@ -22,15 +51,56 @@ import {
 } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EventItem } from "@/components/calendar/EventItem";
 import { MOCK_EVENTS, EventType } from "@/components/calendar/calendarData";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import EventDetailsSheet from "./EventDetailsSheet";
+import CalendarSettingsDialog, {
+  CalendarSettings,
+} from "./CalendarSettingsDialog";
+import FloatingToolbar from "./FloatingToolbar";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const CURRENT_TIME = new Date();
@@ -44,9 +114,73 @@ const TimelineCalendar = () => {
   );
   const [events, setEvents] = React.useState<EventType[]>(MOCK_EVENTS);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
-
-  // Changed to MutableRefObject to match EventItem's expectation
   const timelineRef = React.useRef<HTMLDivElement | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+
+  // New state variables for floating toolbar functionality
+  const [aiTaskInput, setAiTaskInput] = React.useState("");
+  const [isRecording, setIsRecording] = React.useState(false);
+  const [optimizationMode, setOptimizationMode] = React.useState("balanced");
+  const [optimizationPeriod, setOptimizationPeriod] = React.useState("today");
+  const [showPriorityLevels, setShowPriorityLevels] = React.useState({
+    high: true,
+    medium: true,
+    low: true,
+  });
+  const [viewMode, setViewMode] = React.useState("timeline");
+  const [showSettingsDialog, setShowSettingsDialog] = React.useState(false);
+  const [calendarSettings, setCalendarSettings] =
+    React.useState<CalendarSettings>({
+      showWeekends: true,
+      colorScheme: "default",
+      showCompletedTasks: true,
+      timeFormat: "12h",
+      startHour: 8,
+      endHour: 18,
+      expandAllDay: false,
+    });
+  const [optimizationRange, setOptimizationRange] = React.useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined,
+  });
+  const [showOptimizeRangePicker, setShowOptimizeRangePicker] =
+    React.useState(false);
+  const [showOptimizeModes, setShowOptimizeModes] = React.useState(false);
+
+  // Simulated recording state
+  const toggleRecording = () => {
+    setIsRecording(!isRecording);
+    if (!isRecording) {
+      // Simulate voice recording
+      setTimeout(() => {
+        setAiTaskInput(
+          "Schedule a meeting with the design team to discuss new features"
+        );
+        setIsRecording(false);
+      }, 2000);
+    } else {
+      setAiTaskInput("");
+    }
+  };
+
+  // Simulated AI task processing
+  const processAiTask = () => {
+    // In a real application, this would call an API to process the AI task
+    const newTask = {
+      id: `task-${Date.now()}`,
+      title: aiTaskInput.split(" ").slice(0, 5).join(" ") + "...",
+      description: aiTaskInput,
+      start: setMinutes(setHours(new Date(), CURRENT_HOUR + 1), 0),
+      end: setMinutes(setHours(new Date(), CURRENT_HOUR + 2), 0),
+      color: "bg-primary",
+    };
+
+    setEvents([...events, newTask]);
+    setAiTaskInput("");
+  };
 
   React.useEffect(() => {
     if (scrollContainerRef.current && isToday(selectedDate)) {
@@ -96,14 +230,48 @@ const TimelineCalendar = () => {
     );
   };
 
+  // Handler for date selection from the calendar popover
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+    }
+  };
+
+  // Handle saving calendar settings
+  const handleSaveSettings = () => {
+    // Here you would save the settings to persistent storage
+    setIsSettingsOpen(false);
+  };
+
   return (
     <div className="flex h-full">
       {/* Main Calendar */}
       <div className="flex flex-col flex-1 h-full bg-white dark:bg-background">
         {/* Date Navigation */}
         <div className="flex flex-col md:flex-row items-center px-6 py-4 border-b gap-y-3 relative">
-          {/* Date Controls */}
+          {/* Date Controls with repositioned calendar button */}
           <div className="flex items-center gap-2.5 md:mx-auto">
+            {/* Date Picker Popover - Moved to the left side */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 hover:bg-neutral-100 dark:hover:bg-neutral-800/30"
+                >
+                  <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDateSelect}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+
             <Button
               variant="ghost"
               size="icon"
@@ -208,20 +376,20 @@ const TimelineCalendar = () => {
                 <div
                   key={hour}
                   className={`flex items-start h-[60px] relative group transition-colors
-                    ${
-                      hour === CURRENT_HOUR && isToday(selectedDate)
-                        ? "bg-gradient-to-r from-primary/5 to-transparent"
-                        : ""
-                    }`}
+                      ${
+                        hour === CURRENT_HOUR && isToday(selectedDate)
+                          ? "bg-gradient-to-r from-primary/5 to-transparent"
+                          : ""
+                      }`}
                 >
                   <div
                     className={`w-[60px] pr-4 py-2 text-[11px] font-medium tracking-wide text-right sticky left-0
-                      ${
-                        hour === CURRENT_HOUR && isToday(selectedDate)
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                      } 
-                      bg-white dark:bg-background`}
+                        ${
+                          hour === CURRENT_HOUR && isToday(selectedDate)
+                            ? "text-primary"
+                            : "text-muted-foreground"
+                        } 
+                        bg-white dark:bg-background`}
                   >
                     {hour === 0
                       ? "12 AM"
@@ -248,106 +416,46 @@ const TimelineCalendar = () => {
           </div>
         </ScrollArea>
 
-        {/* Event Details Sheet */}
-        <Sheet
-          open={!!selectedEvent}
+        {/* Floating Toolbar */}
+        <FloatingToolbar
+          aiTaskInput={aiTaskInput}
+          setAiTaskInput={setAiTaskInput}
+          isRecording={isRecording}
+          toggleRecording={toggleRecording}
+          processAiTask={processAiTask}
+          optimizationMode={optimizationMode}
+          setOptimizationMode={setOptimizationMode}
+          optimizationPeriod={optimizationPeriod}
+          setOptimizationPeriod={setOptimizationPeriod}
+          showPriorityLevels={showPriorityLevels}
+          setShowPriorityLevels={setShowPriorityLevels}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          setIsSettingsOpen={setIsSettingsOpen}
+          optimizationRange={optimizationRange}
+          setOptimizationRange={setOptimizationRange}
+          showOptimizeRangePicker={showOptimizeRangePicker}
+          setShowOptimizeRangePicker={setShowOptimizeRangePicker}
+          showOptimizeModes={showOptimizeModes}
+          setShowOptimizeModes={setShowOptimizeModes}
+          events={events}
+          setEvents={setEvents}
+        />
+
+        {/* Settings Dialog - Now using the extracted component */}
+        <CalendarSettingsDialog
+          isOpen={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          settings={calendarSettings}
+          onSettingsChange={setCalendarSettings}
+          onSave={handleSaveSettings}
+        />
+
+        {/* Event Details Sheet - Now extracted to a separate component */}
+        <EventDetailsSheet
+          event={selectedEvent}
           onOpenChange={(open) => !open && setSelectedEvent(null)}
-        >
-          <SheetContent className="w-full sm:max-w-md">
-            <SheetHeader>
-              <SheetTitle className="flex justify-between items-center">
-                <span>Event Details</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedEvent(null)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </SheetTitle>
-            </SheetHeader>
-            {selectedEvent && (
-              <div className="mt-6 space-y-6">
-                <div>
-                  <h2 className="text-xl font-semibold">
-                    {selectedEvent.title}
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {selectedEvent.description}
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm">
-                        {format(selectedEvent.start, "EEEE, MMMM d")}
-                      </p>
-                      <p className="text-sm">
-                        {format(selectedEvent.start, "h:mm a")} -{" "}
-                        {format(selectedEvent.end, "h:mm a")}
-                      </p>
-                    </div>
-                  </div>
-
-                  {selectedEvent.location && (
-                    <div className="flex items-center">
-                      <CalendarIcon className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-sm">{selectedEvent.location}</span>
-                    </div>
-                  )}
-                </div>
-
-                {selectedEvent.attendees &&
-                  selectedEvent.attendees.length > 0 && (
-                    <div>
-                      <h3 className="text-sm font-medium mb-2 flex items-center">
-                        <Users className="h-4 w-4 mr-2" /> Attendees
-                      </h3>
-                      <div className="space-y-2">
-                        {selectedEvent.attendees.map((attendee, i) => (
-                          <div key={i} className="flex items-center">
-                            <Avatar className="h-6 w-6 mr-2">
-                              <AvatarImage src={attendee.avatar} />
-                              <AvatarFallback>
-                                {attendee.name[0]}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm">{attendee.name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                {selectedEvent?.tags && selectedEvent.tags.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2 flex items-center">
-                      <Tag className="h-4 w-4 mr-2" /> Tags
-                    </h3>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedEvent.tags.map((tag, i) => (
-                        <Badge key={i} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-2 pt-4">
-                  <Button className="flex-1" variant="outline">
-                    Edit
-                  </Button>
-                  <Button className="flex-1" variant="destructive">
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            )}
-          </SheetContent>
-        </Sheet>
+        />
       </div>
     </div>
   );

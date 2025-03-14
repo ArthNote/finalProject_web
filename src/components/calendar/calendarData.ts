@@ -11,9 +11,11 @@ export type EventType = {
   attendees?: { name: string; avatar: string }[];
   tags?: string[];
   location?: string;
+  priority?: "high" | "medium" | "low";
+  status?: "todo" | "in-progress" | "completed";
 };
 
-// Mock data for events
+// Mock data for events with added priority and status fields
 export const MOCK_EVENTS: EventType[] = [
   {
     id: "1",
@@ -28,6 +30,8 @@ export const MOCK_EVENTS: EventType[] = [
     ],
     tags: ["Meeting", "Product"],
     location: "Main Conference Room",
+    priority: "high",
+    status: "in-progress",
   },
   {
     id: "2",
@@ -42,6 +46,8 @@ export const MOCK_EVENTS: EventType[] = [
     ],
     tags: ["Design", "Review"],
     location: "Design Studio",
+    priority: "medium",
+    status: "todo",
   },
   {
     id: "3",
@@ -56,6 +62,8 @@ export const MOCK_EVENTS: EventType[] = [
     ],
     tags: ["Team", "Social"],
     location: "Sushi Restaurant",
+    priority: "low",
+    status: "completed",
   },
   {
     id: "4",
@@ -69,5 +77,7 @@ export const MOCK_EVENTS: EventType[] = [
     ],
     tags: ["Client", "Call"],
     location: "Zoom Meeting",
+    priority: "high",
+    status: "todo",
   },
 ];
