@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/card";
 import { Loader2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
 

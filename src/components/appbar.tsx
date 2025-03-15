@@ -1,5 +1,5 @@
 "use client";
-import { Link, usePathname } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/navigation";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {

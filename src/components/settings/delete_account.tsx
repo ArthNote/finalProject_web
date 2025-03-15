@@ -30,7 +30,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/hooks/use-toast";
 import { getAuthErrorMessage } from "@/lib/auth-translations";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { DeleteAccountSkeleton } from "./account-skeletons";
 
 const DeleteAccount = () => {

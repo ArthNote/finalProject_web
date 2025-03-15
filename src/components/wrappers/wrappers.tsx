@@ -8,30 +8,28 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 interface ProvidersProps {
   children: React.ReactNode;
-  messages: AbstractIntlMessages;
-  locale: string;
+  // messages: AbstractIntlMessages;
+  // locale: string;
 }
 
-export function Providers({ children, messages, locale }: ProvidersProps) {
+export function Providers({ children }: ProvidersProps) {
   const queryClient = new QueryClient();
 
   return (
     <>
-      <NextIntlClientProvider messages={messages} locale={locale}>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <FontProvider>
-              {children}
-              <Toaster />
-            </FontProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
-      </NextIntlClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <FontProvider>
+            {children}
+            <Toaster />
+          </FontProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </>
   );
 }

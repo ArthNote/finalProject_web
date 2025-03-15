@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { redirect } from "@/i18n/routing";
+import { redirect } from "@/i18n/navigation";
 import {
   createCredentialValidators,
   CredentialFormData,

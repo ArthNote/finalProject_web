@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -147,8 +147,8 @@ const chatData: Record<string, Chat> = {
           "I can help with the modal updates. I'm free this afternoon to work on it. 💪",
         time: "9:15 AM",
         isSender: true,
-      }
-    ]
+      },
+    ],
   },
   "2": {
     name: "Sarah Wilson",
@@ -156,15 +156,18 @@ const chatData: Record<string, Chat> = {
     status: "online",
     lastSeen: "2 minutes ago",
     description: "UI/UX Designer",
-    members: [{ id: 1, name: "Sarah Wilson", status: "online", role: "Member" }],
+    members: [
+      { id: 1, name: "Sarah Wilson", status: "online", role: "Member" },
+    ],
     messages: [
       {
         id: 1,
         sender: "Sarah Wilson",
-        content: "Hi! I've just finished the design mockups for the new feature.",
+        content:
+          "Hi! I've just finished the design mockups for the new feature.",
         time: "10:00 AM",
         isSender: false,
-        status: "read"
+        status: "read",
       },
       {
         id: 2,
@@ -172,7 +175,7 @@ const chatData: Record<string, Chat> = {
         content: "Great! Can you share them with me?",
         time: "10:02 AM",
         isSender: true,
-        status: "read"
+        status: "read",
       },
       {
         id: 3,
@@ -180,7 +183,7 @@ const chatData: Record<string, Chat> = {
         content: "Sure! Here they are:",
         time: "10:05 AM",
         isSender: false,
-        status: "read"
+        status: "read",
       },
       {
         id: 4,
@@ -192,7 +195,7 @@ const chatData: Record<string, Chat> = {
         fileType: "fig",
         fileName: "Design Mockup.fig",
         fileSize: "2.4 MB",
-        status: "read"
+        status: "read",
       },
       {
         id: 5,
@@ -200,9 +203,9 @@ const chatData: Record<string, Chat> = {
         content: "These look amazing! The color scheme works really well.",
         time: "10:10 AM",
         isSender: true,
-        status: "delivered"
-      }
-    ]
+        status: "delivered",
+      },
+    ],
   },
   "3": {
     name: "Mike Chen",
@@ -211,8 +214,8 @@ const chatData: Record<string, Chat> = {
     lastSeen: "1 hour ago",
     description: "Backend Developer",
     members: [{ id: 1, name: "Mike Chen", status: "offline", role: "Member" }],
-    messages: []
-  }
+    messages: [],
+  },
 };
 
 export default function ChatPage() {
@@ -224,12 +227,18 @@ export default function ChatPage() {
   const messageEndRef = useRef<HTMLDivElement>(null);
   const chat = chatData[params.id as keyof typeof chatData];
   const t = useTranslations("chat");
-  
+
   // Add current user to members list for individual chats
-  const currentUser: Member = { id: 0, name: "You", status: "online", role: "Member" };
-  const members = chat?.type === "individual" 
-    ? [currentUser, ...chat.members]
-    : chat?.members;
+  const currentUser: Member = {
+    id: 0,
+    name: "You",
+    status: "online",
+    role: "Member",
+  };
+  const members =
+    chat?.type === "individual"
+      ? [currentUser, ...chat.members]
+      : chat?.members;
 
   // Simulate loading state
   useEffect(() => {
@@ -346,7 +355,10 @@ export default function ChatPage() {
                   <div className="flex items-center gap-2">
                     <h2 className="font-semibold">{chat?.name}</h2>
                     {chat?.type === "group" && (
-                      <Badge variant="secondary" className="h-5 hidden md:block">
+                      <Badge
+                        variant="secondary"
+                        className="h-5 hidden md:block"
+                      >
                         {t("status.membersCount", { count: members?.length })}
                       </Badge>
                     )}
@@ -466,7 +478,7 @@ export default function ChatPage() {
                   >
                     <div className="p-4 border-b">
                       <h3 className="text-lg font-semibold">
-                        {chat?.type === "group" 
+                        {chat?.type === "group"
                           ? t("details.groupDetails")
                           : t("details.chatDetails")}
                       </h3>
@@ -490,7 +502,9 @@ export default function ChatPage() {
                           <div className="py-4 space-y-4">
                             <div>
                               <h4 className="text-sm font-medium mb-2 mt-4">
-                                {chat?.type === "group" ? t("details.members") : t("details.participants")}
+                                {chat?.type === "group"
+                                  ? t("details.members")
+                                  : t("details.participants")}
                               </h4>
                               <div className="space-y-2">
                                 {members?.map((member) => (
@@ -505,7 +519,9 @@ export default function ChatPage() {
                                         </AvatarFallback>
                                       </Avatar>
                                       <div>
-                                        <p className="text-sm font-medium">{member.name}</p>
+                                        <p className="text-sm font-medium">
+                                          {member.name}
+                                        </p>
                                         <p className="text-xs text-muted-foreground">
                                           {member.role}
                                         </p>
@@ -532,11 +548,17 @@ export default function ChatPage() {
                               <div className="space-y-1">
                                 {chat?.type === "group" ? (
                                   <>
-                                    <Button variant="ghost" className="w-full justify-start">
+                                    <Button
+                                      variant="ghost"
+                                      className="w-full justify-start"
+                                    >
                                       <Edit className="mr-2 h-4 w-4" />{" "}
                                       {t("details.actions.editGroup")}
                                     </Button>
-                                    <Button variant="ghost" className="w-full justify-start">
+                                    <Button
+                                      variant="ghost"
+                                      className="w-full justify-start"
+                                    >
                                       <UserPlus className="mr-2 h-4 w-4" />{" "}
                                       {t("details.actions.addMembers")}
                                     </Button>
@@ -550,15 +572,24 @@ export default function ChatPage() {
                                   </>
                                 ) : (
                                   <>
-                                    <Button variant="ghost" className="w-full justify-start">
+                                    <Button
+                                      variant="ghost"
+                                      className="w-full justify-start"
+                                    >
                                       <Volume2 className="mr-2 h-4 w-4" />
                                       {t("details.actions.muteNotifications")}
                                     </Button>
-                                    <Button variant="ghost" className="w-full justify-start">
+                                    <Button
+                                      variant="ghost"
+                                      className="w-full justify-start"
+                                    >
                                       <Archive className="mr-2 h-4 w-4" />
                                       {t("details.actions.archiveChat")}
                                     </Button>
-                                    <Button variant="ghost" className="w-full justify-start">
+                                    <Button
+                                      variant="ghost"
+                                      className="w-full justify-start"
+                                    >
                                       <Slash className="mr-2 h-4 w-4" />
                                       {t("details.actions.blockUser")}
                                     </Button>
@@ -672,7 +703,9 @@ export default function ChatPage() {
           <CardContent className="flex-1 space-y-6 overflow-auto">
             <div>
               <h4 className="text-sm font-medium mb-2 mt-4">
-                {chat?.type === "group" ? t("details.members") : t("details.participants")}
+                {chat?.type === "group"
+                  ? t("details.members")
+                  : t("details.participants")}
               </h4>
               <ScrollArea className="h-[280px] pr-4">
                 <div className="space-y-2">

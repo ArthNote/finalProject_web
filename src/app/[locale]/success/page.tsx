@@ -13,7 +13,7 @@ import { CheckCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 
 const SuccessPage = () => {
   const searchParams = useSearchParams();
@@ -32,7 +32,7 @@ const SuccessPage = () => {
           <CardTitle className="text-2xl">{t("title")}</CardTitle>
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
-        
+
         <CardFooter className="justify-center">
           <Link href="/dashboard">
             <Button className="w-full">{t("cta")}</Button>

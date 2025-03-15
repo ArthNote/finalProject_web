@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 
 interface PriceCardProps {
   plan: "individual" | "team" | "enterprise";

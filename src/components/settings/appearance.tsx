@@ -22,7 +22,7 @@ import { Loader2Icon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useFont } from "../wrappers/font-provider";
 import { useLocale, useTranslations } from "next-intl";
-import { redirect } from "@/i18n/routing";
+import { redirect } from "@/i18n/navigation";
 import { toast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { updateLanguage } from "@/lib/api/users";

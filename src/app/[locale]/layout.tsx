@@ -15,6 +15,7 @@ import {
   dmMono,
 } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
+import { NextIntlClientProvider } from "next-intl";
 
 export const metadata: Metadata = {
   title: "TaskFlow",
@@ -80,9 +81,9 @@ export default async function RootLayout({
           {/* Final overlay */}
           <div className="absolute inset-0 backdrop-blur-[1px] backdrop-saturate-150" />
         </div>
-        <Providers messages={messages} locale={locale}>
-          {children}
-        </Providers>
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

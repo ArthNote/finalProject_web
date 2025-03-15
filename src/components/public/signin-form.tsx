@@ -39,7 +39,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Link, redirect, useRouter } from "@/i18n/routing";
+import { Link, redirect, useRouter } from "@/i18n/navigation";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useTransition } from "react";
 import { useSearchParams } from "next/navigation";

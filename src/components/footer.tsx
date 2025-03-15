@@ -1,6 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { consts } from "@/lib/constants";
@@ -72,7 +72,10 @@ export default function Footer() {
                 <p className="font-medium">{t("helpfulLinks.title")}</p>
                 <ul className="mt-6 space-y-4 text-sm">
                   <li>
-                    <Link href="/contact" className="transition hover:opacity-75">
+                    <Link
+                      href="/contact"
+                      className="transition hover:opacity-75"
+                    >
                       {t("helpfulLinks.contact")}
                     </Link>
                   </li>

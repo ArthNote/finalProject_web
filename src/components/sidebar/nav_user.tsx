@@ -27,7 +27,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/hooks/use-toast";
-import { Link, redirect, useRouter } from "@/i18n/routing";
+import { Link, redirect, useRouter } from "@/i18n/navigation";
 
 export function NavUser({
   user,

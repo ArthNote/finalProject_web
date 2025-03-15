@@ -7,6 +7,7 @@
  * 'relative' -> '2 days ago', 'in 3 months'
  * 'monthDay' -> 'January 1'
  * 'monthYear' -> 'January 2025'
+ * 'weekdayShort' -> 'Saturday, Mar 13'
  */
 export type DateFormatStyle =
   | "short"
@@ -14,7 +15,8 @@ export type DateFormatStyle =
   | "long"
   | "relative"
   | "monthDay"
-  | "monthYear";
+  | "monthYear"
+  | "weekdayShort";
 
 /**
  * Supported locales for date formatting
@@ -43,6 +45,22 @@ export type DateFormatLocale = "en" | "fr";
  * @example
  * // Returns "1 janvier 2025, 12:00" in French
  * formatDate("2025-01-01T12:00:00", "long", "fr")
+ *
+ * @example
+ * // Returns "January 1" in English
+ * formatDate("2025-01-01", "monthDay")
+ *
+ * @example
+ * // Returns "January 2025" in English
+ * formatDate("2025-01-01", "monthYear")
+ *
+ * @example
+ * // Returns "Saturday, Mar 13" in English
+ * formatDate("2025-03-13", "weekdayShort")
+ *
+ * @example
+ * // Returns "2 days ago" or "in 3 months" based on current date
+ * formatDate("2025-01-01", "relative")
  */
 export function formatDate(
   date: string | number | Date,
@@ -102,6 +120,13 @@ export function formatDate(
       return new Intl.DateTimeFormat(localeString, {
         month: "long",
         year: "numeric",
+      }).format(dateObj);
+
+    case "weekdayShort":
+      return new Intl.DateTimeFormat(localeString, {
+        weekday: "long",
+        month: "short",
+        day: "numeric",
       }).format(dateObj);
 
     default:

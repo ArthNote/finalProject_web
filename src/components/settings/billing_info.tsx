@@ -15,7 +15,7 @@ import EmptyState from "../empty_state";
 import { PiInvoice } from "react-icons/pi";
 import { formatDate } from "@/lib/dateFormate";
 import { Badge } from "../ui/badge";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "../ui/skeleton";
 

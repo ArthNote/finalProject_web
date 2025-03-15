@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 import { Brain, Workflow, Focus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 
 const AboutUs = () => {
   const t = useTranslations("HomePage.aboutUs");

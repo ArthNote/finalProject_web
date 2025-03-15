@@ -1,5 +1,5 @@
 "use client";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import React from "react";
 import { Button, buttonVariants } from "../ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -11,7 +11,10 @@ import { motion } from "motion/react";
 const HeroSection = () => {
   const t = useTranslations("HomePage");
   return (
-    <div id="home" className="container flex max-w-screen flex-col items-center gap-5 text-center ">
+    <div
+      id="home"
+      className="container flex max-w-screen flex-col items-center gap-5 text-center "
+    >
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

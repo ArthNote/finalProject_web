@@ -32,7 +32,7 @@ import { Button } from "@/components/ui/button";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { useRouter, Link } from "@/i18n/routing";
+import { useRouter, Link } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 
 export default function ResetPasswordPage() {
@@ -179,7 +179,6 @@ export default function ResetPasswordPage() {
             </form>
           </Form>
         </CardContent>
-
       </Card>
     </div>
   );

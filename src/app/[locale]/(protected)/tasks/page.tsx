@@ -1,30 +1,47 @@
+"use client";
+
 import React from "react";
 import TasksSidebar from "@/components/sidebar/TasksSidebar";
 import { Card } from "@/components/ui/card";
+import FloatingToolbar from "@/components/calendar/FloatingToolbar";
+import { useCalendarStore } from "@/lib/state/useCalendarStore";
+import ListView from "@/components/tasks/listView";
+import KanbanView from "@/components/tasks/KanbanView";
+import GridView from "@/components/tasks/GridView";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-const TasksPage = () => {
+const Page = () => {
+  const { viewMode } = useCalendarStore();
+
+  // Function to render the appropriate view based on viewMode
+  const renderView = () => {
+    switch (viewMode) {
+      case "list":
+        return <ListView />;
+      case "kanban":
+        return <KanbanView />;
+      case "grid":
+        return <GridView />;
+      default:
+        return <ListView />;
+    }
+  };
+
   return (
-    <Card className="flex h-[90vh]">
+    <Card className="flex h-[90vh] relative">
       <TasksSidebar />
-      <main className="flex-1 p-8 pb-24 md:pb-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-lg font-medium tracking-tight">Tasks</h1>
-            <p className="text-sm text-muted-foreground">
-              Manage your schedule and daily activities
-            </p>
+      <main className="flex-1 relative">
+        <ScrollArea className="h-full w-full">
+          <div className="p-8 pb-28 sm:pb-24">
+            <div className="w-full">{renderView()}</div>
           </div>
-
-          {/* Content Area */}
-          <div className="mt-8 rounded-lg border bg-white dark:bg-background p-6">
-            <div className="text-muted-foreground/80">
-              Tasks content will go here
-            </div>
-          </div>
-        </div>
+        </ScrollArea>
       </main>
+
+      {/* FloatingToolbar is now outside the main content padding area */}
+      <FloatingToolbar />
     </Card>
   );
 };
 
-export default TasksPage;
+export default Page;

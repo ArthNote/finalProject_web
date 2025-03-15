@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -124,10 +124,10 @@ export default function ChatComponent() {
           <header className="p-3 sm:p-4 md:p-6 border-b">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
               <div>
-                <h1 className="text-xl sm:text-2xl font-semibold">{t("title")}</h1>
-                <p className="text-sm text-muted-foreground">
-                  {t("subtitle")}
-                </p>
+                <h1 className="text-xl sm:text-2xl font-semibold">
+                  {t("title")}
+                </h1>
+                <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

@@ -17,7 +17,7 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { changePlan } from "@/lib/api/subscriptions";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 
 interface PlanCardProps {
   plan: "individual" | "team" | "enterprise";
