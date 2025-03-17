@@ -6,96 +6,26 @@ import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
   ChevronRight,
-  Clock,
-  X,
   CalendarIcon,
-  Tag,
-  Users,
-  Plus,
-  Mic,
-  BrainCircuit,
   Settings,
-  Sparkles,
-  Zap,
-  Sun,
-  CalendarDays,
-  Keyboard,
-  ArrowUpDown,
-  ListFilter,
-  Clock4,
-  PieChart,
-  Package,
-  ShieldAlert,
-  List,
-  LayoutGrid,
-  KanbanSquare,
-  BarChart2,
-  Coffee,
-  Focus,
-  Moon,
-  Timer,
-  Check,
-  PanelLeft,
-  Palette,
-  EyeIcon,
-  Undo2,
-  CalendarRange,
 } from "lucide-react";
 import {
   format,
   addDays,
   subDays,
   isToday,
-  setHours,
-  setMinutes,
 } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { EventItem } from "@/components/calendar/EventItem";
-import { MOCK_EVENTS, EventType } from "@/components/calendar/calendarData";
+import { EventItem } from "@/components/tasks/side_calendar/EventItem";
+import {
+  MOCK_EVENTS,
+} from "@/components/tasks/side_calendar/calendarData";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import EventDetailsSheet from "./EventDetailsSheet";
 import CalendarSettingsDialog, {
   CalendarSettings,
@@ -197,7 +127,7 @@ const TimelineCalendar = () => {
   return (
     <div className="flex h-full">
       {/* Main Calendar */}
-      <div className="flex flex-col flex-1 h-full bg-white dark:bg-background">
+      <div className="flex flex-col flex-1 h-full bg-background">
         {/* Date Navigation - Redesigned with settings button */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
           {/* Left: Calendar Picker */}
@@ -206,7 +136,7 @@ const TimelineCalendar = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 gap-1 px-2 hover:bg-neutral-100 dark:hover:bg-neutral-800/30"
+                className="h-8"
               >
                 <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
@@ -228,7 +158,7 @@ const TimelineCalendar = () => {
               variant="ghost"
               size="icon"
               onClick={handlePreviousDay}
-              className="h-7 w-7 hover:bg-neutral-100 dark:hover:bg-neutral-800/30"
+              className="h-7 w-7"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -260,7 +190,7 @@ const TimelineCalendar = () => {
               variant="ghost"
               size="icon"
               onClick={handleNextDay}
-              className="h-7 w-7 hover:bg-neutral-100 dark:hover:bg-neutral-800/30"
+              className="h-7 w-7"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -271,7 +201,7 @@ const TimelineCalendar = () => {
             variant="outline"
             size="icon"
             onClick={() => setIsSettingsOpen(true)}
-            className="h-8 gap-1 px-2 hover:bg-neutral-100 dark:hover:bg-neutral-800/30"
+            className="h-8"
           >
             <Settings className="h-3.5 w-3.5 text-muted-foreground" />
           </Button>

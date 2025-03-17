@@ -1,18 +1,19 @@
 import { create } from "zustand";
-import { EventType } from "@/components/calendar/calendarData";
+import { EventType } from "@/components/tasks/side_calendar/calendarData";
 
 interface CalendarState {
   // Floating toolbar related state
   aiTaskInput: string;
   isRecording: boolean;
-  optimizationMode: string;
-  optimizationPeriod: string;
+  optimizationMode: "balanced" | "productivity" | "wellbeing" | "custom";
+  optimizationPeriod: "today" | "tomorrow" | "week" | "custom";
+  optimizationTaskScope: "unscheduled" | "all" | "scheduled";
   showPriorityLevels: {
     high: boolean;
     medium: boolean;
     low: boolean;
   };
-  viewMode: string;
+  viewMode: "list" | "grid" | "kanban";
   isSettingsOpen: boolean;
   optimizationRange: {
     from: Date | undefined;
@@ -29,14 +30,21 @@ interface CalendarState {
   toggleRecording: () => void;
   setIsRecording: (value: boolean) => void;
   processAiTask: () => void;
-  setOptimizationMode: (mode: string) => void;
-  setOptimizationPeriod: (period: string) => void;
+  setOptimizationMode: (
+    mode: "balanced" | "productivity" | "wellbeing" | "custom"
+  ) => void;
+  setOptimizationPeriod: (
+    period: "today" | "tomorrow" | "week" | "custom"
+  ) => void;
+  setOptimizationTaskScope: (
+    scope: "unscheduled" | "all" | "scheduled"
+  ) => void;
   setShowPriorityLevels: (levels: {
     high: boolean;
     medium: boolean;
     low: boolean;
   }) => void;
-  setViewMode: (mode: string) => void;
+  setViewMode: (mode: "list" | "grid" | "kanban") => void;
   setIsSettingsOpen: (isOpen: boolean) => void;
   setOptimizationRange: (range: {
     from: Date | undefined;
@@ -58,6 +66,7 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   isRecording: false,
   optimizationMode: "balanced",
   optimizationPeriod: "today",
+  optimizationTaskScope: "unscheduled",
   showPriorityLevels: {
     high: true,
     medium: true,
@@ -123,6 +132,7 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   },
   setOptimizationMode: (mode) => set({ optimizationMode: mode }),
   setOptimizationPeriod: (period) => set({ optimizationPeriod: period }),
+  setOptimizationTaskScope: (scope) => set({ optimizationTaskScope: scope }),
   setShowPriorityLevels: (levels) => set({ showPriorityLevels: levels }),
   setViewMode: (mode) => set({ viewMode: mode }),
   setIsSettingsOpen: (isOpen) => set({ isSettingsOpen: isOpen }),

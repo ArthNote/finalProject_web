@@ -45,6 +45,7 @@ const sampleTasks = [
     completed: false,
     category: "Work",
     tags: ["client", "proposal"],
+    scheduled: true,
   },
   {
     id: "2",
@@ -55,6 +56,7 @@ const sampleTasks = [
     completed: false,
     category: "Meetings",
     tags: ["team", "weekly"],
+    scheduled: true,
   },
   {
     id: "3",
@@ -65,6 +67,7 @@ const sampleTasks = [
     completed: false,
     category: "Personal",
     tags: ["website", "portfolio"],
+    scheduled: false,
   },
   {
     id: "4",
@@ -75,6 +78,7 @@ const sampleTasks = [
     completed: true,
     category: "Health",
     tags: ["appointment", "health"],
+    scheduled: true,
   },
   {
     id: "5",
@@ -85,6 +89,7 @@ const sampleTasks = [
     completed: false,
     category: "Work",
     tags: ["presentation", "conference"],
+    scheduled: false,
   },
 ];
 
@@ -92,6 +97,7 @@ const ListView = () => {
   const [tasks, setTasks] = useState(sampleTasks);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [scheduledFilter, setScheduledFilter] = useState("all"); // "all", "scheduled", "unscheduled"
   const [tasksOpen, setTasksOpen] = useState({
     todo: true,
     completed: true,
@@ -100,15 +106,25 @@ const ListView = () => {
   // Count tasks by status
   const todoTasksCount = tasks.filter((task) => !task.completed).length;
   const completedTasksCount = tasks.filter((task) => task.completed).length;
+  const unscheduledTasksCount = tasks.filter(
+    (task) => !task.scheduled && !task.completed
+  ).length;
 
-  // Filter tasks based on search query and category
+  // Filter tasks based on search query, category, and scheduled status
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.description.toLowerCase().includes(searchQuery.toLowerCase());
+
     const matchesCategory =
       categoryFilter === "all" || task.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+
+    const matchesScheduledStatus =
+      scheduledFilter === "all" ||
+      (scheduledFilter === "scheduled" && task.scheduled) ||
+      (scheduledFilter === "unscheduled" && !task.scheduled);
+
+    return matchesSearch && matchesCategory && matchesScheduledStatus;
   });
 
   const todoTasks = filteredTasks.filter((task) => !task.completed);
@@ -118,6 +134,14 @@ const ListView = () => {
     setTasks(
       tasks.map((task) =>
         task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const handleToggleScheduled = (taskId: string) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === taskId ? { ...task, scheduled: !task.scheduled } : task
       )
     );
   };
@@ -174,12 +198,147 @@ const ListView = () => {
               ))}
             </SelectContent>
           </Select>
-          <Button className="shrink-0">
-            <Plus className="h-4 w-4 mr-1.5" />
-            New Task
-          </Button>
+
+          <Select value={scheduledFilter} onValueChange={setScheduledFilter}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Task Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Tasks</SelectItem>
+              <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="unscheduled">Unscheduled</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
+
+      {/* Unscheduled Tasks Section - Only show when there are unscheduled tasks */}
+      {unscheduledTasksCount > 0 && scheduledFilter !== "scheduled" && (
+        <Collapsible defaultOpen>
+          <div className="flex items-center justify-between border-b pb-2">
+            <CollapsibleTrigger asChild>
+              <div className="flex items-center gap-2 cursor-pointer">
+                <h3 className="font-medium text-base">Unscheduled</h3>
+                <Badge
+                  variant="secondary"
+                  className="bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
+                >
+                  {unscheduledTasksCount}
+                </Badge>
+                <ChevronDown className="h-4 w-4 transition-transform" />
+              </div>
+            </CollapsibleTrigger>
+            <Select defaultValue="priority">
+              <SelectTrigger className="h-8 w-[140px] text-xs">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="priority">Sort by Priority</SelectItem>
+                <SelectItem value="name">Sort by Name</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <CollapsibleContent>
+            <div className="space-y-3 mt-3">
+              {todoTasks
+                .filter((task) => !task.scheduled)
+                .map((task) => (
+                  <div
+                    key={task.id}
+                    className="group flex items-start gap-3 p-4 border rounded-lg hover:shadow-sm transition-all bg-card"
+                  >
+                    {/* Priority indicator */}
+                    <div className="mt-1.5 flex flex-col items-center gap-2">
+                      <div
+                        className={`h-3 w-3 rounded-full ${getPriorityColor(
+                          task.priority
+                        )}`}
+                      />
+                      <Checkbox
+                        checked={task.completed}
+                        onCheckedChange={() => handleToggleComplete(task.id)}
+                      />
+                    </div>
+
+                    {/* Task details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <h4 className="font-medium text-base truncate">
+                          {task.title}
+                        </h4>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <Badge
+                            variant="outline"
+                            className="bg-secondary/50 h-6"
+                          >
+                            {task.category}
+                          </Badge>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleToggleScheduled(task.id)}
+                              >
+                                Schedule Task
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>Edit Task</DropdownMenuItem>
+                              <DropdownMenuItem>Set Priority</DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Add to Calendar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-500">
+                                Delete Task
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                        {task.description}
+                      </p>
+
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => handleToggleScheduled(task.id)}
+                        >
+                          <Calendar className="mr-1 h-3.5 w-3.5" />
+                          Schedule
+                        </Button>
+
+                        {task.tags?.length > 0 && (
+                          <div className="flex items-center gap-1.5">
+                            <Tag className="h-3 w-3 text-muted-foreground" />
+                            {task.tags.map((tag, i) => (
+                              <span
+                                key={i}
+                                className="text-xs px-1.5 py-0.5 bg-muted rounded-md"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
 
       {/* Todo Tasks Section */}
       <Collapsible
@@ -190,7 +349,11 @@ const ListView = () => {
           <CollapsibleTrigger asChild>
             <div className="flex items-center gap-2 cursor-pointer">
               <h3 className="font-medium text-base">To Do</h3>
-              <Badge variant="secondary">{todoTasksCount}</Badge>
+              <Badge variant="secondary">
+                {scheduledFilter === "unscheduled"
+                  ? 0
+                  : todoTasks.filter((t) => t.scheduled).length}
+              </Badge>
               <ChevronDown
                 className={`h-4 w-4 transition-transform ${
                   tasksOpen.todo ? "rotate-0" : "-rotate-90"
@@ -212,93 +375,108 @@ const ListView = () => {
 
         <CollapsibleContent>
           <div className="space-y-3 mt-3">
-            {todoTasks.length === 0 ? (
+            {todoTasks.filter(
+              (task) => scheduledFilter !== "unscheduled" && task.scheduled
+            ).length === 0 ? (
               <div className="text-center py-8 bg-muted/40 border border-dashed rounded-md">
                 <p className="text-muted-foreground">
-                  No tasks to do. Create a new task to get started!
+                  {scheduledFilter === "scheduled"
+                    ? "No scheduled tasks to do. Schedule some tasks to get started!"
+                    : "No tasks to do. Create a new task to get started!"}
                 </p>
               </div>
             ) : (
-              todoTasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="group flex items-start gap-3 p-4 border rounded-lg hover:shadow-sm transition-all bg-card"
-                >
-                  {/* Priority indicator */}
-                  <div className="mt-1.5 flex flex-col items-center gap-2">
-                    <div
-                      className={`h-3 w-3 rounded-full ${getPriorityColor(
-                        task.priority
-                      )}`}
-                    />
-                    <Checkbox
-                      checked={task.completed}
-                      onCheckedChange={() => handleToggleComplete(task.id)}
-                    />
-                  </div>
-
-                  {/* Task details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <h4 className="font-medium text-base truncate">
-                        {task.title}
-                      </h4>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <Badge
-                          variant="outline"
-                          className="bg-secondary/50 h-6"
-                        >
-                          {task.category}
-                        </Badge>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit Task</DropdownMenuItem>
-                            <DropdownMenuItem>Set Priority</DropdownMenuItem>
-                            <DropdownMenuItem>Add to Calendar</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-500">
-                              Delete Task
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+              todoTasks
+                .filter(
+                  (task) => scheduledFilter !== "unscheduled" && task.scheduled
+                )
+                .map((task) => (
+                  <div
+                    key={task.id}
+                    className="group flex items-start gap-3 p-4 border rounded-lg hover:shadow-sm transition-all bg-card"
+                  >
+                    {/* Priority indicator */}
+                    <div className="mt-1.5 flex flex-col items-center gap-2">
+                      <div
+                        className={`h-3 w-3 rounded-full ${getPriorityColor(
+                          task.priority
+                        )}`}
+                      />
+                      <Checkbox
+                        checked={task.completed}
+                        onCheckedChange={() => handleToggleComplete(task.id)}
+                      />
                     </div>
 
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                      {task.description}
-                    </p>
-
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                      <div className="flex items-center text-xs text-muted-foreground">
-                        <Clock className="mr-1 h-3.5 w-3.5" />
-                        <span>{formatDate(task.dueDate)}</span>
-                      </div>
-
-                      {task.tags?.length > 0 && (
-                        <div className="flex items-center gap-1.5">
-                          <Tag className="h-3 w-3 text-muted-foreground" />
-                          {task.tags.map((tag, i) => (
-                            <span
-                              key={i}
-                              className="text-xs px-1.5 py-0.5 bg-muted rounded-md"
-                            >
-                              {tag}
-                            </span>
-                          ))}
+                    {/* Task details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <h4 className="font-medium text-base truncate">
+                          {task.title}
+                        </h4>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <Badge
+                            variant="outline"
+                            className="bg-secondary/50 h-6"
+                          >
+                            {task.category}
+                          </Badge>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleToggleScheduled(task.id)}
+                              >
+                                Unschedule Task
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>Edit Task</DropdownMenuItem>
+                              <DropdownMenuItem>Set Priority</DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Add to Calendar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-500">
+                                Delete Task
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
-                      )}
+                      </div>
+
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                        {task.description}
+                      </p>
+
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <Clock className="mr-1 h-3.5 w-3.5" />
+                          <span>{formatDate(task.dueDate)}</span>
+                        </div>
+
+                        {task.tags?.length > 0 && (
+                          <div className="flex items-center gap-1.5">
+                            <Tag className="h-3 w-3 text-muted-foreground" />
+                            {task.tags.map((tag, i) => (
+                              <span
+                                key={i}
+                                className="text-xs px-1.5 py-0.5 bg-muted rounded-md"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                ))
             )}
           </div>
         </CollapsibleContent>
