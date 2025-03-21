@@ -133,7 +133,7 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   setOptimizationMode: (mode) => set({ optimizationMode: mode }),
   setOptimizationPeriod: (period) => set({ optimizationPeriod: period }),
   setOptimizationTaskScope: (scope) => set({ optimizationTaskScope: scope }),
-  setShowPriorityLevels: (levels) => set({ showPriorityLevels: levels }),
+  setShowPriorityLevels: (levels) => set({ showPriorityLevels: levels }), 
   setViewMode: (mode) => set({ viewMode: mode }),
   setIsSettingsOpen: (isOpen) => set({ isSettingsOpen: isOpen }),
   setOptimizationRange: (range) => set({ optimizationRange: range }),

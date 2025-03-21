@@ -65,6 +65,7 @@ import { Link } from "@/i18n/navigation";
 import { formatDate } from "@/lib/dateFormate";
 import { useLocale } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
+import CreateTaskSheet from "@/components/tasks/CreateTaskSheet";
 
 // Define interfaces for props to fix TypeScript errors
 interface ScopeOptionProps {
@@ -243,6 +244,10 @@ const FloatingToolbar = () => {
   const [isOptimizationSheetOpen, setIsOptimizationSheetOpen] =
     React.useState(false);
 
+  // Add state for create task sheet
+  const [isCreateTaskSheetOpen, setIsCreateTaskSheetOpen] =
+    React.useState(false);
+
   return (
     <>
       {/* Toggle button shown when toolbar is hidden */}
@@ -399,56 +404,16 @@ const FloatingToolbar = () => {
                       </DialogContent>
                     </Dialog>
 
-                    {/* Manual Task Creation */}
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                          <Keyboard className="mr-2 h-4 w-4" />
-                          Create Manually
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Create Task</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">
-                              Task Title
-                            </label>
-                            <Input placeholder="Enter task title" />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">
-                              Description
-                            </label>
-                            <Textarea placeholder="Enter task description" />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">
-                                Start Time
-                              </label>
-                              <Input type="time" />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">
-                                End Time
-                              </label>
-                              <Input type="time" />
-                            </div>
-                          </div>
-                        </div>
-                        <DialogFooter className="flex justify-between gap-2">
-                          <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
-                          </DialogClose>
-                          <DialogClose asChild>
-                            <Button>Create Task</Button>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    {/* Manual Task Creation - Now opens the sheet instead of dialog */}
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setIsCreateTaskSheetOpen(true);
+                      }}
+                    >
+                      <Keyboard className="mr-2 h-4 w-4" />
+                      Create Manually
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -581,6 +546,12 @@ const FloatingToolbar = () => {
           />
         </SheetContent>
       </Sheet>
+
+      {/* Create Task Sheet */}
+      <CreateTaskSheet
+        open={isCreateTaskSheetOpen}
+        onOpenChange={setIsCreateTaskSheetOpen}
+      />
     </>
   );
 };

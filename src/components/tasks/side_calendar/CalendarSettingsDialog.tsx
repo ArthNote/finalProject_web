@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EyeIcon, Palette, PanelLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export interface CalendarSettings {
   showWeekends: boolean;
@@ -41,21 +42,22 @@ const CalendarSettingsDialog: React.FC<CalendarSettingsDialogProps> = ({
   onSettingsChange,
   onSave,
 }) => {
+  const t = useTranslations("tasks.sideCalendar.settings");
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Calendar Settings</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <h3 className="text-sm font-medium flex items-center gap-2">
-              <EyeIcon className="h-4 w-4 text-muted-foreground" /> Display
-              Options
+              <EyeIcon className="h-4 w-4 text-muted-foreground" />
+              {t("displayOptions.title")}
             </h3>
             <div className="flex items-center justify-between">
               <label htmlFor="showWeekends" className="text-sm">
-                Show weekends
+                {t("displayOptions.showWeekends")}
               </label>
               <input
                 type="checkbox"
@@ -73,7 +75,7 @@ const CalendarSettingsDialog: React.FC<CalendarSettingsDialogProps> = ({
 
             <div className="flex items-center justify-between">
               <label htmlFor="showCompleted" className="text-sm">
-                Show completed tasks
+                {t("displayOptions.showCompleted")}
               </label>
               <input
                 type="checkbox"
@@ -88,34 +90,17 @@ const CalendarSettingsDialog: React.FC<CalendarSettingsDialogProps> = ({
                 className="accent-primary"
               />
             </div>
-
-            <div className="flex items-center justify-between">
-              <label htmlFor="expandAllDay" className="text-sm">
-                Expand all-day section
-              </label>
-              <input
-                type="checkbox"
-                id="expandAllDay"
-                checked={settings.expandAllDay}
-                onChange={(e) =>
-                  onSettingsChange({
-                    ...settings,
-                    expandAllDay: e.target.checked,
-                  })
-                }
-                className="accent-primary"
-              />
-            </div>
           </div>
 
           <div className="grid gap-2">
             <h3 className="text-sm font-medium flex items-center gap-2">
-              <Palette className="h-4 w-4 text-muted-foreground" /> Appearance
+              <Palette className="h-4 w-4 text-muted-foreground" />
+              {t("appearance.title")}
             </h3>
 
             <div className="space-y-1">
               <label htmlFor="colorScheme" className="text-sm">
-                Color scheme
+                {t("appearance.colorScheme")}
               </label>
               <Select
                 value={settings.colorScheme}
@@ -130,17 +115,25 @@ const CalendarSettingsDialog: React.FC<CalendarSettingsDialogProps> = ({
                   <SelectValue placeholder="Select a color scheme" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="default">Default</SelectItem>
-                  <SelectItem value="colorful">Colorful</SelectItem>
-                  <SelectItem value="monochrome">Monochrome</SelectItem>
-                  <SelectItem value="pastel">Pastel</SelectItem>
+                  <SelectItem value="default">
+                    {t("appearance.default")}
+                  </SelectItem>
+                  <SelectItem value="colorful">
+                    {t("appearance.colorful")}
+                  </SelectItem>
+                  <SelectItem value="monochrome">
+                    {t("appearance.monochrome")}
+                  </SelectItem>
+                  <SelectItem value="pastel">
+                    {t("appearance.pastel")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-1">
               <label htmlFor="timeFormat" className="text-sm">
-                Time format
+                {t("appearance.timeFormat")}
               </label>
               <Select
                 value={settings.timeFormat}
@@ -155,81 +148,10 @@ const CalendarSettingsDialog: React.FC<CalendarSettingsDialogProps> = ({
                   <SelectValue placeholder="Select time format" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="12h">12-hour (1:00 PM)</SelectItem>
-                  <SelectItem value="24h">24-hour (13:00)</SelectItem>
+                  <SelectItem value="12h">{t("appearance.12Hour")}</SelectItem>
+                  <SelectItem value="24h">{t("appearance.24Hour")}</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
-
-          <div className="grid gap-2">
-            <h3 className="text-sm font-medium flex items-center gap-2">
-              <PanelLeft className="h-4 w-4 text-muted-foreground" /> Working
-              Hours
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label htmlFor="startHour" className="text-sm">
-                  Start hour
-                </label>
-                <Select
-                  value={settings.startHour.toString()}
-                  onValueChange={(val) =>
-                    onSettingsChange({
-                      ...settings,
-                      startHour: parseInt(val),
-                    })
-                  }
-                >
-                  <SelectTrigger id="startHour">
-                    <SelectValue placeholder="Start hour" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <SelectItem key={i} value={i.toString()}>
-                        {i === 0
-                          ? "12 AM"
-                          : i < 12
-                          ? `${i} AM`
-                          : i === 12
-                          ? "12 PM"
-                          : `${i - 12} PM`}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1">
-                <label htmlFor="endHour" className="text-sm">
-                  End hour
-                </label>
-                <Select
-                  value={settings.endHour.toString()}
-                  onValueChange={(val) =>
-                    onSettingsChange({
-                      ...settings,
-                      endHour: parseInt(val),
-                    })
-                  }
-                >
-                  <SelectTrigger id="endHour">
-                    <SelectValue placeholder="End hour" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <SelectItem key={i} value={i.toString()}>
-                        {i === 0
-                          ? "12 AM"
-                          : i < 12
-                          ? `${i} AM`
-                          : i === 12
-                          ? "12 PM"
-                          : `${i - 12} PM`}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </div>
         </div>
@@ -239,10 +161,10 @@ const CalendarSettingsDialog: React.FC<CalendarSettingsDialogProps> = ({
             variant="outline"
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            {t("cancel")}
           </Button>
           <Button type="button" onClick={onSave}>
-            Save Changes
+            {t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

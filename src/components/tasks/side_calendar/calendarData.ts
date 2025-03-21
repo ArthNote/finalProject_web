@@ -81,3 +81,4 @@ export const MOCK_EVENTS: EventType[] = [
     status: "todo",
   },
 ];
+  

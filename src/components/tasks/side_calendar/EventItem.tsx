@@ -1,16 +1,16 @@
 import React from "react";
 import { format, differenceInMinutes, startOfDay, addMinutes } from "date-fns";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { GripVertical } from "lucide-react";
-import { EventType } from "./calendarData";
+import { GripVertical, CheckCircle2, Clock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { TaskType } from "@/lib/taskService";
 
 interface EventItemProps {
-  event: EventType;
+  event: TaskType;
   selectedDate: Date;
   timelineRef: React.MutableRefObject<HTMLDivElement | null>;
-  onSelect: (event: EventType) => void;
-  onUpdate: (updatedEvent: EventType) => void;
+  onSelect: (event: TaskType) => void;
+  onUpdate: (updatedEvent: TaskType) => void;
 }
 
 export const EventItem: React.FC<EventItemProps> = ({
@@ -32,15 +32,29 @@ export const EventItem: React.FC<EventItemProps> = ({
   // Calculate the initial position and height as a percentage of the day
   const calculateEventPosition = () => {
     const dayStart = startOfDay(selectedDate);
-    const minutesSinceMidnight = differenceInMinutes(event.start, dayStart);
-    const durationMinutes = differenceInMinutes(event.end, event.start);
+
+    // Use startTime if available, otherwise use dueDate
+    const eventStart = event.startTime
+      ? new Date(event.startTime)
+      : new Date(event.dueDate);
+
+    // Calculate end time: use endTime if available, or calculate from duration, or default to 1 hour
+    const eventEnd = event.endTime
+      ? new Date(event.endTime)
+      : event.duration
+      ? addMinutes(eventStart, event.duration)
+      : addMinutes(eventStart, 60);
+
+    const minutesSinceMidnight = differenceInMinutes(eventStart, dayStart);
+    const durationMinutes = differenceInMinutes(eventEnd, eventStart);
 
     const topPercent = (minutesSinceMidnight / (24 * 60)) * 100;
     const heightPercent = (durationMinutes / (24 * 60)) * 100;
 
     return {
       top: `${topPercent}%`,
-      height: `${heightPercent}%`,
+      height: `${Math.max(heightPercent, 1)}%`, // Reduced minimum height for better fitting
+      durationMinutes, // Add this to help determine content
     };
   };
 
@@ -56,7 +70,11 @@ export const EventItem: React.FC<EventItemProps> = ({
     const newStart = addMinutes(dayStart, startMinutes);
     const newEnd = addMinutes(dayStart, startMinutes + durationMinutes);
 
-    return { start: newStart, end: newEnd };
+    return {
+      startTime: newStart.toISOString(),
+      endTime: newEnd.toISOString(),
+      duration: durationMinutes,
+    };
   };
 
   // Event handlers for dragging
@@ -133,8 +151,10 @@ export const EventItem: React.FC<EventItemProps> = ({
 
     onUpdate({
       ...event,
-      start: newTimes.start,
-      end: newTimes.end,
+      startTime: newTimes.startTime,
+      endTime: newTimes.endTime,
+      dueDate: newTimes.startTime, // Keep dueDate synchronized with startTime
+      duration: newTimes.duration,
     });
 
     document.removeEventListener("mousemove", handleDragMove);
@@ -175,7 +195,8 @@ export const EventItem: React.FC<EventItemProps> = ({
 
     // Calculate the height change as a percentage
     const deltaPercent = (deltaY / timelineHeight) * 100;
-    let newHeightPercent = Math.max(2.5, initialEventPos.height + deltaPercent); // Minimum 2.5% (36 min)
+    // Allow much smaller minimum height (0.7% which is ~10 minutes)
+    let newHeightPercent = Math.max(0.7, initialEventPos.height + deltaPercent);
 
     // Ensure the event doesn't extend past the end of the day
     newHeightPercent = Math.min(100 - initialEventPos.top, newHeightPercent);
@@ -206,8 +227,10 @@ export const EventItem: React.FC<EventItemProps> = ({
 
     onUpdate({
       ...event,
-      start: newTimes.start,
-      end: newTimes.end,
+      startTime: newTimes.startTime,
+      endTime: newTimes.endTime,
+      dueDate: newTimes.startTime, // Keep dueDate synchronized with startTime
+      duration: newTimes.duration,
     });
 
     document.removeEventListener("mousemove", handleResizeMove);
@@ -229,16 +252,56 @@ export const EventItem: React.FC<EventItemProps> = ({
     onSelect(event);
   };
 
+  // Get display times
+  const startTime = event.startTime
+    ? new Date(event.startTime)
+    : new Date(event.dueDate);
+  const endTime = event.endTime
+    ? new Date(event.endTime)
+    : event.duration
+    ? addMinutes(startTime, event.duration)
+    : addMinutes(startTime, 60);
+
+  // Format duration for display
+  const getDurationText = () => {
+    const durationMinutes =
+      event.duration || differenceInMinutes(endTime, startTime);
+
+    if (durationMinutes < 60) {
+      return `${durationMinutes}m`;
+    }
+
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = durationMinutes % 60;
+    return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`;
+  };
+
+  // Get the color based on priority
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-500";
+      case "medium":
+        return "bg-amber-500";
+      case "low":
+        return "bg-green-500";
+      default:
+        return "bg-blue-500";
+    }
+  };
+
   return (
     <div
       ref={eventRef}
       className={cn(
-        "absolute left-0 right-7 rounded-md p-2 shadow-sm pointer-events-auto",
+        "absolute left-0 right-7 rounded-md shadow-sm pointer-events-auto p-2",
         "transition-shadow duration-150",
         dragging && "opacity-80 cursor-grabbing shadow-md z-30",
         resizing && "opacity-90 z-30",
         !dragging && !resizing && "hover:shadow-md cursor-pointer",
-        event.color
+        event.completed
+          ? "bg-gray-400 opacity-60"
+          : getPriorityColor(event.priority)
       )}
       style={{
         top: eventPosition.top,
@@ -248,50 +311,83 @@ export const EventItem: React.FC<EventItemProps> = ({
       onClick={handleEventClick}
     >
       <div className="flex flex-col h-full text-white relative">
-        {/* Drag handle */}
-        <div className="drag-handle absolute top-0 right-0 p-1 cursor-grab opacity-50 hover:opacity-100">
-          <GripVertical className="h-3 w-3" />
-        </div>
-
-        <div className="text-xs font-medium">
-          {format(event.start, "h:mm a")} - {format(event.end, "h:mm a")}
-        </div>
-        <div className="font-semibold text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-          {event.title}
-        </div>
-        {event.location && (
-          <div className="text-xs opacity-80 mt-1 overflow-hidden text-ellipsis">
-            {event.location}
+        {/* Render different content based on the duration */}
+        {eventPosition.durationMinutes <= 15 ? (
+          // Ultra-minimal version for very short events (15 min or less) - maintain consistent font size
+          <div className="text-xs font-medium truncate h-full flex items-center">
+            {event.title}
           </div>
-        )}
-        {event.attendees && event.attendees.length > 0 && (
-          <div className="flex mt-auto pt-1">
-            {event.attendees.slice(0, 2).map((attendee, i) => (
-              <Avatar
-                key={i}
-                className="h-5 w-5 border border-white -ml-1 first:ml-0"
-              >
-                <AvatarImage src={attendee.avatar} />
-                <AvatarFallback className="text-[10px]">
-                  {attendee.name[0]}
-                </AvatarFallback>
-              </Avatar>
-            ))}
-            {event.attendees.length > 2 && (
-              <span className="text-xs ml-1 my-auto">
-                +{event.attendees.length - 2}
-              </span>
+        ) : eventPosition.durationMinutes <= 30 ? (
+          // Minimal version for short events (16-30 min) - same font size as above
+          <div className="text-xs font-medium truncate">{event.title}</div>
+        ) : (
+          // Full version for longer events
+          <>
+            {/* Drag handle */}
+            <div className="drag-handle absolute top-0 right-0 p-1 cursor-grab opacity-50 hover:opacity-100">
+              <GripVertical className="h-3 w-3" />
+            </div>
+
+            <div className="text-xs font-medium flex items-center justify-between">
+              <span>{format(startTime, "h:mm a")}</span>
+              {event.completed && <CheckCircle2 className="h-3.5 w-3.5" />}
+            </div>
+
+            <div className="font-medium text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+              {event.title}
+            </div>
+
+            {/* Only show these for events longer than 45 minutes */}
+            {eventPosition.durationMinutes > 45 && (
+              <>
+                {/* Display duration */}
+                <div className="text-xs flex items-center mt-0.5">
+                  <Clock className="h-3 w-3 mr-1 opacity-80" />
+                  <span>{getDurationText()}</span>
+                </div>
+
+                {/* Display task category */}
+                {event.category && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-white/20 hover:bg-white/30 text-white text-xs mt-1 w-fit"
+                  >
+                    {event.category}
+                  </Badge>
+                )}
+
+                {/* Display task tags */}
+                {event.tags &&
+                  event.tags.length > 0 &&
+                  eventPosition.durationMinutes > 60 && (
+                    <div className="flex mt-auto pt-1 gap-1 flex-wrap">
+                      {event.tags.slice(0, 2).map((tag, i) => (
+                        <span
+                          key={i}
+                          className="text-[10px] px-1.5 py-0.5 bg-white/20 rounded-sm"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {event.tags.length > 2 && (
+                        <span className="text-[10px] opacity-80">
+                          +{event.tags.length - 2}
+                        </span>
+                      )}
+                    </div>
+                  )}
+              </>
             )}
-          </div>
+          </>
         )}
+      </div>
 
-        {/* Resize handle */}
-        <div
-          className="resize-handle absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize flex items-center justify-center"
-          onMouseDown={handleResizeStart}
-        >
-          <div className="w-16 h-1 bg-white/30 rounded-full hover:bg-white/50" />
-        </div>
+      {/* Add resize handle for all events, regardless of duration */}
+      <div
+        className="resize-handle absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize flex items-center justify-center"
+        onMouseDown={handleResizeStart}
+      >
+        <div className="w-16 h-1 bg-white/30 rounded-full hover:bg-white/50" />
       </div>
     </div>
   );

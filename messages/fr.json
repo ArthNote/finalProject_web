@@ -556,8 +556,8 @@
           "processing": "Traitement...",
           "toast": {
             "success": {
-            "title": "Lien d'annulation généré",
-            "description": "Un lien pour annuler votre abonnement a été généré. Veuillez consulter votre email."
+              "title": "Lien d'annulation généré",
+              "description": "Un lien pour annuler votre abonnement a été généré. Veuillez consulter votre email."
             },
             "error": {
               "title": "Erreur",
@@ -1065,6 +1065,32 @@
       "activeNow": "{count} actif(s) maintenant",
       "online": "en ligne",
       "offline": "hors ligne"
+    }
+  },
+  "tasks": {
+    "sideCalendar": {
+      "settings": {
+        "title": "Paramètres du calendrier",
+        "displayOptions": {
+          "title": "Options d'affichage",
+          "showWeekends": "Afficher les week-ends",
+          "showCompleted": "Afficher les tâches terminées"
+        },
+        "appearance": {
+          "title": "Apparence",
+          "colorScheme": "Schéma de couleurs",
+          "timeFormat": "Format de l'heure",
+          "default": "Par défaut",
+          "colorful": "Coloré",
+          "monochrome": "Monochrome",
+          "pastel": "Pastel",
+          "12Hour": "12 heures (1:00 PM)",
+          "24Hour": "24 heures (13:00)"
+        },
+        "cancel": "Annuler",
+        "save": "Enregistrer les modifications",
+        "saving": "Enregistrement..."
+      }
     }
   }
 }

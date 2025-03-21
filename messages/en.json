@@ -1160,5 +1160,31 @@
       "online": "online",
       "offline": "offline"
     }
+  },
+  "tasks": {
+    "sideCalendar": {
+      "settings": {
+        "title": "Calendar Settings",
+        "displayOptions": {
+          "title": "Display Options",
+          "showWeekends": "Show Weekends",
+          "showCompleted": "Show Completed Tasks"
+        },
+        "appearance": {
+          "title": "Appearance",
+          "colorScheme": "Color Scheme",
+          "timeFormat": "Time Format",
+          "default": "Default",
+          "colorful": "Colorful",
+          "monochrome": "Monochrome",
+          "pastel": "Pastel",
+          "12Hour": "12-Hour (1:00 PM)",
+          "24Hour": "24-Hour (13:00)"
+        },
+        "cancel": "Cancel",
+        "save": "Save Changes",
+        "saving": "Saving..."
+      }
+    }
   }
 }

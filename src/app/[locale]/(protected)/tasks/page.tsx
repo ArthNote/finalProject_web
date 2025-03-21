@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import TasksSidebar from "@/components/sidebar/TasksSidebar";
 import { Card } from "@/components/ui/card";
 import FloatingToolbar from "@/components/tasks/side_calendar/FloatingToolbar";
 import { useCalendarStore } from "@/lib/state/useCalendarStore";
@@ -34,8 +33,8 @@ const Page = () => {
       </div>
       <main className="flex-1 relative">
         <ScrollArea className="h-full w-full">
-          <div className="p-8 pb-28 sm:pb-24">
-            <div className="w-full">{renderView()}</div>
+          <div className="p-4 sm:p-8 pb-28 sm:pb-24">
+            <div className="w-full max-w-[100vw]">{renderView()}</div>
           </div>
         </ScrollArea>
       </main>

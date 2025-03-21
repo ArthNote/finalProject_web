@@ -9,28 +9,29 @@ import {
   CalendarIcon,
   Settings,
 } from "lucide-react";
-import {
-  format,
-  addDays,
-  subDays,
-  isToday,
-} from "date-fns";
+import { format, addDays, subDays, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
 import { EventItem } from "@/components/tasks/side_calendar/EventItem";
-import {
-  MOCK_EVENTS,
-} from "@/components/tasks/side_calendar/calendarData";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import EventDetailsSheet from "./EventDetailsSheet";
 import CalendarSettingsDialog, {
   CalendarSettings,
 } from "./CalendarSettingsDialog";
 import { useCalendarStore } from "@/lib/state/useCalendarStore";
+import TaskDetailsSheet from "./TaskDetailsSheet";
+import {
+  sampleTasks,
+  updateTaskScheduled,
+  updateTaskCompleted,
+  updateTaskTimes,
+} from "@/lib/taskService";
+import { TaskType } from "@/types/task";
+import { useLocale } from "next-intl";
+import { enUS, fr } from "date-fns/locale";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const CURRENT_TIME = new Date();
@@ -41,6 +42,7 @@ const TimelineCalendar = () => {
   const [openSidebar, setOpenSidebar] = React.useState(true);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const timelineRef = React.useRef<HTMLDivElement | null>(null);
+  const locale = useLocale() as "en" | "fr";
   const [calendarSettings, setCalendarSettings] =
     React.useState<CalendarSettings>({
       showWeekends: true,
@@ -51,6 +53,8 @@ const TimelineCalendar = () => {
       endHour: 18,
       expandAllDay: false,
     });
+  const [tasks, setTasks] = React.useState<TaskType[]>(sampleTasks);
+  const [selectedTask, setSelectedTask] = React.useState<TaskType | null>(null);
 
   // Get state and actions from our Zustand store
   const {
@@ -62,13 +66,6 @@ const TimelineCalendar = () => {
     setSelectedEvent,
     updateEvent,
   } = useCalendarStore();
-
-  // Initialize events from mock data if empty
-  React.useEffect(() => {
-    if (events.length === 0) {
-      setEvents(MOCK_EVENTS);
-    }
-  }, [events.length, setEvents]);
 
   React.useEffect(() => {
     if (scrollContainerRef.current && isToday(selectedDate)) {
@@ -105,11 +102,16 @@ const TimelineCalendar = () => {
     setOpenSidebar(!openSidebar);
   };
 
-  // Filter events for the selected date
-  const eventsForSelectedDay = events.filter(
-    (event) =>
-      format(event.start, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd")
-  );
+  // Filter tasks for the selected date
+  const tasksForSelectedDay = tasks.filter((task) => {
+    // Only show scheduled tasks with due dates matching the selected date
+    if (!task.scheduled) return false;
+
+    const taskDate = new Date(task.date ? task.date : new Date());
+    return (
+      format(taskDate, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd")
+    );
+  });
 
   // Handler for date selection from the calendar popover
   const handleDateSelect = (date: Date | undefined) => {
@@ -124,6 +126,67 @@ const TimelineCalendar = () => {
     setIsSettingsOpen(false);
   };
 
+  // Handle task selection
+  const handleTaskSelected = (task: TaskType) => {
+    setSelectedTask(task);
+  };
+
+  // Handle task completion toggle
+  const handleTaskComplete = (taskId: string, completed: boolean) => {
+    const updatedTask = updateTaskCompleted(taskId, completed);
+    if (updatedTask) {
+      // Update local state
+      setTasks(
+        tasks.map((task) =>
+          task.id === taskId ? { ...task, completed } : task
+        )
+      );
+      setSelectedTask(null); // Close the details sheet
+    }
+  };
+
+  // Handle task scheduling toggle
+  const handleTaskScheduled = (taskId: string, scheduled: boolean) => {
+    const updatedTask = updateTaskScheduled(taskId, scheduled);
+    if (updatedTask) {
+      // Update local state
+      setTasks(
+        tasks.map((task) =>
+          task.id === taskId ? { ...task, scheduled } : task
+        )
+      );
+      setSelectedTask(null); // Close the details sheet
+    }
+  };
+
+  // Handle event update (when dragging/resizing in calendar)
+  const handleEventUpdate = (updatedTask: TaskType) => {
+    // Find the task that corresponds to this event
+    const taskIndex = tasks.findIndex((task) => task.id === updatedTask.id);
+
+    if (taskIndex !== -1) {
+      // Update the task with new start and end times
+      const updatedTasks = [...tasks];
+      updatedTasks[taskIndex] = {
+        ...updatedTasks[taskIndex],
+        date: updatedTask.date,
+        startTime: updatedTask.startTime,
+        endTime: updatedTask.endTime,
+        duration: updatedTask.duration,
+      };
+
+      // Update state and service
+      setTasks(updatedTasks);
+      if (updatedTask.startTime && updatedTask.endTime) {
+        updateTaskTimes(
+          updatedTask.id,
+          updatedTask.startTime,
+          updatedTask.endTime
+        );
+      }
+    }
+  };
+
   return (
     <div className="flex h-full">
       {/* Main Calendar */}
@@ -133,11 +196,7 @@ const TimelineCalendar = () => {
           {/* Left: Calendar Picker */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8"
-              >
+              <Button variant="outline" size="icon" className="h-8">
                 <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
             </PopoverTrigger>
@@ -148,6 +207,8 @@ const TimelineCalendar = () => {
                 selected={selectedDate}
                 onSelect={handleDateSelect}
                 initialFocus
+                locale={locale === "en" ? enUS : fr}
+                lang={locale}
               />
             </PopoverContent>
           </Popover>
@@ -172,7 +233,9 @@ const TimelineCalendar = () => {
               )}
             >
               <h3 className="text-[13px] font-medium tracking-tight">
-                {format(selectedDate, "EEEE")}
+                {format(selectedDate, "EEEE", {
+                  locale: locale === "en" ? enUS : fr,
+                })}
               </h3>
               <p
                 className={cn(
@@ -182,7 +245,9 @@ const TimelineCalendar = () => {
                     : "text-muted-foreground"
                 )}
               >
-                {format(selectedDate, "MMMM d")}
+                {format(selectedDate, "MMMM d", {
+                  locale: locale === "en" ? enUS : fr,
+                })}
               </p>
             </button>
 
@@ -245,29 +310,29 @@ const TimelineCalendar = () => {
               </>
             )}
 
-            {/* Events Layer */}
+            {/* Tasks Layer */}
             <div
               className="absolute left-[68px] right-6 top-0 bottom-0 pointer-events-none z-10"
               ref={timelineRef}
             >
-              {eventsForSelectedDay.map((event) => (
+              {tasksForSelectedDay.map((task) => (
                 <EventItem
-                  key={event.id}
-                  event={event}
+                  key={task.id}
+                  event={task}
                   selectedDate={selectedDate}
                   timelineRef={timelineRef}
-                  onSelect={setSelectedEvent}
-                  onUpdate={updateEvent}
+                  onSelect={() => handleTaskSelected(task)}
+                  onUpdate={handleEventUpdate}
                 />
               ))}
             </div>
 
             {/* Time Slots */}
-            <div className="relative min-h-[1440px] pr-6">
+            <div className="relative min-h-[3600px] pr-6">
               {HOURS.map((hour) => (
                 <div
                   key={hour}
-                  className={`flex items-start h-[60px] relative group transition-colors
+                  className={`flex items-start h-[150px] relative group transition-colors
                       ${
                         hour === CURRENT_HOUR && isToday(selectedDate)
                           ? "bg-gradient-to-r from-primary/5 to-transparent"
@@ -317,10 +382,12 @@ const TimelineCalendar = () => {
           onSave={handleSaveSettings}
         />
 
-        {/* Event Details Sheet - Now extracted to a separate component */}
-        <EventDetailsSheet
-          event={selectedEvent}
-          onOpenChange={(open) => !open && setSelectedEvent(null)}
+        {/* Task Details Sheet */}
+        <TaskDetailsSheet
+          task={selectedTask}
+          onOpenChange={(open) => !open && setSelectedTask(null)}
+          onTaskComplete={handleTaskComplete}
+          onTaskScheduled={handleTaskScheduled}
         />
       </div>
     </div>
