@@ -52,6 +52,7 @@ import { cn } from "@/lib/utils";
 import { sampleTasks, updateTaskCompleted } from "@/lib/taskService";
 import TaskDetailsSheet from "./side_calendar/TaskDetailsSheet";
 import { TaskType } from "@/types/task";
+import TaskViewFilters, { DateRangeType } from "./TaskViewFilters";
 
 // Define column types
 interface Column {
@@ -82,7 +83,6 @@ const KanbanView = () => {
     { id: "unscheduled", title: "Unscheduled", color: "bg-purple-500" },
     { id: "todo", title: "To Do", color: "bg-blue-500" },
     { id: "inprogress", title: "In Progress", color: "bg-amber-500" },
-
     { id: "completed", title: "Completed", color: "bg-green-500" },
   ]);
 
@@ -98,16 +98,11 @@ const KanbanView = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all"); // "all", "high", "medium", "low"
+  const [scheduledFilter, setScheduledFilter] = useState("all"); // "all", "scheduled", "unscheduled"
   const [columnFilter, setColumnFilter] = useState("all"); // Filter by column
-  const [showFilters, setShowFilters] = useState(false);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Initialize with today's date by default
-  const [dateRange, setDateRange] = useState<{
-    type: "none" | "today" | "tomorrow" | "week" | "custom";
-    from: Date | undefined;
-    to: Date | undefined;
-  }>(() => {
+  const [dateRange, setDateRange] = useState<DateRangeType>(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -191,6 +186,22 @@ const KanbanView = () => {
       const matchesColumn =
         columnFilter === "all" || task.status === columnFilter;
 
+      const matchesScheduledStatus =
+        scheduledFilter === "all" ||
+        (scheduledFilter === "scheduled" && task.scheduled) ||
+        (scheduledFilter === "unscheduled" && !task.scheduled);
+
+      // If the task is unscheduled, don't apply the date filter
+      if (!task.scheduled) {
+        return (
+          matchesSearch &&
+          matchesCategory &&
+          matchesPriority &&
+          matchesColumn &&
+          matchesScheduledStatus
+        );
+      }
+
       const matchesDate = isTaskInDateRange(task.date?.toISOString() || "");
 
       return (
@@ -198,127 +209,10 @@ const KanbanView = () => {
         matchesCategory &&
         matchesPriority &&
         matchesColumn &&
+        matchesScheduledStatus &&
         matchesDate
       );
     });
-  };
-
-  // Check if any filters are active
-  const isFilterActive =
-    categoryFilter !== "all" ||
-    priorityFilter !== "all" ||
-    columnFilter !== "all";
-
-  const isDateFilterActive = dateRange.type !== "none";
-
-  // Date filter operations
-  const clearDateFilter = () => {
-    setDateRange({
-      type: "none",
-      from: undefined,
-      to: undefined,
-    });
-    setIsCalendarOpen(false);
-  };
-
-  // Filter clearing
-  const clearFilters = () => {
-    setCategoryFilter("all");
-    setPriorityFilter("all");
-    setColumnFilter("all");
-  };
-
-  // Set date filters for today
-  const setTodayFilter = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    setDateRange({
-      type: "today",
-      from: today,
-      to: today,
-    });
-    setIsCalendarOpen(false);
-  };
-
-  // Set date filters for tomorrow
-  const setTomorrowFilter = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-
-    setDateRange({
-      type: "tomorrow",
-      from: tomorrow,
-      to: tomorrow,
-    });
-    setIsCalendarOpen(false);
-  };
-
-  // Set date filters for this week
-  const setThisWeekFilter = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const endOfWeek = new Date();
-    const dayOfWeek = endOfWeek.getDay();
-    const daysUntilEndOfWeek = 6 - dayOfWeek; // Until Sunday
-    endOfWeek.setDate(endOfWeek.getDate() + daysUntilEndOfWeek);
-    endOfWeek.setHours(23, 59, 59, 999);
-
-    setDateRange({
-      type: "week",
-      from: today,
-      to: endOfWeek,
-    });
-    setIsCalendarOpen(false);
-  };
-
-  // Handle custom date range selection
-  const handleCustomDateRange = (
-    from: Date | undefined,
-    to: Date | undefined
-  ) => {
-    if (!from) {
-      clearDateFilter();
-      return;
-    }
-
-    setDateRange({
-      type: "custom",
-      from,
-      to: to || from,
-    });
-  };
-
-  // Format the date range for display
-  const formatDateRange = () => {
-    switch (dateRange.type) {
-      case "today":
-        return "Today";
-      case "tomorrow":
-        return "Tomorrow";
-      case "week":
-        return "This Week";
-      case "custom":
-        if (
-          dateRange.from &&
-          dateRange.to &&
-          dateRange.from.toDateString() === dateRange.to.toDateString()
-        ) {
-          return format(dateRange.from, "MMM d, yyyy");
-        } else if (dateRange.from && dateRange.to) {
-          return `${format(dateRange.from, "MMM d")} - ${format(
-            dateRange.to,
-            "MMM d, yyyy"
-          )}`;
-        } else if (dateRange.from) {
-          return `From ${format(dateRange.from, "MMM d, yyyy")}`;
-        }
-        return "Custom Range";
-      default:
-        return "All Dates";
-    }
   };
 
   // Handle creating/editing a task
@@ -358,6 +252,8 @@ const KanbanView = () => {
         tags: [],
         order: maxOrder + 1,
         resources: [],
+        startTime: null,
+        endTime: null,
       };
       setTasks([...tasks, newTask]);
     }
@@ -739,333 +635,54 @@ const KanbanView = () => {
   };
 
   const getTasksForColumn = (columnId: string) => {
-    let columnTasks = tasks.filter((task) => task.status === columnId);
-
-    // If we have a date filter active, filter tasks except for unscheduled ones
-    if (dateRange.type !== "none" && columnId !== "unscheduled") {
-      columnTasks = columnTasks.filter((task) => {
-        // If the task is unscheduled, always include it
-        if (!task.scheduled) return true;
-
-        // Otherwise, check if it's in the date range
-        return isTaskInDateRange(task.date?.toISOString() || "");
-      });
-    }
+    const filteredTasks = getFilteredTasks();
+    // Get tasks for this column from the filtered tasks
+    const columnTasks = filteredTasks.filter(
+      (task) => task.status === columnId
+    );
 
     // Sort tasks by their order property
     return [...columnTasks].sort((a, b) => (a.order || 0) - (b.order || 0));
   };
 
-  // Handle priority label display
-  const getPriorityLabel = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return (
-          <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-red-500"></span>
-            <span>High</span>
-          </div>
-        );
-      case "medium":
-        return (
-          <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-amber-500"></span>
-            <span>Medium</span>
-          </div>
-        );
-      case "low":
-        return (
-          <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-green-500"></span>
-            <span>Low</span>
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-blue-500"></span>
-            <span>Normal</span>
-          </div>
-        );
-    }
+  // Handle filter change - this will be passed to the TaskViewFilters component
+  const handleFilterChange = () => {
+    // No action needed, getFilteredTasks will be called when rendering
   };
 
   return (
     <div className="space-y-6">
-      {/* Header with search and filters */}
+      {/* Use the reusable TaskViewFilters component */}
       <div className="flex flex-col gap-4 mb-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search tasks..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            {/* Date Range Selector */}
-            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={isDateFilterActive ? "default" : "outline"}
-                  size="sm"
-                  className={cn(
-                    "gap-1.5",
-                    isDateFilterActive && "bg-primary text-primary-foreground"
-                  )}
-                >
-                  <CalendarRange className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{formatDateRange()}</span>
-                  {isDateFilterActive && (
-                    <X
-                      className="h-3.5 w-3.5 ml-1 hover:bg-background/20 rounded-full"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        clearDateFilter();
-                      }}
-                    />
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-4" align="end">
-                <div className="space-y-4">
-                  <h4 className="font-medium text-sm">Filter by date</h4>
+        <TaskViewFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+          scheduledFilter={scheduledFilter}
+          setScheduledFilter={setScheduledFilter}
+          priorityFilter={priorityFilter}
+          setPriorityFilter={setPriorityFilter}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          categories={categories}
+          onFilterChange={handleFilterChange}
+        />
 
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      variant={
-                        dateRange.type === "today" ? "default" : "outline"
-                      }
-                      size="sm"
-                      onClick={setTodayFilter}
-                      className="justify-start"
-                    >
-                      Today
-                    </Button>
-                    <Button
-                      variant={
-                        dateRange.type === "tomorrow" ? "default" : "outline"
-                      }
-                      size="sm"
-                      onClick={setTomorrowFilter}
-                      className="justify-start"
-                    >
-                      Tomorrow
-                    </Button>
-                    <Button
-                      variant={
-                        dateRange.type === "week" ? "default" : "outline"
-                      }
-                      size="sm"
-                      onClick={setThisWeekFilter}
-                      className="justify-start"
-                    >
-                      This Week
-                    </Button>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm">Custom range</h4>
-                    <Calendar
-                      mode="range"
-                      variant="compact"
-                      selected={{
-                        from: dateRange.from,
-                        to: dateRange.to,
-                      }}
-                      onSelect={(range) => {
-                        handleCustomDateRange(range?.from, range?.to);
-                      }}
-                      initialFocus
-                    />
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <Popover open={showFilters} onOpenChange={setShowFilters}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={isFilterActive ? "default" : "outline"}
-                  size="sm"
-                  className={cn(
-                    "gap-1.5",
-                    isFilterActive && "bg-primary text-primary-foreground"
-                  )}
-                >
-                  <Filter className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Filters</span>
-                  {isFilterActive && (
-                    <span className="ml-1 rounded-full bg-primary-foreground text-primary w-5 h-5 flex items-center justify-center text-xs font-medium">
-                      {[
-                        categoryFilter !== "all" ? 1 : 0,
-                        priorityFilter !== "all" ? 1 : 0,
-                        columnFilter !== "all" ? 1 : 0,
-                      ].reduce((a, b) => a + b, 0)}
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80" align="end">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium">Filters</h4>
-                    {isFilterActive && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 text-xs"
-                        onClick={clearFilters}
-                      >
-                        <X className="mr-1 h-3 w-3" /> Clear all
-                      </Button>
-                    )}
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Category</label>
-                    <Select
-                      value={categoryFilter}
-                      onValueChange={setCategoryFilter}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All Categories" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category === "all" ? "All Categories" : category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Priority</label>
-                    <Select
-                      value={priorityFilter}
-                      onValueChange={setPriorityFilter}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Priority Level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Priorities</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Column</label>
-                    <Select
-                      value={columnFilter}
-                      onValueChange={setColumnFilter}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All Columns" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Columns</SelectItem>
-                        {columns.map((column) => (
-                          <SelectItem key={column.id} value={column.id}>
-                            {column.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setColumnFormData({ title: "", id: "" });
-                setEditingColumn(null);
-                setIsColumnFormOpen(true);
-              }}
-            >
-              <Plus className="h-3.5 w-3.5 sm:mr-2" />
-              <span className="hidden sm:inline">Add Column</span>
-            </Button>
-          </div>
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setColumnFormData({ title: "", id: "" });
+              setEditingColumn(null);
+              setIsColumnFormOpen(true);
+            }}
+          >
+            <Plus className="h-3.5 w-3.5 sm:mr-2" />
+            <span className="hidden sm:inline">Add Column</span>
+          </Button>
         </div>
-
-        {/* Active filters display */}
-        {(isFilterActive || isDateFilterActive) && (
-          <div className="flex flex-wrap gap-1.5 items-center">
-            <span className="text-xs text-muted-foreground">
-              Active filters:
-            </span>
-            {categoryFilter !== "all" && (
-              <Badge
-                variant="secondary"
-                className="px-2 flex gap-1 items-center"
-              >
-                Category: {categoryFilter}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={() => setCategoryFilter("all")}
-                />
-              </Badge>
-            )}
-            {priorityFilter !== "all" && (
-              <Badge
-                variant="secondary"
-                className="px-2 flex gap-1 items-center"
-              >
-                <div
-                  className={`h-2 w-2 rounded-full mr-1 ${getPriorityColor(
-                    priorityFilter
-                  )}`}
-                />
-                Priority: {priorityFilter}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={() => setPriorityFilter("all")}
-                />
-              </Badge>
-            )}
-            {columnFilter !== "all" && (
-              <Badge
-                variant="secondary"
-                className="px-2 flex gap-1 items-center"
-              >
-                Column:{" "}
-                {columns.find((c) => c.id === columnFilter)?.title ||
-                  columnFilter}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={() => setColumnFilter("all")}
-                />
-              </Badge>
-            )}
-            {isDateFilterActive && (
-              <Badge
-                variant="secondary"
-                className="px-2 flex gap-1 items-center"
-              >
-                Date: {formatDateRange()}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={clearDateFilter}
-                />
-              </Badge>
-            )}
-          </div>
-        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-6">
@@ -1122,6 +739,10 @@ const KanbanView = () => {
                   >
                     <Filter className="h-3.5 w-3.5 mr-2" />
                     Filter by Column
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleAddTask(column.id)}>
+                    <Plus className="h-3.5 w-3.5 mr-2" />
+                    Add Task
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -1293,7 +914,9 @@ const KanbanView = () => {
                             {task.date && task.scheduled ? (
                               <div className="flex items-center text-xs text-muted-foreground">
                                 <Clock className="mr-1 h-3 w-3" />
-                                <span>{formatDate(task.date?.toISOString() || "")}</span>
+                                <span>
+                                  {formatDate(task.date?.toISOString() || "")}
+                                </span>
                               </div>
                             ) : (
                               <div className="text-xs text-muted-foreground italic">
@@ -1420,9 +1043,7 @@ const KanbanView = () => {
                   type="datetime-local"
                   value={
                     taskFormData.date
-                      ? new Date(taskFormData.date)
-                          .toISOString()
-                          .slice(0, 16)
+                      ? new Date(taskFormData.date).toISOString().slice(0, 16)
                       : ""
                   }
                   onChange={(e) => {

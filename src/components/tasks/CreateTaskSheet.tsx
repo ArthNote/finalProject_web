@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  taskSchema,
-  TaskFormValues,
-  TaskResource,
-} from "@/lib/validation/task";
+import { createTaskValidators, TaskFormValues, TaskResource } from "@/lib/validation/task";
 import {
   Sheet,
   SheetContent,
@@ -51,7 +47,6 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -70,7 +65,9 @@ import { TaskType } from "@/types/task";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMutation } from "@tanstack/react-query";
 import { sampleTasks } from "@/lib/taskService";
-
+import { useLocale, useTranslations } from "next-intl";
+import { enUS, fr } from "date-fns/locale";
+import { toast } from "@/hooks/use-toast";
 interface CreateTaskSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -87,6 +84,8 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   open,
   onOpenChange,
 }) => {
+  const locale = useLocale() as "en" | "fr";
+  const t = useTranslations("tasks.toolbar.create.manual");
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [tagInput, setTagInput] = React.useState("");
@@ -105,6 +104,9 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const [searchTaskValue, setSearchTaskValue] = useState("");
   const [openTaskCombobox, setOpenTaskCombobox] = useState(false);
   const [openAssignCombobox, setOpenAssignCombobox] = useState(false);
+
+  const tValidation = useTranslations();
+  const { taskSchema } = createTaskValidators(tValidation);
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
@@ -146,7 +148,6 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
       setTasks(tasksData);
     } catch (error) {
       console.error("Error loading tasks:", error);
-      toast.error("Failed to load tasks");
     } finally {
       setIsLoadingTasks(false);
     }
@@ -159,7 +160,6 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
       setTeamMembers(members);
     } catch (error) {
       console.error("Error loading team members:", error);
-      toast.error("Failed to load team members");
     } finally {
       setIsLoadingTeamMembers(false);
     }
@@ -240,10 +240,19 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const { mutate, isPending } = useMutation({
     mutationFn: createManualTask,
     onSuccess: () => {
+      toast({
+        title: t("toast.success.title"),
+        description: t("toast.success.description"),
+      });
       form.reset();
       onOpenChange(false);
     },
     onError: (error) => {
+      toast({
+        title: t("toast.error.title"),
+        description: t("toast.error.description") + " " + error.message,
+        variant: "destructive",
+      });
       console.error("Error creating task: ", error);
     },
   });
@@ -275,7 +284,6 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
       });
     } catch (error) {
       console.error("Error creating task:", error);
-      toast.error("Failed to create task");
     }
   };
 
@@ -283,16 +291,18 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md border-l">
         <SheetHeader className="pb-4">
-          <SheetTitle>Create New Task</SheetTitle>
+          <SheetTitle>{t("title")}</SheetTitle>
         </SheetHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <Tabs defaultValue="basic" className="w-full">
               <TabsList className="grid grid-cols-3 mb-4">
-                <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="schedule">Schedule</TabsTrigger>
-                <TabsTrigger value="details">Details</TabsTrigger>
+                <TabsTrigger value="basic">{t("basicInfo.title")}</TabsTrigger>
+                <TabsTrigger value="schedule">
+                  {t("schedule.title")}
+                </TabsTrigger>
+                <TabsTrigger value="details">{t("details.title")}</TabsTrigger>
               </TabsList>
 
               <ScrollArea className="h-[calc(100vh-220px)]">
@@ -305,9 +315,12 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       name="title"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Task Title*</FormLabel>
+                          <FormLabel>{t("basicInfo.titleLabel")}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter task title" {...field} />
+                            <Input
+                              placeholder={t("basicInfo.titlePlaceholder")}
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -320,10 +333,14 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Description</FormLabel>
+                          <FormLabel>
+                            {t("basicInfo.descriptionLabel")}
+                          </FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="Enter task description"
+                              placeholder={t(
+                                "basicInfo.descriptionPlaceholder"
+                              )}
                               className="min-h-[100px]"
                               {...field}
                             />
@@ -339,20 +356,30 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       name="priority"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Priority</FormLabel>
+                          <FormLabel>{t("basicInfo.priorityLabel")}</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select priority" />
+                                <SelectValue
+                                  placeholder={t(
+                                    "basicInfo.priorityPlaceholder"
+                                  )}
+                                />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="high">High</SelectItem>
-                              <SelectItem value="medium">Medium</SelectItem>
-                              <SelectItem value="low">Low</SelectItem>
+                              <SelectItem value="high">
+                                {t("basicInfo.priorityOptions.high")}
+                              </SelectItem>
+                              <SelectItem value="medium">
+                                {t("basicInfo.priorityOptions.medium")}
+                              </SelectItem>
+                              <SelectItem value="low">
+                                {t("basicInfo.priorityOptions.low")}
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -366,9 +393,12 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       name="category"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Category</FormLabel>
+                          <FormLabel>{t("basicInfo.categoryLabel")}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter category" {...field} />
+                            <Input
+                              placeholder={t("basicInfo.categoryPlaceholder")}
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -386,10 +416,10 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
                             <FormLabel className="text-base">
-                              Schedule Task
+                              {t("schedule.subTitle")}
                             </FormLabel>
                             <FormDescription>
-                              Set a specific date and time for this task
+                              {t("schedule.description")}
                             </FormDescription>
                           </div>
                           <FormControl>
@@ -410,7 +440,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                           name="date"
                           render={({ field }) => (
                             <FormItem className="flex flex-col">
-                              <FormLabel>Date</FormLabel>
+                              <FormLabel>{t("schedule.dateLabel")}</FormLabel>
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <FormControl>
@@ -424,7 +454,9 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                       {field.value ? (
                                         format(field.value, "PPP")
                                       ) : (
-                                        <span>Pick a date</span>
+                                        <span>
+                                          {t("schedule.datePlaceholder")}
+                                        </span>
                                       )}
                                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
@@ -436,9 +468,13 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                 >
                                   <Calendar
                                     mode="single"
+                                    variant="compact"
                                     selected={field.value as Date}
                                     onSelect={field.onChange}
                                     initialFocus
+                                    locale={locale == "fr" ? fr : enUS}
+                                    lang={locale}
+                                    disabled={isPending}
                                   />
                                 </PopoverContent>
                               </Popover>
@@ -454,7 +490,9 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                             name="startTime"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Start Time</FormLabel>
+                                <FormLabel>
+                                  {t("schedule.startTimeLabel")}
+                                </FormLabel>
                                 <div className="flex items-center gap-2">
                                   <FormControl>
                                     <Input
@@ -490,7 +528,9 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                             name="endTime"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>End Time</FormLabel>
+                                <FormLabel>
+                                  {t("schedule.endTimeLabel")}
+                                </FormLabel>
                                 <div className="flex items-center gap-2">
                                   <FormControl>
                                     <Input
@@ -527,11 +567,15 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                           name="duration"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Duration (minutes)</FormLabel>
+                              <FormLabel>
+                                {t("schedule.durationLabel")}
+                              </FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
-                                  placeholder="Enter duration in minutes"
+                                  placeholder={t(
+                                    "schedule.durationPlaceholder"
+                                  )}
                                   min={5}
                                   {...field}
                                   onChange={(e) =>
@@ -544,7 +588,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                 />
                               </FormControl>
                               <FormDescription>
-                                Minimum duration is 5 minutes
+                                {t("schedule.durationDescription")}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -557,7 +601,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                   <TabsContent value="details" className="space-y-6 mt-0">
                     {/* Tags Field */}
                     <div>
-                      <FormLabel>Tags</FormLabel>
+                      <FormLabel>{t("details.tagsLabel")}</FormLabel>
                       <div className="flex flex-wrap gap-2 mt-2 mb-2">
                         {tags?.map((tag) => (
                           <Badge
@@ -578,7 +622,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       </div>
                       <div className="flex gap-2">
                         <Input
-                          placeholder="Add a tag"
+                          placeholder={t("details.tagsPlaceholder")}
                           value={tagInput}
                           onChange={(e) => setTagInput(e.target.value)}
                           onKeyDown={(e) => {
@@ -606,7 +650,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       name="parentId"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Parent Task</FormLabel>
+                          <FormLabel>{t("details.parentTaskLabel")}</FormLabel>
                           <Popover
                             open={openTaskCombobox}
                             onOpenChange={setOpenTaskCombobox}
@@ -627,7 +671,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                   {isLoadingTasks ? (
                                     <div className="flex items-center gap-2">
                                       <Loader2 className="h-4 w-4 animate-spin" />
-                                      <span>Loading tasks...</span>
+                                      <span>{t("details.loadingTasks")}</span>
                                     </div>
                                   ) : field.value && selectedTask ? (
                                     <div className="flex items-center gap-2 truncate">
@@ -636,7 +680,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                       </span>
                                     </div>
                                   ) : (
-                                    "Select a parent task"
+                                    t("details.selectParentTask")
                                   )}
                                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
@@ -645,13 +689,17 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                             <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]">
                               <Command>
                                 <CommandInput
-                                  placeholder="Search for tasks..."
+                                  placeholder={t(
+                                    "details.parentTaskPlaceholder"
+                                  )}
                                   value={searchTaskValue}
                                   onValueChange={setSearchTaskValue}
                                   className="h-9"
                                 />
                                 <CommandList>
-                                  <CommandEmpty>No tasks found</CommandEmpty>
+                                  <CommandEmpty>
+                                    {t("details.noTasksFound")}
+                                  </CommandEmpty>
                                   <CommandGroup>
                                     <CommandItem
                                       onSelect={() => {
@@ -661,7 +709,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                       }}
                                       className="text-muted-foreground"
                                     >
-                                      None (top level task)
+                                      {t("details.noTasks")}
                                     </CommandItem>
                                     {filteredTasks.map((task) => (
                                       <CommandItem
@@ -697,7 +745,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                             </PopoverContent>
                           </Popover>
                           <FormDescription>
-                            Assign this as a subtask of another task
+                            {t("details.parentTaskDescription")}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -711,7 +759,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       name="assignedTo"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Assign To</FormLabel>
+                          <FormLabel>{t("details.assignToLabel")}</FormLabel>
                           <Popover
                             open={openAssignCombobox}
                             onOpenChange={setOpenAssignCombobox}
@@ -733,13 +781,15 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                   {isLoadingTeamMembers ? (
                                     <div className="flex items-center gap-2">
                                       <Loader2 className="h-4 w-4 animate-spin" />
-                                      <span>Loading team...</span>
+                                      <span>{t("details.loadingTeam")}</span>
                                     </div>
                                   ) : field.value?.length ? (
                                     <div className="flex flex-wrap gap-1 mr-2">
                                       {field.value.length > 2 ? (
                                         <span>
-                                          {field.value.length} people assigned
+                                          {t("peopleAssigned", {
+                                            count: field.value.length,
+                                          })}
                                         </span>
                                       ) : (
                                         field.value.map((userId) => {
@@ -759,7 +809,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                       )}
                                     </div>
                                   ) : (
-                                    "Assign to team members"
+                                    t("details.assignToDescription")
                                   )}
                                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
@@ -768,11 +818,13 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                             <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]">
                               <Command>
                                 <CommandInput
-                                  placeholder="Search team members..."
+                                  placeholder={t("details.assignToPlaceholder")}
                                   className="h-9"
                                 />
                                 <CommandList>
-                                  <CommandEmpty>No members found</CommandEmpty>
+                                  <CommandEmpty>
+                                    {t("details.noTeamMembers")}
+                                  </CommandEmpty>
                                   <CommandGroup>
                                     {teamMembers.map((member) => (
                                       <CommandItem
@@ -819,7 +871,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                       }
                                     >
                                       <X className="mr-2 h-4 w-4" />
-                                      Clear all selections
+                                      {t("details.clearAll")}
                                     </Button>
                                   </div>
                                 )}
@@ -827,7 +879,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                             </PopoverContent>
                           </Popover>
                           <FormDescription>
-                            Assign this task to team members
+                            {t("details.assignToDescription")}
                           </FormDescription>
                           {assignedTo.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-1.5">
@@ -863,7 +915,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
 
                     {/* Resources section */}
                     <div className="space-y-3">
-                      <FormLabel>Resources</FormLabel>
+                      <FormLabel>{t("details.resourcesLabel")}</FormLabel>
                       <div className="space-y-2">
                         {resources.length > 0 && (
                           <div className="space-y-2">
@@ -896,9 +948,13 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
 
                         <div className="space-y-2 border rounded-md p-3">
                           <FormItem>
-                            <FormLabel>Resource Name*</FormLabel>
+                            <FormLabel>
+                              {t("details.resourcesNameLabel")}
+                            </FormLabel>
                             <Input
-                              placeholder="Enter resource name"
+                              placeholder={t(
+                                "details.resourcesNamePlaceHolder"
+                              )}
                               value={resourceName}
                               onChange={(e) => setResourceName(e.target.value)}
                             />
@@ -906,9 +962,13 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
 
                           <div className="grid grid-cols-2 gap-2">
                             <FormItem>
-                              <FormLabel>Type</FormLabel>
+                              <FormLabel>
+                                {t("details.resourcesTypeLabel")}
+                              </FormLabel>
                               <Input
-                                placeholder="E.g. Document"
+                                placeholder={t(
+                                  "details.resourcesTypePlaceHolder"
+                                )}
                                 value={resourceType}
                                 onChange={(e) =>
                                   setResourceType(e.target.value)
@@ -917,7 +977,9 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                             </FormItem>
 
                             <FormItem>
-                              <FormLabel>Category*</FormLabel>
+                              <FormLabel>
+                                {t("details.resourcesCategoryLabel")}
+                              </FormLabel>
                               <Select
                                 value={resourceCategory}
                                 onValueChange={(
@@ -925,12 +987,22 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                 ) => setResourceCategory(value)}
                               >
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select category" />
+                                  <SelectValue
+                                    placeholder={t(
+                                      "details.resourcesCategoryPlaceHolder"
+                                    )}
+                                  />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="file">File</SelectItem>
-                                  <SelectItem value="link">Link</SelectItem>
-                                  <SelectItem value="note">Note</SelectItem>
+                                  <SelectItem value="file">
+                                    {t("details.file")}
+                                  </SelectItem>
+                                  <SelectItem value="link">
+                                    {t("details.link")}
+                                  </SelectItem>
+                                  <SelectItem value="note">
+                                    {t("details.note")}
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                             </FormItem>
@@ -938,16 +1010,17 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
 
                           <FormItem>
                             <FormLabel>
-                              URL {resourceCategory === "link" && "*"}
+                              {t("details.resourcesUrlLabel")}
+                              {resourceCategory === "link" && "*"}
                             </FormLabel>
                             <Input
-                              placeholder="Enter URL"
+                              placeholder={t("details.resourcesUrlPlaceholder")}
                               value={resourceUrl}
                               onChange={(e) => setResourceUrl(e.target.value)}
                             />
                             {resourceCategory === "link" && !resourceUrl && (
                               <div className="text-xs text-red-500 mt-1">
-                                URL is required for links
+                                {t("details.resourcesUrlDescription")}
                               </div>
                             )}
                           </FormItem>
@@ -965,7 +1038,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                             }
                           >
                             <Plus className="h-4 w-4 mr-2" />
-                            Add Resource
+                            {t("details.addResource")}
                           </Button>
                         </div>
                       </div>
@@ -978,19 +1051,19 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
             <SheetFooter className="pt-6 border-t mt-6">
               <SheetClose asChild>
                 <Button variant="outline" type="button">
-                  Cancel
+                  {t("cancel")}
                 </Button>
               </SheetClose>
               <Button type="submit" disabled={isPending} className="gap-1">
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating...
+                    {t("creating")}
                   </>
                 ) : (
                   <>
                     <Check className="h-4 w-4" />
-                    Create Task
+                    {t("create")}
                   </>
                 )}
               </Button>

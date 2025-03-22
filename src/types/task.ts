@@ -30,3 +30,22 @@ export interface CreateTaskResponse {
   message: string;
   success: boolean;
 }
+
+// New type for task filter parameters
+export interface TaskFilterParams {
+  search?: string;
+  category?: string;
+  scheduled?: string;
+  priority?: string;
+  dateRange?: {
+    type: string;
+    from?: Date;
+    to?: Date;
+  };
+  todoPage?: number;
+  todoLimit?: number;
+  completedPage?: number;
+  completedLimit?: number;
+  unscheduledPage?: number;
+  unscheduledLimit?: number;
+}

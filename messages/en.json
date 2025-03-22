@@ -253,6 +253,16 @@
     }
   },
   "validation": {
+    "task": {
+      "titleRequired": "Title is required",
+      "titleTooLong": "Title must be less than 100 characters",
+      "descriptionTooLong": "Description must be less than 500 characters",
+      "durationTooShort": "Duration must be at least 15 minutes"
+    },
+    "resource": {
+      "nameRequired": "Resource name is required",
+      "invalidUrl": "Please enter a valid URL"
+    },
     "username": {
       "min": "Username must be at least 3 characters",
       "max": "Username must be at most 20 characters",
@@ -1162,6 +1172,105 @@
     }
   },
   "tasks": {
+    "toolbar": {
+      "hideToolbar": "Hide Toolbar",
+      "create": {
+        "createTask": "Create Task",
+        "createWithAI": "Create with AI",
+        "createTaskWithAI": "Create Task with AI",
+        "createWithAiDescription": "Describe your task in natural language and our AI will schedule it appropriately.",
+        "cancel": "Cancel",
+        "createManually": "Create Manually",
+        "textareaPlaceholder": "Example: Schedule a 1-hour team meeting tomorrow afternoon",
+        "manual": {
+          "title": "Create New Task",
+          "cancel": "Cancel",
+          "create": "Create Task",
+          "creating": "Creating...",
+          "toast": {
+            "success": {
+              "title": "Task created",
+              "description": "Your task has been successfully created"
+            },
+            "error": {
+              "title": "Error",
+              "description": "An error occurred while creating your task"
+            }
+          },
+          "basicInfo": {
+            "title": "Basic Info",
+            "titleLabel": "Task Title*",
+            "titlePlaceholder": "Enter task title",
+            "descriptionLabel": "Description",
+            "descriptionPlaceholder": "Enter task description",
+            "priorityLabel": "Priority",
+            "priorityPlaceholder": "Select priority",
+            "priorityOptions": {
+              "low": "Low",
+              "medium": "Medium",
+              "high": "High"
+            },
+            "categoryLabel": "Category",
+            "categoryPlaceholder": "Enter category"
+          },
+
+          "schedule": {
+            "title": "Schedule",
+            "subTitle": "Schedule Task",
+            "description": "Set a specific date and time for this task",
+            "dateLabel": "Date",
+            "datePlaceholder": "Select a date",
+            "startTimeLabel": "Start Time",
+            "endTimeLabel": "End Time",
+            "durationLabel": "Duration (minutes)",
+            "durationPlaceholder": "Enter duration in minutes",
+            "durationDescription": "Minimum duration is 5 minutes"
+          },
+          "details": {
+            "title": "Details",
+            "tagsLabel": "Tags",
+            "tagsPlaceholder": "Add tags",
+            "parentTaskLabel": "Parent Task",
+            "parentTaskPlaceholder": "Search for tasks...",
+            "loadingTasks": "Loading tasks...",
+            "selectParentTask": "Select Parent Task",
+            "noTasksFound": "No tasks found",
+            "noTasks": "None (top level task)",
+            "parentTaskDescription": "Assign this as a subtask of another task",
+            "assignToLabel": "Assign To",
+            "loadingTeam": "Loading team...",
+            "peopleAssigned": "{count} people assigned",
+            "assignToPlaceholder": "Search team members...",
+            "assignToDescription": "Assign this task to team members",
+            "noTeamMembers": "No team members found",
+            "clearAll": "Clear All Selections",
+            "resourcesLabel": "Resources",
+            "resourcesNameLabel": "Resource Name*",
+            "resourcesNamePlaceHolder": "Enter resource name",
+            "resourcesTypeLabel": "Resource Type*",
+            "resourcesTypePlaceHolder": "E.g. Document",
+            "resourcesCategoryLabel": "Category*",
+            "resourcesCategoryPlaceHolder": "Select category",
+            "file": "File",
+            "link": "Link",
+            "note": "Note",
+            "resourcesUrlLabel": "URL",
+            "resourcesUrlPlaceholder": "Enter URL",
+            "resourcesUrlDescription": "URL is required for links",
+            "addResource": "Add Resource"
+          }
+        }
+      },
+      "optimize": {
+        "optimize": "Optimize",
+        "optimizeSchedule": "Optimize Schedule",
+        "changeView": "Change View",
+        "listView": "List View",
+        "gridView": "Grid View",
+        "kanbanView": "Kanban View"
+      },
+      "calendar": "Calendar"
+    },
     "sideCalendar": {
       "settings": {
         "title": "Calendar Settings",

@@ -394,6 +394,16 @@
     }
   },
   "validation": {
+    "task": {
+      "titleRequired": "Le titre est requis",
+      "titleTooLong": "Le titre doit contenir moins de 100 caractères",
+      "descriptionTooLong": "La description doit contenir moins de 500 caractères",
+      "durationTooShort": "La durée doit être d'au moins 15 minutes"
+    },
+    "resource": {
+      "nameRequired": "Le nom de la ressource est requis",
+      "invalidUrl": "Veuillez saisir une URL valide"
+    },
     "username": {
       "min": "Le nom d'utilisateur doit contenir au moins 3 caractères",
       "max": "Le nom d'utilisateur ne peut pas dépasser 20 caractères",
@@ -1068,6 +1078,104 @@
     }
   },
   "tasks": {
+    "toolbar": {
+      "hideToolbar": "Masquer la barre d'outils",
+      "create": {
+        "createTask": "Créer une tâche",
+        "createWithAI": "Créer avec l'IA",
+        "createTaskWithAI": "Créer une tâche avec l'IA",
+        "createWithAiDescription": "Décrivez votre tâche en langage naturel et notre IA la planifiera de manière appropriée.",
+        "cancel": "Annuler",
+        "createManually": "Créer manuellement",
+        "textareaPlaceholder": "Exemple : Planifier une réunion d'équipe d'une heure demain après-midi",
+        "manual": {
+          "title": "Créer une nouvelle tâche",
+          "cancel": "Annuler",
+          "create": "Créer la tâche",
+          "creating": "Création en cours...",
+          "toast": {
+            "success": {
+              "title": "Tâche créée",
+              "description": "Votre tâche a été créée avec succès"
+            },
+            "error": {
+              "title": "Erreur",
+              "description": "Une erreur s'est produite lors de la création de votre tâche"
+            }
+          },
+          "basicInfo": {
+            "title": "Base",
+            "titleLabel": "Titre de la tâche*",
+            "titlePlaceholder": "Entrez le titre de la tâche",
+            "descriptionLabel": "Description",
+            "descriptionPlaceholder": "Entrez la description de la tâche",
+            "priorityLabel": "Priorité",
+            "priorityPlaceholder": "Sélectionnez la priorité",
+            "priorityOptions": {
+              "low": "Faible",
+              "medium": "Moyenne",
+              "high": "Élevée"
+            },
+            "categoryLabel": "Catégorie",
+            "categoryPlaceholder": "Entrez la catégorie"
+          },
+          "schedule": {
+            "title": "Planification",
+            "subTitle": "Planifier la tâche",
+            "description": "Définir une date et une heure spécifiques pour cette tâche",
+            "dateLabel": "Date",
+            "datePlaceholder": "Sélectionnez une date",
+            "startTimeLabel": "Heure de début",
+            "endTimeLabel": "Heure de fin",
+            "durationLabel": "Durée (minutes)",
+            "durationPlaceholder": "Entrez la durée en minutes",
+            "durationDescription": "La durée minimale est de 5 minutes"
+          },
+          "details": {
+            "title": "Détails",
+            "tagsLabel": "Tags",
+            "tagsPlaceholder": "Ajouter des tags",
+            "parentTaskLabel": "Tâche parente",
+            "parentTaskPlaceholder": "Rechercher des tâches...",
+            "loadingTasks": "Chargement des tâches...",
+            "selectParentTask": "Sélectionner une tâche parente",
+            "noTasksFound": "Aucune tâche trouvée",
+            "noTasks": "Aucune (tâche de premier niveau)",
+            "parentTaskDescription": "Assigner comme sous-tâche d'une autre tâche",
+            "assignToLabel": "Assigner à",
+            "loadingTeam": "Chargement de l'équipe...",
+            "peopleAssigned": "{count} personnes assignées",
+            "assignToPlaceholder": "Rechercher des membres de l'équipe...",
+            "assignToDescription": "Assigner cette tâche à des membres de l'équipe",
+            "noTeamMembers": "Aucun membre d'équipe trouvé",
+            "clearAll": "Effacer toutes les sélections",
+            "resourcesLabel": "Ressources",
+            "resourcesNameLabel": "Nom de la ressource*",
+            "resourcesNamePlaceHolder": "Entrez le nom de la ressource",
+            "resourcesTypeLabel": "Type de ressource*",
+            "resourcesTypePlaceHolder": "Ex. Document",
+            "resourcesCategoryLabel": "Catégorie*",
+            "resourcesCategoryPlaceHolder": "Sélectionnez une catégorie",
+            "file": "Fichier",
+            "link": "Lien",
+            "note": "Note",
+            "resourcesUrlLabel": "URL",
+            "resourcesUrlPlaceholder": "Entrez l'URL",
+            "resourcesUrlDescription": "L'URL est requise pour les liens",
+            "addResource": "Ajouter une ressource"
+          }
+        }
+      },
+      "optimize": {
+        "optimize": "Optimiser",
+        "optimizeSchedule": "Optimiser l'emploi du temps",
+        "changeView": "Changer de vue",
+        "listView": "Vue liste",
+        "gridView": "Vue grille",
+        "kanbanView": "Vue Kanban"
+      },
+      "calendar": "Calendrier"
+    },
     "sideCalendar": {
       "settings": {
         "title": "Paramètres du calendrier",

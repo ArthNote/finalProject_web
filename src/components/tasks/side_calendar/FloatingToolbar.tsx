@@ -63,7 +63,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import TimelineCalendar from "@/components/tasks/side_calendar/TimelineCalendar";
 import { Link } from "@/i18n/navigation";
 import { formatDate } from "@/lib/dateFormate";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
 import CreateTaskSheet from "@/components/tasks/CreateTaskSheet";
 
@@ -150,6 +150,7 @@ const FloatingToolbar = () => {
   // Get all state and actions from the store
 
   const locale = useLocale() as "en" | "fr";
+  const t = useTranslations("tasks.toolbar");
   const {
     aiTaskInput,
     setAiTaskInput,
@@ -313,7 +314,7 @@ const FloatingToolbar = () => {
                         </svg>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Hide Toolbar</TooltipContent>
+                    <TooltipContent>{t("create.hideToolbar")}</TooltipContent>
                   </Tooltip>
                 )}
 
@@ -335,7 +336,7 @@ const FloatingToolbar = () => {
                         </Button>
                       </DropdownMenuTrigger>
                     </TooltipTrigger>
-                    <TooltipContent>Create Task</TooltipContent>
+                    <TooltipContent>{t("create.createTask")}</TooltipContent>
                   </Tooltip>
 
                   <DropdownMenuContent
@@ -343,7 +344,9 @@ const FloatingToolbar = () => {
                     side="top"
                     className="w-56 mb-4"
                   >
-                    <DropdownMenuLabel>Create Task</DropdownMenuLabel>
+                    <DropdownMenuLabel>
+                      {t("create.createTask")}
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
 
                     {/* AI Task Creation */}
@@ -351,24 +354,23 @@ const FloatingToolbar = () => {
                       <DialogTrigger asChild>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                           <BrainCircuit className="mr-2 h-4 w-4" />
-                          Create with AI
+                          {t("create.createWithAI")}
                         </DropdownMenuItem>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-md">
                         <DialogHeader>
                           <DialogTitle className="flex items-center gap-2">
                             <BrainCircuit className="h-5 w-5 text-primary" />
-                            Create Task with AI
+                            {t("create.createTaskWithAI")}
                           </DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                           <p className="text-sm text-muted-foreground">
-                            Describe your task in natural language and our AI
-                            will schedule it appropriately.
+                            {t("create.createWithAiDescription")}
                           </p>
                           <div className="relative">
                             <Textarea
-                              placeholder="Example: Schedule a 1-hour team meeting tomorrow afternoon"
+                              placeholder={t("create.textareaPlaceholder")}
                               className="pr-10 min-h-[100px]"
                               value={aiTaskInput}
                               onChange={(e) => setAiTaskInput(e.target.value)}
@@ -388,7 +390,9 @@ const FloatingToolbar = () => {
                         </div>
                         <DialogFooter className="flex justify-between gap-2">
                           <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">
+                              {t("create.cancel")}
+                            </Button>
                           </DialogClose>
                           <DialogClose asChild>
                             <Button
@@ -397,7 +401,7 @@ const FloatingToolbar = () => {
                               onClick={processAiTask}
                             >
                               <Sparkles className="h-3.5 w-3.5" />
-                              Create with AI
+                              {t("create.createTask")}
                             </Button>
                           </DialogClose>
                         </DialogFooter>
@@ -412,7 +416,7 @@ const FloatingToolbar = () => {
                       }}
                     >
                       <Keyboard className="mr-2 h-4 w-4" />
-                      Create Manually
+                      {t("create.createManually")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -429,10 +433,16 @@ const FloatingToolbar = () => {
                       onClick={() => setIsOptimizationSheetOpen(true)}
                     >
                       <Zap className={`${"h-4 w-4"} text-primary`} />
-                      {!isMobile && <span className="text-sm">Optimize</span>}
+                      {!isMobile && (
+                        <span className="text-sm">
+                          {t("optimize.optimize")}
+                        </span>
+                      )}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Optimize Schedule</TooltipContent>
+                  <TooltipContent>
+                    {t("optimize.optimizeSchedule")}
+                  </TooltipContent>
                 </Tooltip>
 
                 {/* View Toggle - Updated with Kanban view */}
@@ -467,7 +477,7 @@ const FloatingToolbar = () => {
                         </Button>
                       </DropdownMenuTrigger>
                     </TooltipTrigger>
-                    <TooltipContent>Change View</TooltipContent>
+                    <TooltipContent>{t("optimize.changeView")}</TooltipContent>
                   </Tooltip>
 
                   <DropdownMenuContent align="center" className="w-40">
@@ -478,13 +488,16 @@ const FloatingToolbar = () => {
                       }
                     >
                       <DropdownMenuRadioItem value="list">
-                        <List className="mr-2 h-4 w-4" /> List View
+                        <List className="mr-2 h-4 w-4" />{" "}
+                        {t("optimize.listView")}
                       </DropdownMenuRadioItem>
                       <DropdownMenuRadioItem value="grid">
-                        <LayoutGrid className="mr-2 h-4 w-4" /> Grid View
+                        <LayoutGrid className="mr-2 h-4 w-4" />
+                        {t("optimize.gridView")}
                       </DropdownMenuRadioItem>
                       <DropdownMenuRadioItem value="kanban">
-                        <KanbanSquare className="mr-2 h-4 w-4" /> Kanban
+                        <KanbanSquare className="mr-2 h-4 w-4" />
+                        {t("optimize.kanbanView")}
                       </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
@@ -509,7 +522,7 @@ const FloatingToolbar = () => {
                           </Button>
                         </SheetTrigger>
                       </TooltipTrigger>
-                      <TooltipContent>Calendar</TooltipContent>
+                      <TooltipContent>{t("calendar")}</TooltipContent>
                     </Tooltip>
 
                     <SheetContent

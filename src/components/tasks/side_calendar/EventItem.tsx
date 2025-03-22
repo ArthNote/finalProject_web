@@ -3,7 +3,7 @@ import { format, differenceInMinutes, startOfDay, addMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
 import { GripVertical, CheckCircle2, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { TaskType } from "@/lib/taskService";
+import { TaskType } from "@/types/task";
 
 interface EventItemProps {
   event: TaskType;
@@ -36,7 +36,7 @@ export const EventItem: React.FC<EventItemProps> = ({
     // Use startTime if available, otherwise use dueDate
     const eventStart = event.startTime
       ? new Date(event.startTime)
-      : new Date(event.dueDate);
+      : new Date(event.date || "");
 
     // Calculate end time: use endTime if available, or calculate from duration, or default to 1 hour
     const eventEnd = event.endTime
@@ -151,9 +151,9 @@ export const EventItem: React.FC<EventItemProps> = ({
 
     onUpdate({
       ...event,
-      startTime: newTimes.startTime,
-      endTime: newTimes.endTime,
-      dueDate: newTimes.startTime, // Keep dueDate synchronized with startTime
+      startTime: new Date(newTimes.startTime),
+      endTime: new Date(newTimes.endTime),
+      date: new Date(newTimes.startTime), // Keep dueDate synchronized with startTime
       duration: newTimes.duration,
     });
 
@@ -227,9 +227,9 @@ export const EventItem: React.FC<EventItemProps> = ({
 
     onUpdate({
       ...event,
-      startTime: newTimes.startTime,
-      endTime: newTimes.endTime,
-      dueDate: newTimes.startTime, // Keep dueDate synchronized with startTime
+      startTime: new Date(newTimes.startTime),
+      endTime: new Date(newTimes.endTime),
+      date: new Date(newTimes.startTime), // Keep dueDate synchronized with startTime
       duration: newTimes.duration,
     });
 
@@ -255,7 +255,7 @@ export const EventItem: React.FC<EventItemProps> = ({
   // Get display times
   const startTime = event.startTime
     ? new Date(event.startTime)
-    : new Date(event.dueDate);
+    : new Date(event.date || "");
   const endTime = event.endTime
     ? new Date(event.endTime)
     : event.duration
