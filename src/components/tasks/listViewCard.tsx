@@ -9,7 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Calendar, Clock, MoreHorizontal, Tag } from "lucide-react";
+import { Calendar, Clock, MoreHorizontal, Tag, Users } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface ListViewCardProps {
   task: TaskType;
@@ -147,7 +148,7 @@ const ListViewCard = ({
         </p>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          {/* Schedule button - hidden on mobile */}
+          {/* Schedule info */}
           {task.scheduled ? (
             <div className="flex items-center text-xs text-muted-foreground">
               <Clock className="mr-1 h-3.5 w-3.5 shrink-0" />
@@ -168,6 +169,31 @@ const ListViewCard = ({
               <Calendar className="mr-1 h-3.5 w-3.5" />
               Schedule
             </Button>
+          )}
+
+          {/* Show assigned users */}
+          {task.assignedTo && task.assignedTo.length > 0 && (
+            <div className="flex items-center text-xs text-muted-foreground">
+              <Users className="mr-1 h-3.5 w-3.5 shrink-0" />
+              <div className="flex -space-x-1">
+                {task.assignedTo.slice(0, 3).map((user) => (
+                  <Avatar
+                    key={user.id}
+                    className="h-5 w-5 border border-background"
+                  >
+                    <AvatarImage src={user.profilePic} alt={user.name} />
+                    <AvatarFallback className="text-[8px]">
+                      {user.name.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+                {task.assignedTo.length > 3 && (
+                  <span className="ml-1 text-xs">
+                    +{task.assignedTo.length - 3}
+                  </span>
+                )}
+              </div>
+            </div>
           )}
 
           {/* Tags - hidden on mobile */}

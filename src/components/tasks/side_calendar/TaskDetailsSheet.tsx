@@ -15,9 +15,16 @@ import {
   AlertCircle,
   CalendarDays,
   Timer,
+  Users,
+  FileText,
+  Link as LinkIcon,
+  StickyNote,
+  Paperclip,
+  ExternalLink,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TaskType } from "@/types/task";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TaskDetailsSheetProps {
   task: TaskType | null;
@@ -97,6 +104,20 @@ const TaskDetailsSheet: React.FC<TaskDetailsSheetProps> = ({
     ? addMinutes(startTime, task.duration)
     : addMinutes(startTime, 60);
 
+  // Helper function to get appropriate icon for resource type
+  const getResourceIcon = (category: string) => {
+    switch (category) {
+      case "file":
+        return <FileText className="h-4 w-4" />;
+      case "link":
+        return <LinkIcon className="h-4 w-4" />;
+      case "note":
+        return <StickyNote className="h-4 w-4" />;
+      default:
+        return <Paperclip className="h-4 w-4" />;
+    }
+  };
+
   return (
     <Sheet open={!!task} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-md">
@@ -124,7 +145,10 @@ const TaskDetailsSheet: React.FC<TaskDetailsSheetProps> = ({
               <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
               <div>
                 <p className="text-sm">
-                  Date: {task.date ? format(new Date(task.date), "EEEE, MMMM d, yyyy") : "Not specified"}
+                  Date:{" "}
+                  {task.date
+                    ? format(new Date(task.date), "EEEE, MMMM d, yyyy")
+                    : "Not specified"}
                 </p>
                 <p className="text-sm">
                   Time: {format(startTime, "h:mm a")} -{" "}
@@ -160,6 +184,68 @@ const TaskDetailsSheet: React.FC<TaskDetailsSheetProps> = ({
                 Status: {task.scheduled ? "Scheduled" : "Unscheduled"}
               </span>
             </div>
+
+            {/* Assigned Users Section */}
+            {task.assignedTo && task.assignedTo.length > 0 && (
+              <div className="flex items-start">
+                <Users className="h-4 w-4 mr-2 text-muted-foreground mt-0.5" />
+                <div>
+                  <span className="text-sm block mb-1">Assigned to:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {task.assignedTo.map((user) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center gap-2 bg-secondary/50 rounded-full px-2 py-1"
+                      >
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={user.profilePic} alt={user.name} />
+                          <AvatarFallback className="text-xs">
+                            {user.name.slice(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-xs font-medium">{user.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Resources Section */}
+            {task.resources && task.resources.length > 0 && (
+              <div className="flex items-start">
+                <Paperclip className="h-4 w-4 mr-2 text-muted-foreground mt-0.5" />
+                <div className="w-full">
+                  <span className="text-sm block mb-1">Resources:</span>
+                  <div className="space-y-2 w-full">
+                    {task.resources.map((resource) => (
+                      <div
+                        key={resource.id}
+                        className="flex items-center justify-between gap-2 bg-secondary/30 rounded-md px-3 py-2 text-sm"
+                      >
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          {getResourceIcon(resource.category)}
+                          <span className="font-medium truncate">
+                            {resource.name}
+                          </span>
+                        </div>
+                        {resource.url && (
+                          <a
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary/80 transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div>

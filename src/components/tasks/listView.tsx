@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Check,
   Clock,
@@ -42,7 +42,7 @@ const ListView = () => {
   const [todoPage, setTodoPage] = useState(1);
   const [completedPage, setCompletedPage] = useState(1);
   const [unscheduledPage, setUnscheduledPage] = useState(1);
-  const pageSize = 10; // Number of items per page
+  const pageSize = 2; // Number of items per page
 
   // Initialize with today's date by default
   const [dateRange, setDateRange] = useState<DateRangeType>(() => {
@@ -76,12 +76,75 @@ const ListView = () => {
     unscheduledLimit: pageSize,
   };
 
+  // Track locally accumulated tasks
+  const [localTasks, setLocalTasks] = useState<{
+    todo: TaskType[];
+    completed: TaskType[];
+    unscheduled: TaskType[];
+  }>({
+    todo: [],
+    completed: [],
+    unscheduled: [],
+  });
+
   // Use React Query to fetch tasks
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["tasks", filterParams],
     queryFn: () => getTasks(filterParams),
     placeholderData: keepPreviousData, // Keep previous data while loading new data
   });
+
+  // Update local tasks whenever data changes
+  useEffect(() => {
+    if (data) {
+      if (todoPage === 1) {
+        // Reset todo tasks when filters change or on first page
+        setLocalTasks((prev) => ({ ...prev, todo: data.todo }));
+      } else {
+        // Append new todo tasks when loading more, avoiding duplicates
+        const existingIds = new Set(localTasks.todo.map((task) => task.id));
+        const newTasks = data.todo.filter((task) => !existingIds.has(task.id));
+        setLocalTasks((prev) => ({
+          ...prev,
+          todo: [...prev.todo, ...newTasks],
+        }));
+      }
+
+      if (completedPage === 1) {
+        // Reset completed tasks when filters change or on first page
+        setLocalTasks((prev) => ({ ...prev, completed: data.completed }));
+      } else {
+        // Append new completed tasks when loading more, avoiding duplicates
+        const existingIds = new Set(
+          localTasks.completed.map((task) => task.id)
+        );
+        const newTasks = data.completed.filter(
+          (task) => !existingIds.has(task.id)
+        );
+        setLocalTasks((prev) => ({
+          ...prev,
+          completed: [...prev.completed, ...newTasks],
+        }));
+      }
+
+      if (unscheduledPage === 1) {
+        // Reset unscheduled tasks when filters change or on first page
+        setLocalTasks((prev) => ({ ...prev, unscheduled: data.unscheduled }));
+      } else {
+        // Append new unscheduled tasks when loading more, avoiding duplicates
+        const existingIds = new Set(
+          localTasks.unscheduled.map((task) => task.id)
+        );
+        const newTasks = data.unscheduled.filter(
+          (task) => !existingIds.has(task.id)
+        );
+        setLocalTasks((prev) => ({
+          ...prev,
+          unscheduled: [...prev.unscheduled, ...newTasks],
+        }));
+      }
+    }
+  }, [data, todoPage, completedPage, unscheduledPage]);
 
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
 
@@ -228,9 +291,9 @@ const ListView = () => {
 
             <CollapsibleContent>
               <div className="space-y-3 mt-3">
-                {data?.unscheduled && data.unscheduled.length > 0 ? (
+                {localTasks.unscheduled && localTasks.unscheduled.length > 0 ? (
                   <>
-                    {data.unscheduled.map((task) => (
+                    {localTasks.unscheduled.map((task) => (
                       <ListViewCard
                         task={task}
                         key={task.id}
@@ -291,9 +354,9 @@ const ListView = () => {
 
           <CollapsibleContent>
             <div className="space-y-3 mt-3">
-              {data?.todo && data.todo.length > 0 ? (
+              {localTasks.todo && localTasks.todo.length > 0 ? (
                 <>
-                  {data.todo.map((task) => (
+                  {localTasks.todo.map((task) => (
                     <ListViewCard
                       task={task}
                       key={task.id}
@@ -360,9 +423,9 @@ const ListView = () => {
 
         <CollapsibleContent>
           <div className="space-y-2 mt-3">
-            {data?.completed && data.completed.length > 0 ? (
+            {localTasks.completed && localTasks.completed.length > 0 ? (
               <>
-                {data.completed.map((task) => (
+                {localTasks.completed.map((task) => (
                   <ListViewCard
                     task={task}
                     key={task.id}

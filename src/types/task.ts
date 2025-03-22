@@ -15,7 +15,13 @@ export interface TaskType {
   tags?: string[];
   status?: string; // Added status field for kanban view
   order?: number; // Added order field for kanban sorting
-  assignedTo?: string[]; // Array of user IDs for task assignment
+  assignedTo?: AssignedUser[]; // Changed to include user details
+}
+
+export interface AssignedUser {
+  id: string;
+  name: string;
+  profilePic?: string;
 }
 
 export interface TaskResources {
