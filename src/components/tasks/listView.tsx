@@ -30,9 +30,13 @@ import ListViewCard from "./listViewCard";
 import TaskViewFilters, { DateRangeType } from "./TaskViewFilters";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getTasks } from "@/lib/api/tasks";
+import { useLocale, useTranslations } from "next-intl";
+import { ErrorState } from "../error_state";
 
 const ListView = () => {
   // Replace static tasks with API data
+  const t = useTranslations("tasks.listView");
+  const locale = useLocale() as "fr" | "en";
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [scheduledFilter, setScheduledFilter] = useState("all"); // "all", "scheduled", "unscheduled"
@@ -230,19 +234,12 @@ const ListView = () => {
 
   // Handle error state
   if (isError) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="flex flex-col items-center gap-2">
-          <AlertCircle className="h-8 w-8 text-destructive" />
-          <p className="text-muted-foreground">
-            Failed to load tasks. Please try again.
-          </p>
-          <Button onClick={() => refetch()} variant="outline" size="sm">
-            Retry
-          </Button>
-        </div>
-      </div>
-    );
+    return ErrorState({
+      title: t("errorState.title"),
+      description: t("errorState.description"),
+      retryAction: () => refetch(),
+      action: t("errorState.retry"),
+    });
   }
 
   return (
@@ -266,34 +263,185 @@ const ListView = () => {
       {isLoading && data && (
         <div className="flex items-center justify-center py-4">
           <LoaderCircle className="h-5 w-5 animate-spin text-primary mr-2" />
-          <p className="text-sm text-muted-foreground">Updating tasks...</p>
+          <p className="text-sm text-muted-foreground">{t("updatingTasks")}</p>
         </div>
       )}
 
-      {/* Unscheduled Tasks Section - Only show when filter is "all" or "unscheduled" */}
-      {(scheduledFilter === "all" || scheduledFilter === "unscheduled") &&
-        (unscheduledTasksCount > 0 || scheduledFilter === "unscheduled") && (
-          <Collapsible defaultOpen>
+      {!localTasks.unscheduled.length &&
+      !localTasks.todo.length &&
+      !localTasks.completed.length ? (
+        <div className="flex flex-col items-center justify-center p-8 bg-muted/40 border border-dashed rounded-md">
+          <p className="text-muted-foreground mb-2">{t("emptyState.title")}</p>
+          <p className="text-sm text-muted-foreground">
+            {t("emptyState.description")}
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Unscheduled Tasks Section - Only show when filter is "all" or "unscheduled" */}
+          {(scheduledFilter === "all" || scheduledFilter === "unscheduled") &&
+            (unscheduledTasksCount > 0 ||
+              scheduledFilter === "unscheduled") && (
+              <Collapsible defaultOpen>
+                <div className="flex items-center justify-between border-b pb-2">
+                  <CollapsibleTrigger asChild>
+                    <div className="flex items-center gap-2 cursor-pointer">
+                      <h3 className="font-medium text-base">
+                        {t("unscheduled")}
+                      </h3>
+                      <Badge
+                        variant="secondary"
+                        className="bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
+                      >
+                        {unscheduledTasksCount}
+                      </Badge>
+                      <ChevronDown className="h-4 w-4 transition-transform" />
+                    </div>
+                  </CollapsibleTrigger>
+                </div>
+
+                <CollapsibleContent>
+                  <div className="space-y-3 mt-3">
+                    {localTasks.unscheduled &&
+                    localTasks.unscheduled.length > 0 ? (
+                      <>
+                        {localTasks.unscheduled.map((task) => (
+                          <ListViewCard
+                            task={task}
+                            key={task.id}
+                            handleToggleComplete={handleToggleComplete}
+                            handleToggleScheduled={handleToggleScheduled}
+                            handleViewTaskDetails={handleViewTaskDetails}
+                          />
+                        ))}
+                        {hasMoreUnscheduled && (
+                          <Button
+                            onClick={handleLoadMoreUnscheduled}
+                            variant="ghost"
+                            className="w-full text-muted-foreground"
+                            disabled={isLoading}
+                          >
+                            {isLoading ? (
+                              <>
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                {t("loading")}
+                              </>
+                            ) : (
+                              t("loadMore")
+                            )}
+                          </Button>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-center py-8 bg-muted/40 border border-dashed rounded-md">
+                        <p className="text-muted-foreground">
+                          {t("noUnscheduledTasks")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            )}
+
+          {/* Todo Tasks Section - Only show when filter is "all" or "scheduled" */}
+          {(scheduledFilter === "all" || scheduledFilter === "scheduled") && (
+            <Collapsible
+              open={tasksOpen.todo}
+              onOpenChange={(open) =>
+                setTasksOpen({ ...tasksOpen, todo: open })
+              }
+            >
+              <div className="flex items-center justify-between border-b pb-2">
+                <CollapsibleTrigger asChild>
+                  <div className="flex items-center gap-2 cursor-pointer">
+                    <h3 className="font-medium text-base">{t("todo")}</h3>
+                    <Badge variant="secondary">{todoTasksCount}</Badge>
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        tasksOpen.todo ? "rotate-0" : "-rotate-90"
+                      }`}
+                    />
+                  </div>
+                </CollapsibleTrigger>
+              </div>
+
+              <CollapsibleContent>
+                <div className="space-y-3 mt-3">
+                  {localTasks.todo && localTasks.todo.length > 0 ? (
+                    <>
+                      {localTasks.todo.map((task) => (
+                        <ListViewCard
+                          task={task}
+                          key={task.id}
+                          handleToggleComplete={handleToggleComplete}
+                          handleToggleScheduled={handleToggleScheduled}
+                          handleViewTaskDetails={handleViewTaskDetails}
+                        />
+                      ))}
+                      {hasMoreTodo && (
+                        <Button
+                          onClick={handleLoadMoreTodo}
+                          variant="ghost"
+                          className="w-full text-muted-foreground"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <>
+                              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                              {t("loading")}
+                            </>
+                          ) : (
+                            t("loadMore")
+                          )}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-8 bg-muted/40 border border-dashed rounded-md">
+                      <p className="text-muted-foreground">
+                        {scheduledFilter === "scheduled"
+                          ? t("noScheduledTasksToDo")
+                          : t("noTasksToDo")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+
+          {/* Completed Tasks Section */}
+          <Collapsible
+            open={tasksOpen.completed}
+            onOpenChange={(open) =>
+              setTasksOpen({ ...tasksOpen, completed: open })
+            }
+          >
             <div className="flex items-center justify-between border-b pb-2">
               <CollapsibleTrigger asChild>
                 <div className="flex items-center gap-2 cursor-pointer">
-                  <h3 className="font-medium text-base">Unscheduled</h3>
-                  <Badge
-                    variant="secondary"
-                    className="bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
-                  >
-                    {unscheduledTasksCount}
-                  </Badge>
-                  <ChevronDown className="h-4 w-4 transition-transform" />
+                  <h3 className="font-medium text-base">{t("completed")}</h3>
+                  <Badge variant="secondary">{completedTasksCount}</Badge>
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform ${
+                      tasksOpen.completed ? "rotate-0" : "-rotate-90"
+                    }`}
+                  />
                 </div>
               </CollapsibleTrigger>
+              {data?.completed && data.completed.length > 0 && (
+                <Button variant="ghost" size="sm">
+                  {t("clearALL")}
+                </Button>
+              )}
             </div>
 
             <CollapsibleContent>
-              <div className="space-y-3 mt-3">
-                {localTasks.unscheduled && localTasks.unscheduled.length > 0 ? (
+              <div className="space-y-2 mt-3">
+                {localTasks.completed && localTasks.completed.length > 0 ? (
                   <>
-                    {localTasks.unscheduled.map((task) => (
+                    {localTasks.completed.map((task) => (
                       <ListViewCard
                         task={task}
                         key={task.id}
@@ -302,9 +450,9 @@ const ListView = () => {
                         handleViewTaskDetails={handleViewTaskDetails}
                       />
                     ))}
-                    {hasMoreUnscheduled && (
+                    {hasMoreCompleted && (
                       <Button
-                        onClick={handleLoadMoreUnscheduled}
+                        onClick={handleLoadMoreCompleted}
                         variant="ghost"
                         className="w-full text-muted-foreground"
                         disabled={isLoading}
@@ -312,10 +460,10 @@ const ListView = () => {
                         {isLoading ? (
                           <>
                             <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Loading...
+                            {t("loading")}
                           </>
                         ) : (
-                          <>Load more unscheduled tasks</>
+                          t("loadMore")
                         )}
                       </Button>
                     )}
@@ -323,143 +471,15 @@ const ListView = () => {
                 ) : (
                   <div className="text-center py-8 bg-muted/40 border border-dashed rounded-md">
                     <p className="text-muted-foreground">
-                      No unscheduled tasks to do.
+                      {t("noCompletedTasks")}
                     </p>
                   </div>
                 )}
               </div>
             </CollapsibleContent>
           </Collapsible>
-        )}
-
-      {/* Todo Tasks Section - Only show when filter is "all" or "scheduled" */}
-      {(scheduledFilter === "all" || scheduledFilter === "scheduled") && (
-        <Collapsible
-          open={tasksOpen.todo}
-          onOpenChange={(open) => setTasksOpen({ ...tasksOpen, todo: open })}
-        >
-          <div className="flex items-center justify-between border-b pb-2">
-            <CollapsibleTrigger asChild>
-              <div className="flex items-center gap-2 cursor-pointer">
-                <h3 className="font-medium text-base">To Do</h3>
-                <Badge variant="secondary">{todoTasksCount}</Badge>
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    tasksOpen.todo ? "rotate-0" : "-rotate-90"
-                  }`}
-                />
-              </div>
-            </CollapsibleTrigger>
-          </div>
-
-          <CollapsibleContent>
-            <div className="space-y-3 mt-3">
-              {localTasks.todo && localTasks.todo.length > 0 ? (
-                <>
-                  {localTasks.todo.map((task) => (
-                    <ListViewCard
-                      task={task}
-                      key={task.id}
-                      handleToggleComplete={handleToggleComplete}
-                      handleToggleScheduled={handleToggleScheduled}
-                      handleViewTaskDetails={handleViewTaskDetails}
-                    />
-                  ))}
-                  {hasMoreTodo && (
-                    <Button
-                      onClick={handleLoadMoreTodo}
-                      variant="ghost"
-                      className="w-full text-muted-foreground"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <>
-                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                          Loading...
-                        </>
-                      ) : (
-                        <>Load more tasks</>
-                      )}
-                    </Button>
-                  )}
-                </>
-              ) : (
-                <div className="text-center py-8 bg-muted/40 border border-dashed rounded-md">
-                  <p className="text-muted-foreground">
-                    {scheduledFilter === "scheduled"
-                      ? "No scheduled tasks to do. Schedule some tasks to get started!"
-                      : "No tasks to do. Create a new task to get started!"}
-                  </p>
-                </div>
-              )}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+        </>
       )}
-
-      {/* Completed Tasks Section */}
-      <Collapsible
-        open={tasksOpen.completed}
-        onOpenChange={(open) => setTasksOpen({ ...tasksOpen, completed: open })}
-      >
-        <div className="flex items-center justify-between border-b pb-2">
-          <CollapsibleTrigger asChild>
-            <div className="flex items-center gap-2 cursor-pointer">
-              <h3 className="font-medium text-base">Completed</h3>
-              <Badge variant="secondary">{completedTasksCount}</Badge>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${
-                  tasksOpen.completed ? "rotate-0" : "-rotate-90"
-                }`}
-              />
-            </div>
-          </CollapsibleTrigger>
-          {data?.completed && data.completed.length > 0 && (
-            <Button variant="ghost" size="sm">
-              Clear All
-            </Button>
-          )}
-        </div>
-
-        <CollapsibleContent>
-          <div className="space-y-2 mt-3">
-            {localTasks.completed && localTasks.completed.length > 0 ? (
-              <>
-                {localTasks.completed.map((task) => (
-                  <ListViewCard
-                    task={task}
-                    key={task.id}
-                    handleToggleComplete={handleToggleComplete}
-                    handleToggleScheduled={handleToggleScheduled}
-                    handleViewTaskDetails={handleViewTaskDetails}
-                  />
-                ))}
-                {hasMoreCompleted && (
-                  <Button
-                    onClick={handleLoadMoreCompleted}
-                    variant="ghost"
-                    className="w-full text-muted-foreground"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      <>Load more completed tasks</>
-                    )}
-                  </Button>
-                )}
-              </>
-            ) : (
-              <div className="text-center py-8 bg-muted/40 border border-dashed rounded-md">
-                <p className="text-muted-foreground">No completed tasks yet.</p>
-              </div>
-            )}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
 
       {/* Task Details Sheet */}
       <TaskDetailsSheet

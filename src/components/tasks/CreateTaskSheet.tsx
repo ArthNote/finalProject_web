@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createTaskValidators, TaskFormValues, TaskResource } from "@/lib/validation/task";
+import {
+  createTaskValidators,
+  TaskFormValues,
+  TaskResource,
+} from "@/lib/validation/task";
 import {
   Sheet,
   SheetContent,
@@ -276,7 +280,14 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
         startTime: values.startTime || null,
         tags: values.tags,
         title: values.title,
-        assignedTo: values.assignedTo,
+        assignedTo: values.assignedTo.map((userId) => {
+          const member = teamMembers.find((m) => m.id === userId);
+          return {
+            id: userId,
+            name: member?.name || "Unknown",
+            profilePic: member?.avatar,
+          };
+        }),
         date: values.date || null,
         order: 0,
         status: values.scheduled ? "todo" : "unscheduled",
@@ -305,7 +316,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                 <TabsTrigger value="details">{t("details.title")}</TabsTrigger>
               </TabsList>
 
-              <ScrollArea className="h-[calc(100vh-220px)]">
+              <ScrollArea className="h-[calc(100vh-250px)]">
                 <div className="p-1">
                   <TabsContent value="basic" className="space-y-6 mt-0">
                     {/* Basic fields - unchanged */}

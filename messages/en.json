@@ -1294,6 +1294,119 @@
         "save": "Save Changes",
         "saving": "Saving..."
       }
+    },
+    "filters": {
+      "searchPlaceholder": "Search tasks...",
+      "filterByDate": "Filter by Date",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "thisWeek": "This Week",
+      "week": "This Week",
+      "customRange": "Custom Range",
+      "filters": "Filters",
+      "clearAll": "Clear All",
+      "category": "Category",
+      "allCategories": "All Categories",
+      "priority": "Priority",
+      "priorityLevel": "Priority Level",
+      "allPriorities": "All Priorities",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "status": "Status",
+      "taskStatus": "Task Status",
+      "allTasks": "All Tasks",
+      "scheduled": "Scheduled",
+      "unscheduled": "Unschedule",
+      "activeFilters": "Active Filters:",
+      "date": "Date"
+    },
+    "listView": {
+      "updatingTasks": "Updating tasks...",
+      "unscheduled": "Unscheduled",
+      "emptyState": {
+        "title": "No tasks found",
+        "description": "Try changing your filters or creating a new task"
+      },
+      "errorState": {
+        "title": "Error loading tasks",
+        "description": "An error occurred while loading your tasks. Please try again.",
+        "retry": "Retry"
+      },
+      "loading": "Loading...",
+      "loadMore": "Load More Tasks",
+      "noUnscheduledTasks": "No unscheduled tasks found",
+      "todo": "To Do",
+      "noTasksToDo": "No tasks to do. Create a new task to get started!",
+      "noScheduledTasksToDo": "No scheduled tasks to do. Schedule some tasks to get started!",
+      "completed": "Completed",
+      "clearALL": "Clear All",
+      "noCompletedTasks": "No completed tasks yet.",
+      "card": {
+        "completed": "Completed",
+        "editTask": "Edit Task",
+        "setPriority": "Set Priority",
+        "addToCalendar": "Add to Calendar",
+        "deleteTask": "Delete Task",
+        "scheduleTask": "Schedule Task",
+        "unscheduleTask": "Unschedule Task",
+        "notScheduled": "Not Scheduled",
+        "schedule": "Schedule"
+      }
+    },
+    "detailsSheet": {
+      "notSpecified": "Not Specified",
+      "durationMinutes": "{count} minutes",
+      "durationHours": "{count, plural, one {# hour} other {# hours}}",
+      "durationHoursMinutes": "{hours, plural, one {# hour} other {# hours}} {minutes, plural, one {# minute} other {# minutes}}",
+      "title": "Task Details",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "priority": "Priority",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "status": "Status",
+      "scheduled": "Scheduled",
+      "unscheduled": "Unscheduled",
+      "assignedTo": "Assigned To",
+      "resources": "Resources",
+      "category": "Category",
+      "tags": "Tags",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "gridView": {
+      "updatingTasks": "Updating tasks...",
+      "emptyState": {
+        "title": "No tasks found",
+        "description": "Try changing your filters or creating a new task"
+      },
+      "errorState": {
+        "title": "Error loading tasks",
+        "description": "An error occurred while loading your tasks. Please try again.",
+        "retry": "Retry"
+      },
+      "unscheduledTasks": "Unscheduled Tasks",
+      "loading": "Loading...",
+      "loadMore": "Load More Tasks",
+      "activeTasks": "Active Tasks",
+      "completedTasks": "Completed Tasks",
+      "noUnscheduledTasks": "No unscheduled tasks to display",
+      "noActiveTasks": "No active tasks to display",
+      "noCompletedTasks": "No completed tasks to display",
+      "card": {
+        "markInComplete": "Mark as Incomplete",
+        "markComplete": "Mark as Completed",
+        "completed": "Completed",
+        "uncategorized": "Uncategorized",
+        "unschedule": "Unscheduled",
+        "schedule": "Schedule",
+        "noDescriptionProvided": "No description provided",
+        "noDateScheduled": "No date scheduled",
+        "notScheduled": "Not Scheduled"
+      }
     }
   }
 }

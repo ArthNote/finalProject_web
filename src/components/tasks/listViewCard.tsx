@@ -11,6 +11,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Calendar, Clock, MoreHorizontal, Tag, Users } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useLocale, useTranslations } from "next-intl";
 
 interface ListViewCardProps {
   task: TaskType;
@@ -18,16 +19,6 @@ interface ListViewCardProps {
   handleToggleComplete: (taskId: string) => void;
   handleToggleScheduled: (taskId: string) => void;
 }
-
-const formatDate = (dateString: string | Date) => {
-  const date = dateString instanceof Date ? dateString : new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
 
 const getPriorityColor = (priority: string) => {
   switch (priority) {
@@ -48,6 +39,19 @@ const ListViewCard = ({
   handleToggleComplete,
   handleToggleScheduled,
 }: ListViewCardProps) => {
+  const t = useTranslations("tasks.listView.card");
+  const locale = useLocale() as "fr" | "en";
+
+  const formatDate = (dateString: string | Date) => {
+    const date = dateString instanceof Date ? dateString : new Date(dateString);
+    return date.toLocaleDateString(locale, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   if (task.completed) {
     return (
       <div className="group flex items-start gap-3 p-3 border rounded-lg bg-muted/50 overflow-hidden">
@@ -72,7 +76,7 @@ const ListViewCard = ({
 
           <div className="flex items-center text-xs text-muted-foreground/70 truncate">
             <Clock className="mr-1 h-3 w-3 shrink-0" />
-            <span className="truncate">Completed</span>
+            <span className="truncate">{t("completed")}</span>
           </div>
         </div>
       </div>
@@ -129,13 +133,13 @@ const ListViewCard = ({
                 <DropdownMenuItem
                   onClick={() => handleToggleScheduled(task.id)}
                 >
-                  {task.scheduled ? "Unschedule Task" : "Schedule Task"}
+                  {task.scheduled ? t("unscheduleTask") : t("scheduleTask")}
                 </DropdownMenuItem>
-                <DropdownMenuItem>Edit Task</DropdownMenuItem>
-                <DropdownMenuItem>Set Priority</DropdownMenuItem>
-                <DropdownMenuItem>Add to Calendar</DropdownMenuItem>
+                <DropdownMenuItem>{t("editTask")}</DropdownMenuItem>
+                <DropdownMenuItem>{t("setPriority")}</DropdownMenuItem>
+                <DropdownMenuItem>{t("addToCalendar")}</DropdownMenuItem>
                 <DropdownMenuItem className="text-red-500">
-                  Delete Task
+                  {t("deleteTask")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -153,7 +157,7 @@ const ListViewCard = ({
             <div className="flex items-center text-xs text-muted-foreground">
               <Clock className="mr-1 h-3.5 w-3.5 shrink-0" />
               <span className="truncate max-w-[150px] sm:max-w-none">
-                {task.date ? formatDate(task.date) : "Not scheduled"}
+                {task.date ? formatDate(task.date) : t("notScheduled")}
               </span>
             </div>
           ) : (
@@ -167,7 +171,7 @@ const ListViewCard = ({
               }}
             >
               <Calendar className="mr-1 h-3.5 w-3.5" />
-              Schedule
+              {t("schedule")}
             </Button>
           )}
 

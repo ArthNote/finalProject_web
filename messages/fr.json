@@ -1199,6 +1199,119 @@
         "save": "Enregistrer les modifications",
         "saving": "Enregistrement..."
       }
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher des tâches...",
+      "filterByDate": "Filtrer par date",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "thisWeek": "Cette semaine",
+      "week": "Cette semaine",
+      "customRange": "Période personnalisée",
+      "filters": "Filtres",
+      "clearAll": "Tout effacer",
+      "category": "Catégorie",
+      "allCategories": "Toutes les catégories",
+      "priority": "Priorité",
+      "priorityLevel": "Niveau de priorité",
+      "allPriorities": "Toutes les priorités",
+      "high": "Élevée",
+      "medium": "Moyenne",
+      "low": "Faible",
+      "status": "Statut",
+      "taskStatus": "Statut de la tâche",
+      "allTasks": "Toutes les tâches",
+      "scheduled": "Planifiées",
+      "unscheduled": "Non planifiées",
+      "activeFilters": "Filtres actifs :",
+      "date": "Date"
+    },
+    "listView": {
+      "emptyState": {
+        "title": "Aucune tâche trouvée",
+        "description": "Essayez de modifier vos filtres ou créez une nouvelle tâche"
+      },
+      "errorState": {
+        "title": "Erreur lors du chargement des tâches",
+        "description": "Une erreur s'est produite lors du chargement de vos tâches. Veuillez réessayer.",
+        "retry": "Réessayer"
+      },
+      "updatingTasks": "Mise à jour des tâches...",
+      "unscheduled": "Non planifiées",
+      "loading": "Chargement...",
+      "loadMore": "Charger plus de tâches",
+      "noUnscheduledTasks": "Aucune tâche non planifiée trouvée",
+      "todo": "À faire",
+      "noTasksToDo": "Aucune tâche à faire. Créez une nouvelle tâche pour commencer !",
+      "noScheduledTasksToDo": "Aucune tâche planifiée à faire. Planifiez des tâches pour commencer !",
+      "completed": "Terminées",
+      "clearALL": "Tout effacer",
+      "noCompletedTasks": "Aucune tâche terminée pour le moment.",
+      "card": {
+        "completed": "Terminée",
+        "editTask": "Modifier la tâche",
+        "setPriority": "Définir la priorité",
+        "addToCalendar": "Ajouter au calendrier",
+        "deleteTask": "Supprimer la tâche",
+        "scheduleTask": "Planifier la tâche",
+        "unscheduleTask": "Annuler la planification",
+        "notScheduled": "Non planifiée",
+        "schedule": "Planifier"
+      }
+    },
+    "detailsSheet": {
+      "notSpecified": "Non spécifié",
+      "durationMinutes": "{count} minutes",
+      "durationHours": "{count, plural, one {# heure} other {# heures}}",
+      "durationHoursMinutes": "{hours, plural, one {# heure} other {# heures}} {minutes, plural, one {# minute} other {# minutes}}",
+      "title": "Détails de la tâche",
+      "date": "Date",
+      "time": "Heure",
+      "duration": "Durée",
+      "priority": "Priorité",
+      "high": "Élevée",
+      "medium": "Moyenne",
+      "low": "Faible",
+      "status": "Statut",
+      "scheduled": "Planifiée",
+      "unscheduled": "Non planifiée",
+      "assignedTo": "Assignée à",
+      "resources": "Ressources",
+      "category": "Catégorie",
+      "tags": "Tags",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "gridView": {
+      "updatingTasks": "Mise à jour des tâches...",
+      "emptyState": {
+        "title": "Aucune tâche trouvée",
+        "description": "Essayez de modifier vos filtres ou créez une nouvelle tâche"
+      },
+      "errorState": {
+        "title": "Erreur lors du chargement des tâches",
+        "description": "Une erreur s'est produite lors du chargement de vos tâches. Veuillez réessayer.",
+        "retry": "Réessayer"
+      },
+      "unscheduledTasks": "Tâches non planifiées",
+      "loading": "Chargement...",
+      "loadMore": "Charger plus de tâches",
+      "activeTasks": "Tâches actives",
+      "completedTasks": "Tâches terminées",
+      "noUnscheduledTasks": "Aucune tâche non planifiée à afficher",
+      "noActiveTasks": "Aucune tâche active à afficher",
+      "noCompletedTasks": "Aucune tâche terminée à afficher",
+      "card": {
+        "markInComplete": "Marquer comme non terminée",
+        "markComplete": "Marquer comme terminée",
+        "completed": "Terminée",
+        "uncategorized": "Sans catégorie",
+        "unschedule": "Non planifiée",
+        "schedule": "Planifier",
+        "noDescriptionProvided": "Aucune description fournie",
+        "noDateScheduled": "Aucune date planifiée",
+        "notScheduled": "Non planifiée"
+      }
     }
   }
 }

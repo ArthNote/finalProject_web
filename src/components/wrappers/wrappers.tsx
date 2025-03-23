@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AbstractIntlMessages, NextIntlClientProvider } from "next-intl";
 import { FontProvider } from "./font-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 interface ProvidersProps {
   children: React.ReactNode;
   // messages: AbstractIntlMessages;
@@ -29,6 +29,7 @@ export function Providers({ children }: ProvidersProps) {
             <Toaster />
           </FontProvider>
         </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </>
   );
