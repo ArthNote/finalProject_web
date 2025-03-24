@@ -266,8 +266,8 @@ export const sampleTasks: TaskType[] = [
     description: "Add recent projects and update skills section",
     priority: "low",
     date: createDateTime(today, 0, 0),
-    startTime: undefined,
-    endTime: undefined,
+    startTime: null,
+    endTime: null,
     duration: 180, // 3 hours (estimated)
     completed: false,
     category: "Personal",
@@ -281,8 +281,8 @@ export const sampleTasks: TaskType[] = [
     description: "Research new frontend frameworks for potential adoption",
     priority: "medium",
     date: createDateTime(tomorrow, 0, 0),
-    startTime: undefined,
-    endTime: undefined,
+    startTime: null,
+    endTime: null,
     duration: 120, // 2 hours (estimated)
     completed: false,
     category: "Research",
@@ -296,8 +296,8 @@ export const sampleTasks: TaskType[] = [
     description: "Create slides for the upcoming conference",
     priority: "high",
     date: createDateTime(tomorrow, 0, 0),
-    startTime: undefined,
-    endTime: undefined,
+    startTime: null,
+    endTime: null,
     duration: 180, // 3 hours (estimated)
     completed: false,
     category: "Work",

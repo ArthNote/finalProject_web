@@ -1093,16 +1093,7 @@
           "cancel": "Annuler",
           "create": "Créer la tâche",
           "creating": "Création en cours...",
-          "toast": {
-            "success": {
-              "title": "Tâche créée",
-              "description": "Votre tâche a été créée avec succès"
-            },
-            "error": {
-              "title": "Erreur",
-              "description": "Une erreur s'est produite lors de la création de votre tâche"
-            }
-          },
+
           "basicInfo": {
             "title": "Base",
             "titleLabel": "Titre de la tâche*",
@@ -1162,7 +1153,34 @@
             "resourcesUrlLabel": "URL",
             "resourcesUrlPlaceholder": "Entrez l'URL",
             "resourcesUrlDescription": "L'URL est requise pour les liens",
-            "addResource": "Ajouter une ressource"
+            "addResource": "Ajouter une ressource",
+            "editResource": "Modifier la ressource",
+            "cancelEdit": "Annuler",
+            "updateResource": "Mettre à jour",
+            "addNewResource": "Ajouter une nouvelle ressource",
+            "resourcesNameRequired": "Le nom de la ressource est requis",
+            "resourcesUrlRequired": "L'URL est requise pour les ressources de type lien"
+          },
+          "editTitle": "Modifier la tâche",
+          "update": "Mettre à jour",
+          "updating": "Mise à jour...",
+          "toast": {
+            "success": {
+              "title": "Tâche créée",
+              "description": "Votre tâche a été créée avec succès"
+            },
+            "error": {
+              "title": "Erreur",
+              "description": "Une erreur s'est produite lors de la création de votre tâche"
+            },
+            "updateSuccess": {
+              "title": "Tâche mise à jour",
+              "description": "Votre tâche a été mise à jour avec succès"
+            },
+            "updateError": {
+              "title": "Erreur",
+              "description": "Une erreur s'est produite lors de la mise à jour de votre tâche"
+            }
           }
         }
       },
@@ -1257,7 +1275,9 @@
         "unscheduleTask": "Annuler la planification",
         "notScheduled": "Non planifiée",
         "schedule": "Planifier"
-      }
+      },
+      "inprogress": "En cours",
+      "noInProgressTasks": "Aucune tâche en cours trouvée"
     },
     "detailsSheet": {
       "notSpecified": "Non spécifié",
@@ -1310,6 +1330,42 @@
         "schedule": "Planifier",
         "noDescriptionProvided": "Aucune description fournie",
         "noDateScheduled": "Aucune date planifiée",
+        "notScheduled": "Non planifiée"
+      },
+      "inprogressTasks": "Tâches en cours",
+      "noInProgressTasks": "Aucune tâche en cours à afficher"
+    },
+    "kanbanView": {
+      "updatingTasks": "Mise à jour des tâches...",
+      "emptyState": {
+        "title": "Aucune tâche trouvée",
+        "description": "Essayez de modifier vos filtres ou créez une nouvelle tâche"
+      },
+      "errorState": {
+        "title": "Erreur lors du chargement des tâches",
+        "description": "Une erreur s'est produite lors du chargement de vos tâches. Veuillez réessayer.",
+        "retry": "Réessayer"
+      },
+      "unscheduled": "Non planifiées",
+      "todo": "À faire",
+      "inprogress": "En cours",
+      "completed": "Terminées",
+      "filterByColumn": "Filtrer par colonne",
+      "dragAtTop": "Déposer en haut",
+      "dragAtBottom": "Déposer en bas",
+      "dropHere": "Déposer ici",
+      "noTasksYet": "Pas encore de tâches",
+      "loading": "Chargement...",
+      "loadMore": "Charger plus de tâches",
+      "card": {
+        "viewDetails": "Voir les détails",
+        "editTask": "Modifier la tâche",
+        "moveTo": "Déplacer vers...",
+        "markInComplete": "Marquer comme non terminée",
+        "markComplete": "Marquer comme terminée",
+        "deleteTask": "Supprimer la tâche",
+        "noDescription": "Aucune description fournie",
+        "uncategorized": "Sans catégorie",
         "notScheduled": "Non planifiée"
       }
     }

@@ -51,12 +51,11 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
-import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
-import { createManualTask } from "@/lib/api/tasks";
+import { updateTask } from "@/lib/api/tasks";
 import {
   Command,
   CommandEmpty,
@@ -72,9 +71,11 @@ import { sampleTasks } from "@/lib/taskService";
 import { useLocale, useTranslations } from "next-intl";
 import { enUS, fr } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
-interface CreateTaskSheetProps {
+
+interface EditTaskSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  task: TaskType | null;
 }
 
 type TeamMember = {
@@ -84,14 +85,15 @@ type TeamMember = {
   avatar?: string;
 };
 
-const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
+const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
   open,
   onOpenChange,
+  task,
 }) => {
+  if (!task) return null;
+
   const locale = useLocale() as "en" | "fr";
   const t = useTranslations("tasks.toolbar.create.manual");
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [tagInput, setTagInput] = React.useState("");
   const [resourceName, setResourceName] = React.useState("");
   const [resourceType, setResourceType] = React.useState("");
@@ -99,6 +101,10 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
     "file" | "link" | "note"
   >("link");
   const [resourceUrl, setResourceUrl] = React.useState("");
+  const [editingResourceId, setEditingResourceId] = useState<string | null>(
+    null
+  );
+  const queryClient = useQueryClient();
 
   // State for parent task and assignees
   const [tasks, setTasks] = useState<TaskType[]>([]);
@@ -109,28 +115,48 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const [openTaskCombobox, setOpenTaskCombobox] = useState(false);
   const [openAssignCombobox, setOpenAssignCombobox] = useState(false);
 
-  const queryClient = useQueryClient();
-
   const tValidation = useTranslations();
   const { taskSchema } = createTaskValidators(tValidation);
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      priority: "medium",
-      category: "",
-      scheduled: false,
-      date: null,
-      startTime: null,
-      endTime: null,
-      tags: [],
-      assignedTo: [],
-      resources: [],
-      parentId: undefined,
+      title: task.title || "",
+      description: task.description || "",
+      priority: task.priority || "medium",
+      category: task.category || "",
+      scheduled: task.scheduled || false,
+      date: task.date ? new Date(task.date) : null,
+      startTime: task.startTime ? new Date(task.startTime) : null,
+      endTime: task.endTime ? new Date(task.endTime) : null,
+      tags: task.tags || [],
+      assignedTo: task.assignedTo?.map((user) => user.id) || [],
+      resources: task.resources || [],
+      parentId: task.parentId || null, // Explicitly set null when parentId is falsy
+      duration: task.duration || 0,
     },
   });
+
+  // Reset form values when task changes
+  useEffect(() => {
+    if (task && open) {
+      form.reset({
+        title: task.title || "",
+        description: task.description || "",
+        priority: task.priority || "medium",
+        category: task.category || "",
+        scheduled: task.scheduled || false,
+        date: task.date ? new Date(task.date) : null,
+        startTime: task.startTime ? new Date(task.startTime) : null,
+        endTime: task.endTime ? new Date(task.endTime) : null,
+        tags: task.tags || [],
+        assignedTo: task.assignedTo?.map((user) => user.id) || [],
+        resources: task.resources || [],
+        parentId: task.parentId || null, // Explicitly set null when parentId is falsy
+        duration: task.duration || null, // Use null instead of 0
+      });
+    }
+  }, [task, open, form]);
 
   // Watch values from the form
   const isScheduled = form.watch("scheduled");
@@ -150,7 +176,8 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const loadTasks = async () => {
     try {
       setIsLoadingTasks(true);
-      const tasksData = sampleTasks; // Replace with your API call to fetch tasks
+      // Filter out the current task to avoid setting itself as parent
+      const tasksData = sampleTasks.filter((t) => t.id !== task.id);
       setTasks(tasksData);
     } catch (error) {
       console.error("Error loading tasks:", error);
@@ -162,7 +189,18 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const loadTeamMembers = async () => {
     try {
       setIsLoadingTeamMembers(true);
-      const members = [] as TeamMember[]; // Replace with your API call to fetch team members
+      // In a real application, this would be an API call to fetch team members
+      // For now, we'll derive from the assigned users if any
+      const members = task.assignedTo
+        ? task.assignedTo.map((user) => ({
+            id: user.id,
+            name: user.name,
+            email: `${user.name
+              .toLowerCase()
+              .replace(/\s+/g, ".")}@example.com`,
+            avatar: user.profilePic,
+          }))
+        : [];
       setTeamMembers(members);
     } catch (error) {
       console.error("Error loading team members:", error);
@@ -187,18 +225,65 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
 
   const handleAddResource = () => {
     if (resourceName.trim() && resourceCategory) {
-      const newResource: TaskResource = {
-        id: Date.now().toString(),
-        name: resourceName.trim(),
-        type: resourceType.trim(),
-        category: resourceCategory,
-        ...(resourceUrl.trim() ? { url: resourceUrl.trim() } : {}),
-      };
-      form.setValue("resources", [...resources, newResource]);
+      // Validate URL for link resources
+      if (resourceCategory === "link" && !resourceUrl.trim()) {
+        toast({
+          title: t("details.resourcesUrlRequired"),
+          description: t("details.resourcesUrlRequired"),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (editingResourceId) {
+        // Update existing resource
+        const updatedResources = resources.map((resource) =>
+          resource.id === editingResourceId
+            ? {
+                ...resource,
+                name: resourceName.trim(),
+                type: resourceType.trim() || "General",
+                category: resourceCategory,
+                url: resourceUrl.trim() || undefined,
+              }
+            : resource
+        );
+        form.setValue("resources", updatedResources);
+        setEditingResourceId(null);
+      } else {
+        // Add new resource
+        const newResource: TaskResource = {
+          id: `new-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          name: resourceName.trim(),
+          type: resourceType.trim() || "General",
+          category: resourceCategory,
+          url: resourceUrl.trim() || undefined,
+        };
+        form.setValue("resources", [...resources, newResource]);
+      }
+
+      // Reset form fields after adding
       setResourceName("");
       setResourceType("");
       setResourceUrl("");
+      setResourceCategory("link");
     }
+  };
+
+  const handleEditResource = (resource: TaskResource) => {
+    setResourceName(resource.name);
+    setResourceType(resource.type || "");
+    setResourceCategory(resource.category);
+    setResourceUrl(resource.url || "");
+    setEditingResourceId(resource.id || null);
+  };
+
+  const handleCancelEditResource = () => {
+    setResourceName("");
+    setResourceType("");
+    setResourceUrl("");
+    setResourceCategory("link");
+    setEditingResourceId(null);
   };
 
   const handleRemoveResource = (id: string) => {
@@ -231,7 +316,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
       )
     : tasks;
 
-  const selectedTask = tasks.find((task) => task.id === parentId);
+  const selectedTask = tasks.find((t) => t.id === parentId);
 
   const getInitials = (name: string) => {
     return name
@@ -244,38 +329,39 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
 
   // Mutations
   const { mutate, isPending } = useMutation({
-    mutationFn: createManualTask,
+    mutationFn: updateTask,
     onSuccess: () => {
       toast({
-        title: t("toast.success.title"),
-        description: t("toast.success.description"),
+        title: t("toast.updateSuccess.title"),
+        description: t("toast.updateSuccess.description"),
       });
-      form.reset();
       Promise.all([
-        queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.refetchQueries({ queryKey: ["tasks"], type: "all" }),
       ]).then(() => {
         setTimeout(() => onOpenChange(false), 100);
       });
     },
     onError: (error) => {
       toast({
-        title: t("toast.error.title"),
-        description: t("toast.error.description") + " " + error.message,
+        title: t("toast.updateError.title"),
+        description: t("toast.updateError.description"),
         variant: "destructive",
       });
-      console.error("Error creating task: ", error);
+      console.error("Error updating task: ", error);
     },
   });
 
   const onSubmit = async (values: TaskFormValues) => {
-    try {
-      mutate({
+    console.log("Form submitted with values:", values);
+    mutate({
+      taskId: task.id,
+      taskData: {
         category: values.category || "",
         completed: false,
         description: values.description,
-        duration: values.duration || 0,
+        duration: values.duration || null, // Use null instead of undefined
         endTime: values.endTime || null,
-        parentId: values.parentId || null,
+        parentId: values.parentId || null, // Ensure null is explicitly set when parentId is undefined
         priority: values.priority,
         // Ensure each resource has a defined id
         resources: values.resources.map((resource) => ({
@@ -297,18 +383,16 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
         date: values.date || null,
         order: 0,
         status: values.scheduled ? "todo" : "unscheduled",
-        id: "",
-      });
-    } catch (error) {
-      console.error("Error creating task:", error);
-    }
+        id: task.id,
+      },
+    });
   };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-lg border-l">
         <SheetHeader className="pb-4">
-          <SheetTitle>{t("title")}</SheetTitle>
+          <SheetTitle>{t("editTitle")}</SheetTitle>
         </SheetHeader>
 
         <Form {...form}>
@@ -325,7 +409,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
               <ScrollArea className="h-[calc(100vh-250px)] pr-3">
                 <div className="p-1">
                   <TabsContent value="basic" className="space-y-6 mt-0">
-                    {/* Basic fields - unchanged */}
+                    {/* Basic fields */}
                     <FormField
                       control={form.control}
                       disabled={isPending}
@@ -377,6 +461,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
+                            value={field.value}
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -424,7 +509,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                   </TabsContent>
 
                   <TabsContent value="schedule" className="space-y-6 mt-0">
-                    {/* Schedule fields - unchanged */}
+                    {/* Schedule fields */}
                     <FormField
                       control={form.control}
                       disabled={isPending}
@@ -594,18 +679,17 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                     "schedule.durationPlaceholder"
                                   )}
                                   min={5}
-                                  value={field.value ?? ""}
-                                  onChange={(e) =>
-                                    field.onChange(
-                                      e.target.value === ""
-                                        ? undefined
-                                        : Number(e.target.value)
-                                    )
+                                  {...field}
+                                  value={
+                                    field.value === null ? "" : field.value
                                   }
-                                  onBlur={field.onBlur}
-                                  name={field.name}
-                                  ref={field.ref}
-                                  disabled={field.disabled}
+                                  onChange={(e) => {
+                                    const value =
+                                      e.target.value === ""
+                                        ? null
+                                        : Number(e.target.value);
+                                    field.onChange(value);
+                                  }}
                                 />
                               </FormControl>
                               <FormDescription>
@@ -664,7 +748,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       </div>
                     </div>
 
-                    {/* Parent Task Field - Now enabled */}
+                    {/* Parent Task Field */}
                     <FormField
                       control={form.control}
                       disabled={isPending}
@@ -773,7 +857,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       )}
                     />
 
-                    {/* Assigned To - Now enabled */}
+                    {/* Assigned To */}
                     <FormField
                       control={form.control}
                       disabled={isPending}
@@ -808,7 +892,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                     <div className="flex flex-wrap gap-1 mr-2">
                                       {field.value.length > 2 ? (
                                         <span>
-                                          {t("peopleAssigned", {
+                                          {t("details.peopleAssigned", {
                                             count: field.value.length,
                                           })}
                                         </span>
@@ -934,7 +1018,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                       )}
                     />
 
-                    {/* Resources section */}
+                    {/* Resources section - Enhanced for editing existing resources */}
                     <div className="space-y-3">
                       <FormLabel>{t("details.resourcesLabel")}</FormLabel>
                       <div className="space-y-2">
@@ -945,29 +1029,99 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                 key={resource.id}
                                 className="flex items-center justify-between p-2 border rounded-md"
                               >
-                                <div>
-                                  <p className="font-medium">{resource.name}</p>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium truncate">
+                                    {resource.name}
+                                  </p>
                                   <p className="text-xs text-muted-foreground">
-                                    {resource.category} • {resource.type}
-                                    {resource.url && ` • ${resource.url}`}
+                                    {resource.category} •{" "}
+                                    {resource.type || "General"}
+                                    {resource.url && (
+                                      <span className="ml-1">
+                                        •{" "}
+                                        <a
+                                          href={resource.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-primary hover:underline"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          {resource.url.length > 30
+                                            ? `${resource.url.substring(
+                                                0,
+                                                30
+                                              )}...`
+                                            : resource.url}
+                                        </a>
+                                      </span>
+                                    )}
                                   </p>
                                 </div>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleRemoveResource(resource.id!)
-                                  }
-                                >
-                                  <Trash2 className="h-4 w-4 text-muted-foreground" />
-                                </Button>
+                                <div className="flex space-x-1">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleEditResource(resource)}
+                                    aria-label={`Edit resource ${resource.name}`}
+                                    disabled={editingResourceId !== null}
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      className="lucide lucide-pencil"
+                                    >
+                                      <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                      <path d="m15 5 4 4" />
+                                    </svg>
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleRemoveResource(resource.id!)
+                                    }
+                                    aria-label={`Remove resource ${resource.name}`}
+                                    disabled={editingResourceId === resource.id}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                  </Button>
+                                </div>
                               </div>
                             ))}
                           </div>
                         )}
 
                         <div className="space-y-2 border rounded-md p-3">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="text-sm font-medium">
+                              {editingResourceId
+                                ? t("details.editResource")
+                                : resources.length
+                                ? t("details.addNewResource")
+                                : t("details.addResource")}
+                            </h4>
+                            {editingResourceId && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleCancelEditResource}
+                              >
+                                <X className="h-4 w-4 mr-1" />
+                                {t("details.cancelEdit")}
+                              </Button>
+                            )}
+                          </div>
+
                           <FormItem>
                             <FormLabel>
                               {t("details.resourcesNameLabel")}
@@ -979,6 +1133,11 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                               value={resourceName}
                               onChange={(e) => setResourceName(e.target.value)}
                             />
+                            {!resourceName.trim() && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {t("details.resourcesNameRequired")}
+                              </p>
+                            )}
                           </FormItem>
 
                           <div className="grid grid-cols-2 gap-2">
@@ -1005,7 +1164,13 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                 value={resourceCategory}
                                 onValueChange={(
                                   value: "file" | "link" | "note"
-                                ) => setResourceCategory(value)}
+                                ) => {
+                                  setResourceCategory(value);
+                                  // Clear URL if changing from link to something else
+                                  if (value !== "link") {
+                                    setResourceUrl("");
+                                  }
+                                }}
                               >
                                 <SelectTrigger>
                                   <SelectValue
@@ -1038,10 +1203,11 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                               placeholder={t("details.resourcesUrlPlaceholder")}
                               value={resourceUrl}
                               onChange={(e) => setResourceUrl(e.target.value)}
+                              disabled={resourceCategory !== "link"}
                             />
                             {resourceCategory === "link" && !resourceUrl && (
                               <div className="text-xs text-red-500 mt-1">
-                                {t("details.resourcesUrlDescription")}
+                                {t("details.resourcesUrlRequired")}
                               </div>
                             )}
                           </FormItem>
@@ -1058,13 +1224,41 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                 !resourceUrl.trim())
                             }
                           >
-                            <Plus className="h-4 w-4 mr-2" />
-                            {t("details.addResource")}
+                            {editingResourceId ? (
+                              <>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="lucide lucide-check mr-2"
+                                >
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                                {t("details.updateResource")}
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="h-4 w-4 mr-2" />
+                                {resources.length
+                                  ? t("details.addNewResource")
+                                  : t("details.addResource")}
+                              </>
+                            )}
                           </Button>
                         </div>
                       </div>
                     </div>
+
+                    {/* ...existing code... */}
                   </TabsContent>
+
+                  {/* ...existing code... */}
                 </div>
               </ScrollArea>
             </Tabs>
@@ -1079,12 +1273,12 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {t("creating")}
+                    {t("updating")}
                   </>
                 ) : (
                   <>
                     <Check className="h-4 w-4" />
-                    {t("create")}
+                    {t("update")}
                   </>
                 )}
               </Button>
@@ -1096,4 +1290,4 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   );
 };
 
-export default CreateTaskSheet;
+export default EditTaskSheet;

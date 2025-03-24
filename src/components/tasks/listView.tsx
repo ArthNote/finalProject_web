@@ -19,11 +19,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
-import {
-  sampleTasks,
-  updateTaskCompleted,
-  updateTaskScheduled,
-} from "@/lib/taskService";
+import { updateTaskScheduled } from "@/lib/taskService";
 import TaskDetailsSheet from "./side_calendar/TaskDetailsSheet";
 import { TaskFilterParams, TaskType } from "@/types/task";
 import ListViewCard from "./listViewCard";
@@ -46,6 +42,7 @@ const ListView = () => {
   const [todoPage, setTodoPage] = useState(1);
   const [completedPage, setCompletedPage] = useState(1);
   const [unscheduledPage, setUnscheduledPage] = useState(1);
+  const [inprogressPage, setInprogressPage] = useState(1); // Add in-progress pagination
   const pageSize = 2; // Number of items per page
 
   // Initialize with today's date by default
@@ -63,6 +60,7 @@ const ListView = () => {
   const [tasksOpen, setTasksOpen] = useState({
     todo: true,
     completed: true,
+    inprogress: true, // Add state for in-progress section
   });
 
   // Create filter params for the API
@@ -78,6 +76,8 @@ const ListView = () => {
     completedLimit: pageSize,
     unscheduledPage: unscheduledPage,
     unscheduledLimit: pageSize,
+    inprogressPage: inprogressPage, // Add in-progress pagination
+    inprogressLimit: pageSize,
   };
 
   // Track locally accumulated tasks
@@ -85,10 +85,12 @@ const ListView = () => {
     todo: TaskType[];
     completed: TaskType[];
     unscheduled: TaskType[];
+    inprogress: TaskType[]; // Add in-progress tasks
   }>({
     todo: [],
     completed: [],
     unscheduled: [],
+    inprogress: [], // Initialize empty array
   });
 
   // Use React Query to fetch tasks
@@ -147,8 +149,28 @@ const ListView = () => {
           unscheduled: [...prev.unscheduled, ...newTasks],
         }));
       }
+
+      if (inprogressPage === 1) {
+        // Reset in-progress tasks when filters change or on first page
+        setLocalTasks((prev) => ({
+          ...prev,
+          inprogress: data.inprogress || [],
+        }));
+      } else {
+        // Append new in-progress tasks when loading more, avoiding duplicates
+        const existingIds = new Set(
+          localTasks.inprogress.map((task) => task.id)
+        );
+        const newTasks = (data.inprogress || []).filter(
+          (task) => !existingIds.has(task.id)
+        );
+        setLocalTasks((prev) => ({
+          ...prev,
+          inprogress: [...prev.inprogress, ...newTasks],
+        }));
+      }
     }
-  }, [data, todoPage, completedPage, unscheduledPage]);
+  }, [data, todoPage, completedPage, unscheduledPage, inprogressPage]);
 
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
 
@@ -162,24 +184,30 @@ const ListView = () => {
   const hasMoreUnscheduled = data?.unscheduledTotal
     ? data.unscheduledTotal > unscheduledPage * pageSize
     : false;
+  const hasMoreInprogress = data?.inprogressTotal
+    ? data.inprogressTotal > inprogressPage * pageSize
+    : false;
 
   // Handler for "Load More" buttons
   const handleLoadMoreTodo = () => setTodoPage((prev) => prev + 1);
   const handleLoadMoreCompleted = () => setCompletedPage((prev) => prev + 1);
   const handleLoadMoreUnscheduled = () =>
     setUnscheduledPage((prev) => prev + 1);
+  const handleLoadMoreInprogress = () => setInprogressPage((prev) => prev + 1);
 
   // Reset pagination when filters change
   React.useEffect(() => {
     setTodoPage(1);
     setCompletedPage(1);
     setUnscheduledPage(1);
+    setInprogressPage(1); // Reset in-progress pagination
   }, [searchQuery, categoryFilter, scheduledFilter, priorityFilter, dateRange]);
 
   // Count tasks by status
   const todoTasksCount = data?.todoTotal || 0;
   const completedTasksCount = data?.completedTotal || 0;
   const unscheduledTasksCount = data?.unscheduledTotal || 0;
+  const inprogressTasksCount = data?.inprogressTotal || 0;
 
   // Get unique categories from tasks
   const categories = ["all"]; // We'll need to fetch categories from the server or add them dynamically
@@ -192,8 +220,6 @@ const ListView = () => {
         data?.unscheduled.find((t) => t.id === taskId)?.completed ||
         false;
 
-      const updatedTask = await updateTaskCompleted(taskId, !isCompleted);
-      // Refetch tasks to update the UI
       refetch();
     } catch (error) {
       console.error("Error updating task completion status:", error);
@@ -269,6 +295,7 @@ const ListView = () => {
 
       {!localTasks.unscheduled.length &&
       !localTasks.todo.length &&
+      !localTasks.inprogress.length &&
       !localTasks.completed.length ? (
         <div className="flex flex-col items-center justify-center p-8 bg-muted/40 border border-dashed rounded-md">
           <p className="text-muted-foreground mb-2">{t("emptyState.title")}</p>
@@ -403,6 +430,71 @@ const ListView = () => {
                         {scheduledFilter === "scheduled"
                           ? t("noScheduledTasksToDo")
                           : t("noTasksToDo")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+
+          {/* In Progress Tasks Section - Only show when filter is "all" or "scheduled" */}
+          {(scheduledFilter === "all" || scheduledFilter === "scheduled") && (
+            <Collapsible
+              open={tasksOpen.inprogress}
+              onOpenChange={(open) =>
+                setTasksOpen({ ...tasksOpen, inprogress: open })
+              }
+            >
+              <div className="flex items-center justify-between border-b pb-2">
+                <CollapsibleTrigger asChild>
+                  <div className="flex items-center gap-2 cursor-pointer">
+                    <h3 className="font-medium text-base">{t("inprogress")}</h3>
+                    <Badge variant="secondary">{inprogressTasksCount}</Badge>
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        tasksOpen.inprogress ? "rotate-0" : "-rotate-90"
+                      }`}
+                    />
+                  </div>
+                </CollapsibleTrigger>
+              </div>
+
+              <CollapsibleContent>
+                <div className="space-y-3 mt-3">
+                  {localTasks.inprogress && localTasks.inprogress.length > 0 ? (
+                    <>
+                      {localTasks.inprogress.map((task) => (
+                        <ListViewCard
+                          task={task}
+                          key={task.id}
+                          handleToggleComplete={handleToggleComplete}
+                          handleToggleScheduled={handleToggleScheduled}
+                          handleViewTaskDetails={handleViewTaskDetails}
+                        />
+                      ))}
+                      {hasMoreInprogress && (
+                        <Button
+                          onClick={handleLoadMoreInprogress}
+                          variant="ghost"
+                          className="w-full text-muted-foreground"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <>
+                              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                              {t("loading")}
+                            </>
+                          ) : (
+                            t("loadMore")
+                          )}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-8 bg-muted/40 border border-dashed rounded-md">
+                      <p className="text-muted-foreground">
+                        {t("noInProgressTasks")}
                       </p>
                     </div>
                   )}

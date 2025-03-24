@@ -23,7 +23,7 @@ import TaskViewFilters, { DateRangeType } from "./TaskViewFilters";
 import { Button } from "@/components/ui/button";
 import { getTasks } from "@/lib/api/tasks";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { updateTaskCompleted, updateTaskScheduled } from "@/lib/taskService";
+import { updateTaskScheduled } from "@/lib/taskService";
 import GridViewCard from "./gridViewCard";
 import { useLocale, useTranslations } from "next-intl";
 import { enUS, fr } from "date-fns/locale";
@@ -40,6 +40,7 @@ const GridView = () => {
   const [todoPage, setTodoPage] = useState(1);
   const [completedPage, setCompletedPage] = useState(1);
   const [unscheduledPage, setUnscheduledPage] = useState(1);
+  const [inprogressPage, setInprogressPage] = useState(1); // Add in-progress pagination state
   const pageSize = 6; // Number of items per page
 
   const [dateRange, setDateRange] = useState<DateRangeType>(() => {
@@ -65,16 +66,20 @@ const GridView = () => {
     completedLimit: pageSize,
     unscheduledPage: unscheduledPage,
     unscheduledLimit: pageSize,
+    inprogressPage: inprogressPage, // Add in-progress pagination
+    inprogressLimit: pageSize,
   };
 
   const [localTasks, setLocalTasks] = useState<{
     todo: TaskType[];
     completed: TaskType[];
     unscheduled: TaskType[];
+    inprogress: TaskType[]; // Add in-progress tasks
   }>({
     todo: [],
     completed: [],
     unscheduled: [],
+    inprogress: [], // Initialize empty array
   });
 
   const { data, isLoading, isError, refetch } = useQuery({
@@ -132,8 +137,28 @@ const GridView = () => {
           unscheduled: [...prev.unscheduled, ...newTasks],
         }));
       }
+
+      if (inprogressPage === 1) {
+        // Reset in-progress tasks when filters change or on first page
+        setLocalTasks((prev) => ({
+          ...prev,
+          inprogress: data.inprogress || [],
+        }));
+      } else {
+        // Append new in-progress tasks when loading more, avoiding duplicates
+        const existingIds = new Set(
+          localTasks.inprogress.map((task) => task.id)
+        );
+        const newTasks = (data.inprogress || []).filter(
+          (task) => !existingIds.has(task.id)
+        );
+        setLocalTasks((prev) => ({
+          ...prev,
+          inprogress: [...prev.inprogress, ...newTasks],
+        }));
+      }
     }
-  }, [data, todoPage, completedPage, unscheduledPage]);
+  }, [data, todoPage, completedPage, unscheduledPage, inprogressPage]);
 
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
 
@@ -147,18 +172,23 @@ const GridView = () => {
   const hasMoreUnscheduled = data?.unscheduledTotal
     ? data.unscheduledTotal > unscheduledPage * pageSize
     : false;
+  const hasMoreInprogress = data?.inprogressTotal
+    ? data.inprogressTotal > inprogressPage * pageSize
+    : false;
 
   // Handler for "Load More" buttons
   const handleLoadMoreTodo = () => setTodoPage((prev) => prev + 1);
   const handleLoadMoreCompleted = () => setCompletedPage((prev) => prev + 1);
   const handleLoadMoreUnscheduled = () =>
     setUnscheduledPage((prev) => prev + 1);
+  const handleLoadMoreInprogress = () => setInprogressPage((prev) => prev + 1);
 
   // Reset pagination when filters change
   React.useEffect(() => {
     setTodoPage(1);
     setCompletedPage(1);
     setUnscheduledPage(1);
+    setInprogressPage(1); // Reset in-progress pagination
   }, [searchQuery, categoryFilter, scheduledFilter, priorityFilter, dateRange]);
 
   // Get unique categories from tasks
@@ -173,8 +203,6 @@ const GridView = () => {
         data?.unscheduled.find((t) => t.id === taskId)?.completed ||
         false;
 
-      await updateTaskCompleted(taskId, !isCompleted);
-      // Refetch tasks to update the UI
       refetch();
     } catch (error) {
       console.error("Error updating task completion status:", error);
@@ -265,6 +293,7 @@ const GridView = () => {
 
       {!localTasks.unscheduled.length &&
       !localTasks.todo.length &&
+      !localTasks.inprogress.length &&
       !localTasks.completed.length ? (
         <div className="flex flex-col items-center justify-center p-8 bg-muted/40 border border-dashed rounded-md">
           <p className="text-muted-foreground mb-2">{t("emptyState.title")}</p>
@@ -321,11 +350,11 @@ const GridView = () => {
             </div>
           )}
 
-          {/* Active Todo Tasks */}
+          {/* Todo Tasks */}
           {(scheduledFilter === "all" || scheduledFilter === "scheduled") && (
             <div className="space-y-4">
               <h3 className="font-medium text-base border-b pb-2">
-                {t("activeTasks")}
+                {t("todoTasks")}
               </h3>
               {localTasks.todo &&
               localTasks.todo.filter((task) => !task.completed).length > 0 ? (
@@ -366,7 +395,54 @@ const GridView = () => {
                   )}
                 </>
               ) : (
-                <EmptyStateUI message={t("noActiveTasks")} />
+                <EmptyStateUI message={t("noTodoTasks")} />
+              )}
+            </div>
+          )}
+
+          {/* In Progress Tasks - Only show when filter is "all" or "scheduled" */}
+          {(scheduledFilter === "all" || scheduledFilter === "scheduled") && (
+            <div className="space-y-4">
+              <h3 className="font-medium text-base border-b pb-2">
+                {t("inprogressTasks")}
+              </h3>
+              {localTasks.inprogress && localTasks.inprogress.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {localTasks.inprogress.map((task) => (
+                      <GridViewCard
+                        key={task.id}
+                        task={task}
+                        setSelectedTask={setSelectedTask}
+                        handleToggleComplete={handleToggleComplete}
+                        handleToggleScheduled={handleToggleScheduled}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Load More for in-progress tasks */}
+                  {hasMoreInprogress && (
+                    <div className="flex justify-center mt-4">
+                      <Button
+                        onClick={handleLoadMoreInprogress}
+                        variant="ghost"
+                        className="w-full text-muted-foreground"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            {t("loading")}
+                          </>
+                        ) : (
+                          t("loadMore")
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <EmptyStateUI message={t("noInProgressTasks")} />
               )}
             </div>
           )}

@@ -1187,16 +1187,7 @@
           "cancel": "Cancel",
           "create": "Create Task",
           "creating": "Creating...",
-          "toast": {
-            "success": {
-              "title": "Task created",
-              "description": "Your task has been successfully created"
-            },
-            "error": {
-              "title": "Error",
-              "description": "An error occurred while creating your task"
-            }
-          },
+
           "basicInfo": {
             "title": "Basic Info",
             "titleLabel": "Task Title*",
@@ -1257,7 +1248,34 @@
             "resourcesUrlLabel": "URL",
             "resourcesUrlPlaceholder": "Enter URL",
             "resourcesUrlDescription": "URL is required for links",
-            "addResource": "Add Resource"
+            "addResource": "Add Resource",
+            "editResource": "Edit Resource",
+            "cancelEdit": "Cancel",
+            "updateResource": "Update Resource",
+            "addNewResource": "Add New Resource",
+            "resourcesNameRequired": "Resource name is required",
+            "resourcesUrlRequired": "URL is required for link resources"
+          },
+          "editTitle": "Edit Task",
+          "update": "Update Task",
+          "updating": "Updating...",
+          "toast": {
+            "success": {
+              "title": "Task created",
+              "description": "Your task has been successfully created"
+            },
+            "error": {
+              "title": "Error",
+              "description": "An error occurred while creating your task"
+            },
+            "updateSuccess": {
+              "title": "Task updated",
+              "description": "Your task has been successfully updated"
+            },
+            "updateError": {
+              "title": "Error",
+              "description": "An error occurred while updating your task"
+            }
           }
         }
       },
@@ -1324,6 +1342,8 @@
     "listView": {
       "updatingTasks": "Updating tasks...",
       "unscheduled": "Unscheduled",
+      "inprogress": "In Progress",
+      "noInProgressTasks": "No in-progress tasks found",
       "emptyState": {
         "title": "No tasks found",
         "description": "Try changing your filters or creating a new task"
@@ -1375,7 +1395,18 @@
       "category": "Category",
       "tags": "Tags",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "toast": {
+        "deleteSuccess": {
+          "title": "Task deleted",
+          "description": "Your task has been successfully deleted"
+        },
+        "deleteError": {
+          "title": "Error",
+          "description": "An error occurred while deleting your task"
+        }
+      }
     },
     "gridView": {
       "updatingTasks": "Updating tasks...",
@@ -1389,12 +1420,14 @@
         "retry": "Retry"
       },
       "unscheduledTasks": "Unscheduled Tasks",
+      "inprogressTasks": "In Progress Tasks",
+      "noInProgressTasks": "No in-progress tasks to display",
       "loading": "Loading...",
       "loadMore": "Load More Tasks",
-      "activeTasks": "Active Tasks",
+      "todoTasks": "To Do Tasks",
       "completedTasks": "Completed Tasks",
       "noUnscheduledTasks": "No unscheduled tasks to display",
-      "noActiveTasks": "No active tasks to display",
+      "noTodoTasks": "No to-do tasks to display",
       "noCompletedTasks": "No completed tasks to display",
       "card": {
         "markInComplete": "Mark as Incomplete",
@@ -1405,6 +1438,40 @@
         "schedule": "Schedule",
         "noDescriptionProvided": "No description provided",
         "noDateScheduled": "No date scheduled",
+        "notScheduled": "Not Scheduled"
+      }
+    },
+    "kanbanView": {
+      "updatingTasks": "Updating tasks...",
+      "emptyState": {
+        "title": "No tasks found",
+        "description": "Try changing your filters or creating a new task"
+      },
+      "errorState": {
+        "title": "Error loading tasks",
+        "description": "An error occurred while loading your tasks. Please try again.",
+        "retry": "Retry"
+      },
+      "unscheduled": "Unscheduled",
+      "todo": "To Do",
+      "inprogress": "In Progress",
+      "completed": "Completed",
+      "filterByColumn": "Filter by Column",
+      "dragAtTop": "Drop at the top",
+      "dragAtBottom": "Drop at the bottom",
+      "dropHere": "Drop here",
+      "noTasksYet": "No tasks yet",
+      "loading": "Loading...",
+      "loadMore": "Load More Tasks",
+      "card": {
+        "viewDetails": "View Details",
+        "editTask": "Edit Task",
+        "moveTo": "Move to..",
+        "markInComplete": "Mark as Incomplete",
+        "markComplete": "Mark as Completed",
+        "deleteTask": "Delete Task",
+        "noDescription": "No description provided",
+        "uncategorized": "Uncategorized",
         "notScheduled": "Not Scheduled"
       }
     }
