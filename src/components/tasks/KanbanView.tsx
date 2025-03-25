@@ -15,13 +15,17 @@ import { updateTaskScheduled } from "@/lib/taskService";
 import TaskDetailsSheet from "./side_calendar/TaskDetailsSheet";
 import { TaskFilterParams, TaskType } from "@/types/task";
 import TaskViewFilters, { DateRangeType } from "./TaskViewFilters";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getTasks } from "@/lib/api/tasks";
+// Remove direct import of keepPreviousData and useQuery
+// import { keepPreviousData, useQuery } from "@tanstack/react-query";
+// Remove direct import of getTasks
+// import { getTasks } from "@/lib/api/tasks";
 import { useLocale, useTranslations } from "next-intl";
 import { ErrorState } from "../error_state";
 import KanbanColumn from "./kanban/KanbanColumn";
 import { Column } from "./kanban/types";
 import { useDragAndDrop } from "./kanban/useDragAndDrop";
+// Import useTasks and related functions from tasks service
+import { useTasks, hasMoreTasks, getNextPage } from "@/lib/services/tasks";
 
 const KanbanView = () => {
   const t = useTranslations("tasks.kanbanView");
@@ -34,12 +38,14 @@ const KanbanView = () => {
   const [scheduledFilter, setScheduledFilter] = useState("all");
   const [columnFilter, setColumnFilter] = useState("all");
 
-  // Pagination state
-  const [todoPage, setTodoPage] = useState(1);
-  const [completedPage, setCompletedPage] = useState(1);
-  const [unscheduledPage, setUnscheduledPage] = useState(1);
-  const [inprogressPage, setInprogressPage] = useState(1);
-  const pageSize = 2; // Number of items per page
+  // Replace pagination state variables with a single object to match ListView structure
+  const [pagination, setPagination] = useState({
+    todoPage: 1,
+    completedPage: 1,
+    unscheduledPage: 1,
+    inprogressPage: 1,
+    pageSize: 6, // Number of items per page
+  });
 
   // Initialize with today's date by default
   const [dateRange, setDateRange] = useState<DateRangeType>(() => {
@@ -61,19 +67,6 @@ const KanbanView = () => {
     { id: "completed", title: t("completed"), color: "bg-green-500" },
   ]);
 
-  // Track locally accumulated tasks
-  const [localTasks, setLocalTasks] = useState<{
-    todo: TaskType[];
-    completed: TaskType[];
-    unscheduled: TaskType[];
-    inprogress: TaskType[];
-  }>({
-    todo: [],
-    completed: [],
-    unscheduled: [],
-    inprogress: [],
-  });
-
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [taskFormData, setTaskFormData] = useState<Partial<TaskType>>({});
@@ -83,118 +76,72 @@ const KanbanView = () => {
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
 
   // Create filter params for the API
-  const filterParams: TaskFilterParams = {
+  const filterParams = {
     search: searchQuery,
     category: categoryFilter,
     scheduled: scheduledFilter,
     priority: priorityFilter,
     dateRange: dateRange,
-    todoPage: todoPage,
-    todoLimit: pageSize,
-    completedPage: completedPage,
-    completedLimit: pageSize,
-    unscheduledPage: unscheduledPage,
-    unscheduledLimit: pageSize,
-    inprogressPage: inprogressPage,
-    inprogressLimit: pageSize,
   };
 
-  // Use React Query to fetch tasks
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["tasks", filterParams],
-    queryFn: () => getTasks(filterParams),
-    placeholderData: keepPreviousData, // Keep previous data while loading new data
-  });
-
-  // Update local tasks whenever data changes
-  useEffect(() => {
-    if (data) {
-      if (todoPage === 1) {
-        setLocalTasks((prev) => ({ ...prev, todo: data.todo }));
-      } else {
-        const existingIds = new Set(localTasks.todo.map((task) => task.id));
-        const newTasks = data.todo.filter((task) => !existingIds.has(task.id));
-        setLocalTasks((prev) => ({
-          ...prev,
-          todo: [...prev.todo, ...newTasks],
-        }));
-      }
-
-      if (completedPage === 1) {
-        setLocalTasks((prev) => ({ ...prev, completed: data.completed }));
-      } else {
-        const existingIds = new Set(
-          localTasks.completed.map((task) => task.id)
-        );
-        const newTasks = data.completed.filter(
-          (task) => !existingIds.has(task.id)
-        );
-        setLocalTasks((prev) => ({
-          ...prev,
-          completed: [...prev.completed, ...newTasks],
-        }));
-      }
-
-      if (unscheduledPage === 1) {
-        setLocalTasks((prev) => ({ ...prev, unscheduled: data.unscheduled }));
-      } else {
-        const existingIds = new Set(
-          localTasks.unscheduled.map((task) => task.id)
-        );
-        const newTasks = data.unscheduled.filter(
-          (task) => !existingIds.has(task.id)
-        );
-        setLocalTasks((prev) => ({
-          ...prev,
-          unscheduled: [...prev.unscheduled, ...newTasks],
-        }));
-      }
-
-      if (inprogressPage === 1) {
-        setLocalTasks((prev) => ({ ...prev, inprogress: data.inprogress }));
-      } else {
-        const existingIds = new Set(
-          localTasks.inprogress.map((task) => task.id)
-        );
-        const newTasks = data.inprogress.filter(
-          (task) => !existingIds.has(task.id)
-        );
-        setLocalTasks((prev) => ({
-          ...prev,
-          inprogress: [...prev.inprogress, ...newTasks],
-        }));
-      }
-    }
-  }, [data, todoPage, completedPage, unscheduledPage, inprogressPage]);
+  // Replace direct data fetching with useTasks hook
+  const {
+    todo: todoTasks,
+    completed: completedTasks,
+    unscheduled: unscheduledTasks,
+    inprogress: inprogressTasks,
+    todoTotal,
+    completedTotal,
+    unscheduledTotal,
+    inprogressTotal,
+    isLoading,
+    isError,
+    refetch,
+  } = useTasks(filterParams, pagination, setPagination);
 
   // Helper to check if we should show the "Load More" button
-  const hasMoreTodo = data?.todoTotal
-    ? data.todoTotal > todoPage * pageSize
-    : false;
-  const hasMoreCompleted = data?.completedTotal
-    ? data.completedTotal > completedPage * pageSize
-    : false;
-  const hasMoreUnscheduled = data?.unscheduledTotal
-    ? data.unscheduledTotal > unscheduledPage * pageSize
-    : false;
-  const hasMoreInprogress = data?.inprogressTotal
-    ? data.inprogressTotal > inprogressPage * pageSize
-    : false;
+  const hasMoreTodo = hasMoreTasks(
+    todoTotal,
+    pagination.todoPage,
+    pagination.pageSize
+  );
+  const hasMoreCompleted = hasMoreTasks(
+    completedTotal,
+    pagination.completedPage,
+    pagination.pageSize
+  );
+  const hasMoreUnscheduled = hasMoreTasks(
+    unscheduledTotal,
+    pagination.unscheduledPage,
+    pagination.pageSize
+  );
+  const hasMoreInprogress = hasMoreTasks(
+    inprogressTotal,
+    pagination.inprogressPage,
+    pagination.pageSize
+  );
 
-  // Handler for "Load More" buttons
-  const handleLoadMoreTodo = () => setTodoPage((prev) => prev + 1);
-  const handleLoadMoreCompleted = () => setCompletedPage((prev) => prev + 1);
+  // Update handler for "Load More" buttons
+  const handleLoadMoreTodo = () =>
+    setPagination((prev) => ({
+      ...prev,
+      todoPage: getNextPage(prev.todoPage),
+    }));
+  const handleLoadMoreCompleted = () =>
+    setPagination((prev) => ({
+      ...prev,
+      completedPage: getNextPage(prev.completedPage),
+    }));
   const handleLoadMoreUnscheduled = () =>
-    setUnscheduledPage((prev) => prev + 1);
-  const handleLoadMoreInprogress = () => setInprogressPage((prev) => prev + 1);
-
-  // Reset pagination when filters change
-  React.useEffect(() => {
-    setTodoPage(1);
-    setCompletedPage(1);
-    setUnscheduledPage(1);
-    setInprogressPage(1);
-  }, [searchQuery, categoryFilter, scheduledFilter, priorityFilter, dateRange]);
+    setPagination((prev) => ({
+      ...prev,
+      unscheduledPage: getNextPage(prev.unscheduledPage),
+    }));
+  const handleLoadMoreInprogress = () =>
+    setPagination((prev) => ({
+      ...prev,
+      inprogressPage: getNextPage(prev.inprogressPage),
+    }));
 
   // Setup drag and drop
   const {
@@ -222,14 +169,6 @@ const KanbanView = () => {
 
     if (editingTask) {
       // Update existing task - in a real app, this would call an API
-      // For now, just update the local state
-      const taskToUpdate = {
-        ...localTasks.todo.find((t) => t.id === editingTask),
-        ...localTasks.completed.find((t) => t.id === editingTask),
-        ...localTasks.unscheduled.find((t) => t.id === editingTask),
-        ...taskFormData,
-      };
-
       // Refresh data after update
       refetch();
     } else {
@@ -297,13 +236,17 @@ const KanbanView = () => {
 
   const handleToggleComplete = async (taskId: string) => {
     try {
-      const isCompleted =
-        localTasks.todo.find((t) => t.id === taskId)?.completed ||
-        localTasks.completed.find((t) => t.id === taskId)?.completed ||
-        localTasks.unscheduled.find((t) => t.id === taskId)?.completed ||
-        false;
+      const findTask = (id: string) => {
+        return (
+          todoTasks.find((t) => t.id === id) ||
+          completedTasks.find((t) => t.id === id) ||
+          unscheduledTasks.find((t) => t.id === id) ||
+          inprogressTasks.find((t) => t.id === id) ||
+          null
+        );
+      };
 
-      // Refetch tasks to update the UI
+      // Logic for toggling completion status
       refetch();
     } catch (error) {
       console.error("Error updating task completion status:", error);
@@ -312,11 +255,18 @@ const KanbanView = () => {
 
   const handleToggleScheduled = async (taskId: string) => {
     try {
-      const isScheduled =
-        localTasks.todo.find((t) => t.id === taskId)?.scheduled ||
-        localTasks.completed.find((t) => t.id === taskId)?.scheduled ||
-        localTasks.unscheduled.find((t) => t.id === taskId)?.scheduled ||
-        false;
+      const findTask = (id: string) => {
+        return (
+          todoTasks.find((t) => t.id === id) ||
+          completedTasks.find((t) => t.id === id) ||
+          unscheduledTasks.find((t) => t.id === id) ||
+          inprogressTasks.find((t) => t.id === id) ||
+          null
+        );
+      };
+
+      const task = findTask(taskId);
+      const isScheduled = task?.scheduled || false;
 
       await updateTaskScheduled(taskId, !isScheduled);
       // Refetch tasks to update the UI
@@ -335,18 +285,24 @@ const KanbanView = () => {
   const getTasksForColumn = (columnId: string) => {
     // Map our API task lists to the appropriate columns
     if (columnId === "todo") {
-      return localTasks.todo.filter((t) => !t.completed);
+      return todoTasks.filter((t) => !t.completed);
     } else if (columnId === "completed") {
-      return localTasks.completed;
+      return completedTasks;
     } else if (columnId === "unscheduled") {
-      return localTasks.unscheduled;
+      return unscheduledTasks;
     } else if (columnId === "inprogress") {
-      return localTasks.inprogress;
+      return inprogressTasks;
     }
     return [];
   };
 
-  if (isLoading && !data) {
+  if (
+    isLoading &&
+    !todoTasks.length &&
+    !completedTasks.length &&
+    !unscheduledTasks.length &&
+    !inprogressTasks.length
+  ) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-2">
@@ -380,18 +336,26 @@ const KanbanView = () => {
         dateRange={dateRange}
         setDateRange={setDateRange}
         categories={categories}
+        refrshTasks={refetch}
       />
 
       {/* Show loading indicator during subsequent data fetches */}
-      {isLoading && data && (
-        <div className="flex items-center justify-center py-4">
-          <LoaderCircle className="h-5 w-5 animate-spin text-primary mr-2" />
-          <p className="text-sm text-muted-foreground">{t("updatingTasks")}</p>
-        </div>
-      )}
-      {!localTasks.unscheduled.length &&
-      !localTasks.todo.length &&
-      !localTasks.completed.length ? (
+      {isLoading &&
+        (todoTasks.length > 0 ||
+          completedTasks.length > 0 ||
+          unscheduledTasks.length > 0 ||
+          inprogressTasks.length > 0) && (
+          <div className="flex items-center justify-center py-4">
+            <LoaderCircle className="h-5 w-5 animate-spin text-primary mr-2" />
+            <p className="text-sm text-muted-foreground">
+              {t("updatingTasks")}
+            </p>
+          </div>
+        )}
+      {!unscheduledTasks.length &&
+      !todoTasks.length &&
+      !completedTasks.length &&
+      !inprogressTasks.length ? (
         <div className="flex flex-col items-center justify-center p-8 bg-muted/40 border border-dashed rounded-md">
           <p className="text-muted-foreground mb-2">{t("emptyState.title")}</p>
           <p className="text-sm text-muted-foreground">

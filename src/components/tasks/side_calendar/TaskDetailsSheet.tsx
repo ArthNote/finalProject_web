@@ -47,7 +47,6 @@ const TaskDetailsSheet: React.FC<TaskDetailsSheetProps> = ({
   onTaskComplete,
   onTaskScheduled,
 }) => {
-  if (!task) return null;
   const t = useTranslations("tasks.detailsSheet");
   const locale = useLocale() as "fr" | "en";
   const queryClient = useQueryClient();
@@ -76,6 +75,8 @@ const TaskDetailsSheet: React.FC<TaskDetailsSheetProps> = ({
       console.error("Error deleting task:", error);
     },
   });
+
+  if (!task) return null;
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -165,6 +166,7 @@ const TaskDetailsSheet: React.FC<TaskDetailsSheetProps> = ({
                 <h2 className="text-xl font-semibold pr-4">{task.title}</h2>
                 <Checkbox
                   checked={task.completed}
+                  disabled={!task.scheduled}
                   onCheckedChange={(checked) =>
                     onTaskComplete && onTaskComplete(task.id, !!checked)
                   }

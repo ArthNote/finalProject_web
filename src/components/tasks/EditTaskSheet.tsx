@@ -353,6 +353,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
 
   const onSubmit = async (values: TaskFormValues) => {
     console.log("Form submitted with values:", values);
+    const isScheduled = values.startTime && values.endTime && values.duration;
     mutate({
       taskId: task.id,
       taskData: {
@@ -368,7 +369,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
           ...resource,
           id: resource.id || Date.now().toString(),
         })),
-        scheduled: values.scheduled,
+        scheduled: isScheduled ? values.scheduled : false,
         startTime: values.startTime || null,
         tags: values.tags,
         title: values.title,

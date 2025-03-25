@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Filter, CalendarRange, X } from "lucide-react";
+import { Search, Filter, CalendarRange, X, RefreshCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +41,7 @@ interface TaskViewFiltersProps {
   setDateRange: (dateRange: DateRangeType) => void;
   categories: string[];
   onFilterChange?: () => void;
+  refrshTasks?: () => void;
 }
 
 const TaskViewFilters: React.FC<TaskViewFiltersProps> = ({
@@ -56,11 +57,13 @@ const TaskViewFilters: React.FC<TaskViewFiltersProps> = ({
   setDateRange,
   categories,
   onFilterChange,
+  refrshTasks,
 }) => {
   const t = useTranslations("tasks.filters");
   const locale = useLocale() as "en" | "fr";
   const [showFilters, setShowFilters] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [refetching, setRefetching] = useState(false);
 
   // Check if any filters are active
   const isFilterActive =
@@ -390,6 +393,21 @@ const TaskViewFilters: React.FC<TaskViewFiltersProps> = ({
               </div>
             </PopoverContent>
           </Popover>
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setRefetching(true);
+              refrshTasks?.();
+              setTimeout(() => setRefetching(false), 1000);
+            }}
+            disabled={refetching}
+          >
+            <RefreshCcw
+              className={cn("h-3.5 w-3.5", refetching && "animate-spin-ccw")}
+            />
+          </Button>
         </div>
       </div>
 

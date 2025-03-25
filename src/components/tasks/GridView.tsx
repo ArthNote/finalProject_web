@@ -1,33 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { TaskFilterParams, TaskType } from "@/types/task";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Clock,
-  MoreHorizontal,
-  Check,
-  LoaderCircle,
-  AlertCircle,
-} from "lucide-react";
-import { format } from "date-fns";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import React, { useState } from "react";
+import { TaskType } from "@/types/task";
+import { LoaderCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { updateTaskScheduled } from "@/lib/taskService";
 import TaskDetailsSheet from "./side_calendar/TaskDetailsSheet";
 import TaskViewFilters, { DateRangeType } from "./TaskViewFilters";
-import { Button } from "@/components/ui/button";
-import { getTasks } from "@/lib/api/tasks";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { updateTaskScheduled } from "@/lib/taskService";
-import GridViewCard from "./gridViewCard";
 import { useLocale, useTranslations } from "next-intl";
-import { enUS, fr } from "date-fns/locale";
 import { ErrorState } from "../error_state";
+import GridViewCard from "./gridViewCard";
+import { useTasks, hasMoreTasks, getNextPage } from "@/lib/services/tasks";
 
 const GridView = () => {
   const t = useTranslations("tasks.gridView");
@@ -37,11 +18,14 @@ const GridView = () => {
   const [scheduledFilter, setScheduledFilter] = useState("all"); // "all", "scheduled", "unscheduled"
   const [priorityFilter, setPriorityFilter] = useState("all"); // "all",
 
-  const [todoPage, setTodoPage] = useState(1);
-  const [completedPage, setCompletedPage] = useState(1);
-  const [unscheduledPage, setUnscheduledPage] = useState(1);
-  const [inprogressPage, setInprogressPage] = useState(1); // Add in-progress pagination state
-  const pageSize = 6; // Number of items per page
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    todoPage: 1,
+    completedPage: 1,
+    unscheduledPage: 1,
+    inprogressPage: 1,
+    pageSize: 6, // Number of items per page
+  });
 
   const [dateRange, setDateRange] = useState<DateRangeType>(() => {
     const today = new Date();
@@ -54,155 +38,93 @@ const GridView = () => {
     };
   });
 
-  const filterParams: TaskFilterParams = {
+  // Create filter params for the API
+  const filterParams = {
     search: searchQuery,
     category: categoryFilter,
     scheduled: scheduledFilter,
     priority: priorityFilter,
     dateRange: dateRange,
-    todoPage: todoPage,
-    todoLimit: pageSize,
-    completedPage: completedPage,
-    completedLimit: pageSize,
-    unscheduledPage: unscheduledPage,
-    unscheduledLimit: pageSize,
-    inprogressPage: inprogressPage, // Add in-progress pagination
-    inprogressLimit: pageSize,
   };
-
-  const [localTasks, setLocalTasks] = useState<{
-    todo: TaskType[];
-    completed: TaskType[];
-    unscheduled: TaskType[];
-    inprogress: TaskType[]; // Add in-progress tasks
-  }>({
-    todo: [],
-    completed: [],
-    unscheduled: [],
-    inprogress: [], // Initialize empty array
-  });
-
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["tasks", filterParams],
-    queryFn: () => getTasks(filterParams),
-    placeholderData: keepPreviousData, // Keep previous data while loading new data
-  });
-
-  // Update local tasks whenever data changes
-  useEffect(() => {
-    if (data) {
-      if (todoPage === 1) {
-        // Reset todo tasks when filters change or on first page
-        setLocalTasks((prev) => ({ ...prev, todo: data.todo }));
-      } else {
-        // Append new todo tasks when loading more, avoiding duplicates
-        const existingIds = new Set(localTasks.todo.map((task) => task.id));
-        const newTasks = data.todo.filter((task) => !existingIds.has(task.id));
-        setLocalTasks((prev) => ({
-          ...prev,
-          todo: [...prev.todo, ...newTasks],
-        }));
-      }
-
-      if (completedPage === 1) {
-        // Reset completed tasks when filters change or on first page
-        setLocalTasks((prev) => ({ ...prev, completed: data.completed }));
-      } else {
-        // Append new completed tasks when loading more, avoiding duplicates
-        const existingIds = new Set(
-          localTasks.completed.map((task) => task.id)
-        );
-        const newTasks = data.completed.filter(
-          (task) => !existingIds.has(task.id)
-        );
-        setLocalTasks((prev) => ({
-          ...prev,
-          completed: [...prev.completed, ...newTasks],
-        }));
-      }
-
-      if (unscheduledPage === 1) {
-        // Reset unscheduled tasks when filters change or on first page
-        setLocalTasks((prev) => ({ ...prev, unscheduled: data.unscheduled }));
-      } else {
-        // Append new unscheduled tasks when loading more, avoiding duplicates
-        const existingIds = new Set(
-          localTasks.unscheduled.map((task) => task.id)
-        );
-        const newTasks = data.unscheduled.filter(
-          (task) => !existingIds.has(task.id)
-        );
-        setLocalTasks((prev) => ({
-          ...prev,
-          unscheduled: [...prev.unscheduled, ...newTasks],
-        }));
-      }
-
-      if (inprogressPage === 1) {
-        // Reset in-progress tasks when filters change or on first page
-        setLocalTasks((prev) => ({
-          ...prev,
-          inprogress: data.inprogress || [],
-        }));
-      } else {
-        // Append new in-progress tasks when loading more, avoiding duplicates
-        const existingIds = new Set(
-          localTasks.inprogress.map((task) => task.id)
-        );
-        const newTasks = (data.inprogress || []).filter(
-          (task) => !existingIds.has(task.id)
-        );
-        setLocalTasks((prev) => ({
-          ...prev,
-          inprogress: [...prev.inprogress, ...newTasks],
-        }));
-      }
-    }
-  }, [data, todoPage, completedPage, unscheduledPage, inprogressPage]);
 
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
 
+  // Use our custom hook to get tasks
+  const {
+    todo: todoTasks,
+    completed: completedTasks,
+    unscheduled: unscheduledTasks,
+    inprogress: inprogressTasks,
+    todoTotal,
+    completedTotal,
+    unscheduledTotal,
+    inprogressTotal,
+    isLoading,
+    isError,
+    refetch,
+  } = useTasks(filterParams, pagination, setPagination);
+
   // Helper to check if we should show the "Load More" button
-  const hasMoreTodo = data?.todoTotal
-    ? data.todoTotal > todoPage * pageSize
-    : false;
-  const hasMoreCompleted = data?.completedTotal
-    ? data.completedTotal > completedPage * pageSize
-    : false;
-  const hasMoreUnscheduled = data?.unscheduledTotal
-    ? data.unscheduledTotal > unscheduledPage * pageSize
-    : false;
-  const hasMoreInprogress = data?.inprogressTotal
-    ? data.inprogressTotal > inprogressPage * pageSize
-    : false;
+  const hasMoreTodo = hasMoreTasks(
+    todoTotal,
+    pagination.todoPage,
+    pagination.pageSize
+  );
+  const hasMoreCompleted = hasMoreTasks(
+    completedTotal,
+    pagination.completedPage,
+    pagination.pageSize
+  );
+  const hasMoreUnscheduled = hasMoreTasks(
+    unscheduledTotal,
+    pagination.unscheduledPage,
+    pagination.pageSize
+  );
+  const hasMoreInprogress = hasMoreTasks(
+    inprogressTotal,
+    pagination.inprogressPage,
+    pagination.pageSize
+  );
 
   // Handler for "Load More" buttons
-  const handleLoadMoreTodo = () => setTodoPage((prev) => prev + 1);
-  const handleLoadMoreCompleted = () => setCompletedPage((prev) => prev + 1);
+  const handleLoadMoreTodo = () =>
+    setPagination((prev) => ({
+      ...prev,
+      todoPage: getNextPage(prev.todoPage),
+    }));
+  const handleLoadMoreCompleted = () =>
+    setPagination((prev) => ({
+      ...prev,
+      completedPage: getNextPage(prev.completedPage),
+    }));
   const handleLoadMoreUnscheduled = () =>
-    setUnscheduledPage((prev) => prev + 1);
-  const handleLoadMoreInprogress = () => setInprogressPage((prev) => prev + 1);
-
-  // Reset pagination when filters change
-  React.useEffect(() => {
-    setTodoPage(1);
-    setCompletedPage(1);
-    setUnscheduledPage(1);
-    setInprogressPage(1); // Reset in-progress pagination
-  }, [searchQuery, categoryFilter, scheduledFilter, priorityFilter, dateRange]);
+    setPagination((prev) => ({
+      ...prev,
+      unscheduledPage: getNextPage(prev.unscheduledPage),
+    }));
+  const handleLoadMoreInprogress = () =>
+    setPagination((prev) => ({
+      ...prev,
+      inprogressPage: getNextPage(prev.inprogressPage),
+    }));
 
   // Get unique categories from tasks
   const categories = ["all"]; // We'll need to fetch categories from the server or add them dynamically
 
-  // Task action handlers - copied from ListView
+  // Task action handlers
   const handleToggleComplete = async (taskId: string) => {
     try {
-      const isCompleted =
-        data?.todo.find((t) => t.id === taskId)?.completed ||
-        data?.completed.find((t) => t.id === taskId)?.completed ||
-        data?.unscheduled.find((t) => t.id === taskId)?.completed ||
-        false;
+      const findTask = (id: string) => {
+        return (
+          todoTasks.find((t) => t.id === id) ||
+          completedTasks.find((t) => t.id === id) ||
+          unscheduledTasks.find((t) => t.id === id) ||
+          inprogressTasks.find((t) => t.id === id) ||
+          null
+        );
+      };
 
+      // Logic for toggling completion status
       refetch();
     } catch (error) {
       console.error("Error updating task completion status:", error);
@@ -211,30 +133,24 @@ const GridView = () => {
 
   const handleToggleScheduled = async (taskId: string) => {
     try {
-      const isScheduled =
-        data?.todo.find((t) => t.id === taskId)?.scheduled ||
-        data?.completed.find((t) => t.id === taskId)?.scheduled ||
-        data?.unscheduled.find((t) => t.id === taskId)?.scheduled ||
-        false;
+      const findTask = (id: string) => {
+        return (
+          todoTasks.find((t) => t.id === id) ||
+          completedTasks.find((t) => t.id === id) ||
+          unscheduledTasks.find((t) => t.id === id) ||
+          inprogressTasks.find((t) => t.id === id) ||
+          null
+        );
+      };
+
+      const task = findTask(taskId);
+      const isScheduled = task?.scheduled || false;
 
       await updateTaskScheduled(taskId, !isScheduled);
       // Refetch tasks to update the UI
       refetch();
     } catch (error) {
       console.error("Error updating task scheduling status:", error);
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-500";
-      case "medium":
-        return "bg-amber-500";
-      case "low":
-        return "bg-green-500";
-      default:
-        return "bg-slate-500";
     }
   };
 
@@ -246,7 +162,13 @@ const GridView = () => {
   );
 
   // Handle loading state
-  if (isLoading && !data) {
+  if (
+    isLoading &&
+    !todoTasks.length &&
+    !completedTasks.length &&
+    !unscheduledTasks.length &&
+    !inprogressTasks.length
+  ) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-2">
@@ -281,20 +203,27 @@ const GridView = () => {
         dateRange={dateRange}
         setDateRange={setDateRange}
         categories={categories}
+        refrshTasks={refetch}
       />
 
       {/* Show loading indicator during subsequent data fetches */}
-      {isLoading && data && (
-        <div className="flex items-center justify-center py-4">
-          <LoaderCircle className="h-5 w-5 animate-spin text-primary mr-2" />
-          <p className="text-sm text-muted-foreground">{t("updatingTasks")}</p>
-        </div>
-      )}
+      {isLoading &&
+        (todoTasks.length > 0 ||
+          completedTasks.length > 0 ||
+          unscheduledTasks.length > 0 ||
+          inprogressTasks.length > 0) && (
+          <div className="flex items-center justify-center py-4">
+            <LoaderCircle className="h-5 w-5 animate-spin text-primary mr-2" />
+            <p className="text-sm text-muted-foreground">
+              {t("updatingTasks")}
+            </p>
+          </div>
+        )}
 
-      {!localTasks.unscheduled.length &&
-      !localTasks.todo.length &&
-      !localTasks.inprogress.length &&
-      !localTasks.completed.length ? (
+      {!unscheduledTasks.length &&
+      !todoTasks.length &&
+      !inprogressTasks.length &&
+      !completedTasks.length ? (
         <div className="flex flex-col items-center justify-center p-8 bg-muted/40 border border-dashed rounded-md">
           <p className="text-muted-foreground mb-2">{t("emptyState.title")}</p>
           <p className="text-sm text-muted-foreground">
@@ -309,10 +238,10 @@ const GridView = () => {
               <h3 className="font-medium text-base border-b pb-2">
                 {t("unscheduledTasks")}
               </h3>
-              {localTasks.unscheduled && localTasks.unscheduled.length > 0 ? (
+              {unscheduledTasks && unscheduledTasks.length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {localTasks.unscheduled.map((task) => (
+                    {unscheduledTasks.map((task) => (
                       <GridViewCard
                         key={task.id}
                         task={task}
@@ -356,11 +285,11 @@ const GridView = () => {
               <h3 className="font-medium text-base border-b pb-2">
                 {t("todoTasks")}
               </h3>
-              {localTasks.todo &&
-              localTasks.todo.filter((task) => !task.completed).length > 0 ? (
+              {todoTasks &&
+              todoTasks.filter((task) => !task.completed).length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {localTasks.todo
+                    {todoTasks
                       .filter((task) => !task.completed)
                       .map((task) => (
                         <GridViewCard
@@ -406,10 +335,10 @@ const GridView = () => {
               <h3 className="font-medium text-base border-b pb-2">
                 {t("inprogressTasks")}
               </h3>
-              {localTasks.inprogress && localTasks.inprogress.length > 0 ? (
+              {inprogressTasks && inprogressTasks.length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {localTasks.inprogress.map((task) => (
+                    {inprogressTasks.map((task) => (
                       <GridViewCard
                         key={task.id}
                         task={task}
@@ -452,11 +381,11 @@ const GridView = () => {
             <h3 className="font-medium text-base border-b pb-2">
               {t("completedTasks")}
             </h3>
-            {localTasks.completed &&
-            localTasks.completed.filter((task) => task.completed).length > 0 ? (
+            {completedTasks &&
+            completedTasks.filter((task) => task.completed).length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {localTasks.completed
+                  {completedTasks
                     .filter((task) => task.completed)
                     .map((task) => (
                       <GridViewCard

@@ -269,6 +269,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
 
   const onSubmit = async (values: TaskFormValues) => {
     try {
+      const isScheduled = values.startTime && values.endTime && values.duration;
       mutate({
         category: values.category || "",
         completed: false,
@@ -282,7 +283,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
           ...resource,
           id: resource.id || Date.now().toString(),
         })),
-        scheduled: values.scheduled,
+        scheduled: isScheduled ? values.scheduled : false,
         startTime: values.startTime || null,
         tags: values.tags,
         title: values.title,

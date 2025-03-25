@@ -1182,6 +1182,7 @@
         "cancel": "Cancel",
         "createManually": "Create Manually",
         "textareaPlaceholder": "Example: Schedule a 1-hour team meeting tomorrow afternoon",
+        "hideToolbar": "Hide Toolbar",
         "manual": {
           "title": "Create New Task",
           "cancel": "Cancel",
@@ -1371,7 +1372,36 @@
         "scheduleTask": "Schedule Task",
         "unscheduleTask": "Unschedule Task",
         "notScheduled": "Not Scheduled",
-        "schedule": "Schedule"
+        "schedule": "Schedule",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "unscheduled": "Unscheduled",
+        "inprogress": "In Progress",
+        "todo": "To Do",
+        "setStatus": "Set Status",
+        "toast": {
+          "updateSuccess": {
+            "title": "Task updated",
+            "description": "Your task has been successfully updated"
+          },
+          "updateError": {
+            "title": "Error",
+            "description": "An error occurred while updating your task"
+          },
+          "statusSuccess": {
+            "title": "Task complete status updated",
+            "description": "Your task complete status has been successfully updated"
+          },
+          "statusError": {
+            "title": "Error",
+            "description": "An error occurred while updating your task complete status"
+          },
+          "unscheduledTask": {
+            "title": "Task unscheduled",
+            "description": "Schedule the task to change its status."
+          }
+        }
       }
     },
     "detailsSheet": {
@@ -1438,7 +1468,40 @@
         "schedule": "Schedule",
         "noDescriptionProvided": "No description provided",
         "noDateScheduled": "No date scheduled",
-        "notScheduled": "Not Scheduled"
+        "notScheduled": "Not Scheduled",
+        "editTask": "Edit Task",
+        "setPriority": "Set Priority",
+        "scheduleTask": "Schedule Task",
+        "deleteTask": "Delete Task",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "unscheduled": "Unscheduled",
+        "inprogress": "In Progress",
+        "todo": "To Do",
+        "setStatus": "Set Status",
+        "toast": {
+          "updateSuccess": {
+            "title": "Task updated",
+            "description": "Your task has been successfully updated"
+          },
+          "updateError": {
+            "title": "Error",
+            "description": "An error occurred while updating your task"
+          },
+          "statusSuccess": {
+            "title": "Task complete status updated",
+            "description": "Your task complete status has been successfully updated"
+          },
+          "statusError": {
+            "title": "Error",
+            "description": "An error occurred while updating your task complete status"
+          },
+          "unscheduledTask": {
+            "title": "Task unscheduled",
+            "description": "Schedule the task to change its status."
+          }
+        }
       }
     },
     "kanbanView": {
@@ -1472,7 +1535,40 @@
         "deleteTask": "Delete Task",
         "noDescription": "No description provided",
         "uncategorized": "Uncategorized",
-        "notScheduled": "Not Scheduled"
+        "notScheduled": "Not Scheduled",
+
+        "setPriority": "Set Priority",
+        "scheduleTask": "Schedule Task",
+
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "unscheduled": "Unscheduled",
+        "inprogress": "In Progress",
+        "todo": "To Do",
+        "setStatus": "Set Status",
+        "toast": {
+          "updateSuccess": {
+            "title": "Task updated",
+            "description": "Your task has been successfully updated"
+          },
+          "updateError": {
+            "title": "Error",
+            "description": "An error occurred while updating your task"
+          },
+          "statusSuccess": {
+            "title": "Task complete status updated",
+            "description": "Your task complete status has been successfully updated"
+          },
+          "statusError": {
+            "title": "Error",
+            "description": "An error occurred while updating your task complete status"
+          },
+          "unscheduledTask": {
+            "title": "Task unscheduled",
+            "description": "Schedule the task to change its status."
+          }
+        }
       }
     }
   }

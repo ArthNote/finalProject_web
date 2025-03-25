@@ -1081,6 +1081,7 @@
     "toolbar": {
       "hideToolbar": "Masquer la barre d'outils",
       "create": {
+        "hideToolbar": "Masquer la barre d'outils",
         "createTask": "Créer une tâche",
         "createWithAI": "Créer avec l'IA",
         "createTaskWithAI": "Créer une tâche avec l'IA",
@@ -1274,7 +1275,36 @@
         "scheduleTask": "Planifier la tâche",
         "unscheduleTask": "Annuler la planification",
         "notScheduled": "Non planifiée",
-        "schedule": "Planifier"
+        "schedule": "Planifier",
+        "unscheduled": "Non planifiée",
+        "inprogress": "En cours",
+        "todo": "À faire",
+        "setStatus": "Définir le statut",
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée",
+        "toast": {
+          "updateSuccess": {
+            "title": "Tâche mise à jour",
+            "description": "Votre tâche a été mise à jour avec succès"
+          },
+          "updateError": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la mise à jour de votre tâche"
+          },
+          "statusSuccess": {
+            "title": "Statut de la tâche mis à jour",
+            "description": "Le statut de complétion de votre tâche a été mis à jour avec succès"
+          },
+          "statusError": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la mise à jour du statut de complétion de votre tâche"
+          },
+          "unscheduledTask": {
+            "title": "Tâche non planifiée",
+            "description": "Planifiez la tâche pour changer son statut."
+          }
+        }
       },
       "inprogress": "En cours",
       "noInProgressTasks": "Aucune tâche en cours trouvée"
@@ -1330,7 +1360,40 @@
         "schedule": "Planifier",
         "noDescriptionProvided": "Aucune description fournie",
         "noDateScheduled": "Aucune date planifiée",
-        "notScheduled": "Non planifiée"
+        "notScheduled": "Non planifiée",
+        "editTask": "Modifier la tâche",
+        "setPriority": "Définir la priorité",
+        "scheduleTask": "Planifier la tâche",
+        "deleteTask": "Supprimer la tâche",
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée",
+        "unscheduled": "Non planifiée",
+        "inprogress": "En cours",
+        "todo": "À faire",
+        "setStatus": "Définir le statut",
+        "toast": {
+          "updateSuccess": {
+            "title": "Tâche mise à jour",
+            "description": "Votre tâche a été mise à jour avec succès"
+          },
+          "updateError": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la mise à jour de votre tâche"
+          },
+          "statusSuccess": {
+            "title": "Statut de la tâche mis à jour",
+            "description": "Le statut de complétion de votre tâche a été mis à jour avec succès"
+          },
+          "statusError": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la mise à jour du statut de complétion de votre tâche"
+          },
+          "unscheduledTask": {
+            "title": "Tâche non planifiée",
+            "description": "Planifiez la tâche pour changer son statut."
+          }
+        }
       },
       "inprogressTasks": "Tâches en cours",
       "noInProgressTasks": "Aucune tâche en cours à afficher"
@@ -1359,14 +1422,45 @@
       "loadMore": "Charger plus de tâches",
       "card": {
         "viewDetails": "Voir les détails",
-        "editTask": "Modifier la tâche",
         "moveTo": "Déplacer vers...",
         "markInComplete": "Marquer comme non terminée",
         "markComplete": "Marquer comme terminée",
-        "deleteTask": "Supprimer la tâche",
         "noDescription": "Aucune description fournie",
         "uncategorized": "Sans catégorie",
-        "notScheduled": "Non planifiée"
+        "notScheduled": "Non planifiée",
+        "editTask": "Modifier la tâche",
+        "setPriority": "Définir la priorité",
+        "scheduleTask": "Planifier la tâche",
+        "deleteTask": "Supprimer la tâche",
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée",
+        "unscheduled": "Non planifiée",
+        "inprogress": "En cours",
+        "todo": "À faire",
+        "setStatus": "Définir le statut",
+        "toast": {
+          "updateSuccess": {
+            "title": "Tâche mise à jour",
+            "description": "Votre tâche a été mise à jour avec succès"
+          },
+          "updateError": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la mise à jour de votre tâche"
+          },
+          "statusSuccess": {
+            "title": "Statut de la tâche mis à jour",
+            "description": "Le statut de complétion de votre tâche a été mis à jour avec succès"
+          },
+          "statusError": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de la mise à jour du statut de complétion de votre tâche"
+          },
+          "unscheduledTask": {
+            "title": "Tâche non planifiée",
+            "description": "Planifiez la tâche pour changer son statut."
+          }
+        }
       }
     }
   }
