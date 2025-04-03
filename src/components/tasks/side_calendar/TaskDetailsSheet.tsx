@@ -33,6 +33,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteTask } from "@/lib/api/tasks";
 import { toast } from "@/hooks/use-toast";
 import EditTaskSheet from "../EditTaskSheet";
+import AlertDialogDelete from "@/components/alert-dialog-delete";
 
 interface TaskDetailsSheetProps {
   task: TaskType | null;
@@ -62,6 +63,10 @@ const TaskDetailsSheet: React.FC<TaskDetailsSheetProps> = ({
 
       Promise.all([
         queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.refetchQueries({
+          queryKey: ["calendar-tasks"],
+          type: "active",
+        }),
       ]).then(() => {
         setTimeout(() => onOpenChange(false), 100);
       });
@@ -343,21 +348,18 @@ const TaskDetailsSheet: React.FC<TaskDetailsSheetProps> = ({
                 >
                   {t("edit")}
                 </Button>
-                <Button
-                  className="flex-1"
-                  variant="destructive"
-                  onClick={() => mutate(task.id)}
-                  disabled={isPending}
+                <AlertDialogDelete
+                  title={t("deleteTask.title")}
+                  description={t("deleteTask.description")}
+                  cancel={t("deleteTask.cancel")}
+                  deleteT={t("deleteTask.confirm")}
+                  onDelete={() => mutate(task.id)}
+                  isDeleting={isPending}
                 >
-                  {isPending ? (
-                    <>
-                      <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                      {t("deleting")}
-                    </>
-                  ) : (
-                    t("delete")
-                  )}
-                </Button>
+                  <Button className="flex-1" variant="destructive">
+                    {t("delete")}
+                  </Button>
+                </AlertDialogDelete>
               </div>
             </div>
           </ScrollArea>

@@ -37,6 +37,10 @@ export interface CrudTaskResponse {
   success: boolean;
 }
 
+export interface GetAiTasksResponse extends CrudTaskResponse {
+  data: TaskType[];
+}
+
 // New type for task filter parameters
 export interface TaskFilterParams {
   search?: string;

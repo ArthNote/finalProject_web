@@ -1,4 +1,9 @@
-import { CrudTaskResponse, TaskFilterParams, TaskType } from "@/types/task";
+import {
+  CrudTaskResponse,
+  GetAiTasksResponse,
+  TaskFilterParams,
+  TaskType,
+} from "@/types/task";
 import { consts } from "../constants";
 
 export async function createManualTask(
@@ -21,6 +26,28 @@ export async function createManualTask(
     return await response.json();
   } catch (error) {
     console.error("Error creating task:", error);
+    throw error;
+  }
+}
+
+export async function saveTasks(tasks: TaskType[]): Promise<CrudTaskResponse> {
+  try {
+    const response = await fetch(`${consts.backend}/tasks/all`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(tasks),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to save tasks");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error saving tasks:", error);
     throw error;
   }
 }
@@ -96,6 +123,34 @@ export async function getTasks(params: TaskFilterParams): Promise<{
     return await response.json();
   } catch (error) {
     console.error("Error fetching tasks:", error);
+    throw error;
+  }
+}
+
+export async function generateTasksWithAi(
+  prompt: string
+): Promise<GetAiTasksResponse> {
+  try {
+    const taskData = {
+      prompt: prompt,
+      date: new Date().toISOString(),
+    };
+    const response = await fetch(`${consts.backend}/tasks/ai`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(taskData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to generate tasks with AI");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error generating tasks with AI:", error);
     throw error;
   }
 }
@@ -256,6 +311,142 @@ export async function updateTaskKanban(data: {
     return result;
   } catch (error) {
     console.error("Error updating task status:", error);
+    throw error;
+  }
+}
+
+export async function updateTaskTimes(data: {
+  id: string;
+  startTime: Date;
+  endTime: Date;
+  duration: number;
+  date: Date;
+}): Promise<CrudTaskResponse> {
+  const { id, startTime, endTime, duration, date } = data;
+  try {
+    const response = await fetch(`${consts.backend}/tasks/times/${id}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+        duration,
+        date: date.toISOString(),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update task times");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating task times:", error);
+    throw error;
+  }
+}
+
+export async function getTasksByDate(data: {
+  date: string;
+}): Promise<{ tasks: TaskType[]; message: string; success: boolean }> {
+  try {
+    const response = await fetch(`${consts.backend}/tasks/byDate`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ date: data.date }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch tasks by date");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching tasks by date:", error);
+    throw error;
+  }
+}
+
+export async function updateTaskCompleted(
+  id: string
+): Promise<CrudTaskResponse> {
+  try {
+    const response = await fetch(`${consts.backend}/tasks/completed/${id}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update task completion status");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating task completion status:", error);
+    throw error;
+  }
+}
+
+export async function updateTaskScheduled(
+  id: string,
+  scheduled: boolean
+): Promise<CrudTaskResponse> {
+  try {
+    const response = await fetch(`${consts.backend}/tasks/status/${id}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: scheduled ? "todo" : "unscheduled",
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update task scheduled status");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating task scheduled status:", error);
+    throw error;
+  }
+}
+
+export async function getCalendarTasks(
+  startDate: Date,
+  endDate: Date
+): Promise<{ tasks: TaskType[]; success: boolean }> {
+  try {
+    const params = new URLSearchParams({
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    });
+
+    const response = await fetch(`${consts.backend}/tasks/calendar?${params}`, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch calendar tasks");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching calendar tasks:", error);
     throw error;
   }
 }

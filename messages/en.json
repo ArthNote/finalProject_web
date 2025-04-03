@@ -1291,6 +1291,34 @@
       "calendar": "Calendar"
     },
     "sideCalendar": {
+      "error": {
+        "title": "Error loading calendar",
+        "description": "An error occurred while loading your calendar. Please try again.",
+        "retry": "Retry"
+      },
+      "loadingTasks": "Loading tasks...",
+      "toast": {
+        "updateSuccess": {
+          "title": "Task time updated",
+          "description": "Your task time has been successfully updated"
+        },
+        "updateError": {
+          "title": "Error",
+          "description": "An error occurred while updating your task time"
+        },
+        "statusSuccess": {
+          "title": "Task complete status updated",
+          "description": "Your task complete status has been successfully updated"
+        },
+        "statusError": {
+          "title": "Error",
+          "description": "An error occurred while updating your task complete status"
+        },
+        "unscheduledTask": {
+          "title": "Task unscheduled",
+          "description": "Schedule the task to change its status."
+        }
+      },
       "settings": {
         "title": "Calendar Settings",
         "displayOptions": {
@@ -1309,6 +1337,7 @@
           "12Hour": "12-Hour (1:00 PM)",
           "24Hour": "24-Hour (13:00)"
         },
+
         "cancel": "Cancel",
         "save": "Save Changes",
         "saving": "Saving..."
@@ -1427,6 +1456,12 @@
       "edit": "Edit",
       "delete": "Delete",
       "deleting": "Deleting...",
+      "deleteTask": {
+        "title": "Delete Task",
+        "description": "Are you sure you want to delete this task? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete Task"
+      },
       "toast": {
         "deleteSuccess": {
           "title": "Task deleted",
@@ -1571,5 +1606,28 @@
         }
       }
     }
+  },
+  "calendar": {
+    "tasks": "Tasks",
+    "view": "View",
+    "today": "Today",
+    "more": "More",
+    "tabs": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day"
+    },
+    "noTasksScheduled": "No tasks scheduled",
+    "task": "task",
+    "includesHighPriority": "Includes high priority tasks",
+    "clickToView": "Click to view details",
+    "noTasksScheduledDescription": "This day is clear of any scheduled tasks or events.",
+    "urgent": "Urgent",
+    "viewDetails": "View Details",
+    "highPriority": "High Priority",
+    "scheduled": "scheduled",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
   }
 }

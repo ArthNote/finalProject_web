@@ -1196,6 +1196,34 @@
       "calendar": "Calendrier"
     },
     "sideCalendar": {
+      "toast": {
+        "updateSuccess": {
+          "title": "Horaire de tâche mis à jour",
+          "description": "L'horaire de votre tâche a été mis à jour avec succès"
+        },
+        "updateError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la mise à jour de l'horaire de votre tâche"
+        },
+        "statusSuccess": {
+          "title": "Statut de complétion de la tâche mis à jour",
+          "description": "Le statut de complétion de votre tâche a été mis à jour avec succès"
+        },
+        "statusError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la mise à jour du statut de complétion de votre tâche"
+        },
+        "unscheduledTask": {
+          "title": "Tâche non planifiée",
+          "description": "Planifiez la tâche pour changer son statut."
+        }
+      },
+      "error": {
+        "title": "Erreur lors du chargement du calendrier",
+        "description": "Une erreur s'est produite lors du chargement de votre calendrier. Veuillez réessayer.",
+        "retry": "Réessayer"
+      },
+      "loadingTasks": "Chargement des tâches...",
       "settings": {
         "title": "Paramètres du calendrier",
         "displayOptions": {
@@ -1206,7 +1234,7 @@
         "appearance": {
           "title": "Apparence",
           "colorScheme": "Schéma de couleurs",
-          "timeFormat": "Format de l'heure",
+          "timeFormat": "Format d'heure",
           "default": "Par défaut",
           "colorful": "Coloré",
           "monochrome": "Monochrome",
@@ -1214,6 +1242,7 @@
           "12Hour": "12 heures (1:00 PM)",
           "24Hour": "24 heures (13:00)"
         },
+
         "cancel": "Annuler",
         "save": "Enregistrer les modifications",
         "saving": "Enregistrement..."
@@ -1330,7 +1359,23 @@
       "category": "Catégorie",
       "tags": "Tags",
       "edit": "Modifier",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "deleteTask": {
+        "title": "Supprimer la tâche",
+        "description": "Êtes-vous sûr de vouloir supprimer cette tâche ? Cette action ne peut pas être annulée.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer la tâche"
+      },
+      "toast": {
+        "deleteSuccess": {
+          "title": "Tâche supprimée",
+          "description": "Votre tâche a été supprimée avec succès"
+        },
+        "deleteError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la suppression de votre tâche"
+        }
+      }
     },
     "gridView": {
       "updatingTasks": "Mise à jour des tâches...",
@@ -1463,5 +1508,28 @@
         }
       }
     }
+  },
+  "calendar": {
+    "tasks": "Tâches",
+    "view": "Vue",
+    "today": "Aujourd'hui",
+    "more": "Plus",
+    "tabs": {
+      "month": "Mois",
+      "week": "Semaine",
+      "day": "Jour"
+    },
+    "noTasksScheduled": "Aucune tâche planifiée",
+    "task": "tâche",
+    "includesHighPriority": "Inclut des tâches prioritaires",
+    "clickToView": "Cliquez pour voir les détails",
+    "noTasksScheduledDescription": "Cette journée est libre de toute tâche ou événement planifié.",
+    "urgent": "Urgent",
+    "viewDetails": "Voir les détails",
+    "highPriority": "Haute Priorité",
+    "scheduled": "planifiée",
+    "high": "Élevée",
+    "medium": "Moyenne",
+    "low": "Faible"
   }
 }

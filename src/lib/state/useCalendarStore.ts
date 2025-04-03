@@ -25,6 +25,9 @@ interface CalendarState {
   // Add selectedEvent property
   selectedEvent: EventType | null;
 
+  // Flag to track if we're in a double-click scenario
+  isDoubleClicking: boolean;
+
   // Actions
   setAiTaskInput: (value: string) => void;
   toggleRecording: () => void;
@@ -58,6 +61,8 @@ interface CalendarState {
   removeEvent: (eventId: string) => void;
   // Add setSelectedEvent action
   setSelectedEvent: (event: EventType | null) => void;
+  // Set double click flag
+  setIsDoubleClicking: (isDoubleClicking: boolean) => void;
 }
 
 export const useCalendarStore = create<CalendarState>((set) => ({
@@ -83,6 +88,8 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   events: [],
   // Initialize selectedEvent as null
   selectedEvent: null,
+  // Initialize double click flag as false
+  isDoubleClicking: false,
 
   // Actions
   setAiTaskInput: (value) => set({ aiTaskInput: value }),
@@ -133,7 +140,7 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   setOptimizationMode: (mode) => set({ optimizationMode: mode }),
   setOptimizationPeriod: (period) => set({ optimizationPeriod: period }),
   setOptimizationTaskScope: (scope) => set({ optimizationTaskScope: scope }),
-  setShowPriorityLevels: (levels) => set({ showPriorityLevels: levels }), 
+  setShowPriorityLevels: (levels) => set({ showPriorityLevels: levels }),
   setViewMode: (mode) => set({ viewMode: mode }),
   setIsSettingsOpen: (isOpen) => set({ isSettingsOpen: isOpen }),
   setOptimizationRange: (range) => set({ optimizationRange: range }),
@@ -142,15 +149,25 @@ export const useCalendarStore = create<CalendarState>((set) => ({
   setEvents: (events) => set({ events }),
   addEvent: (event) => set((state) => ({ events: [...state.events, event] })),
   updateEvent: (updatedEvent) =>
-    set((state) => ({
-      events: state.events.map((event) =>
-        event.id === updatedEvent.id ? updatedEvent : event
-      ),
-    })),
+    set((state) => {
+      // Don't update if we're in a double-click scenario
+      if (state.isDoubleClicking) {
+        return state;
+      }
+
+      // Otherwise proceed with the update
+      return {
+        events: state.events.map((event) =>
+          event.id === updatedEvent.id ? updatedEvent : event
+        ),
+      };
+    }),
   removeEvent: (eventId) =>
     set((state) => ({
       events: state.events.filter((event) => event.id !== eventId),
     })),
   // Add setSelectedEvent implementation
   setSelectedEvent: (event) => set({ selectedEvent: event }),
+  // Add setIsDoubleClicking implementation
+  setIsDoubleClicking: (isDoubleClicking) => set({ isDoubleClicking }),
 }));

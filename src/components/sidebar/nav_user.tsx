@@ -6,7 +6,11 @@ import {
   LogOut,
   Settings,
   User,
+  Moon,
+  Sun,
+  Monitor,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -28,6 +32,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/hooks/use-toast";
 import { Link, redirect, useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 
 export function NavUser({
   user,
@@ -38,6 +43,7 @@ export function NavUser({
     avatar: string;
   };
 }) {
+  const { theme, setTheme } = useTheme();
   const { isMobile } = useSidebar();
 
   const t = useTranslations("nav");
@@ -132,7 +138,43 @@ export function NavUser({
               </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-
+            <DropdownMenuGroup>
+              <div className="p-0.5">
+                <div className="relative flex h-6 items-center rounded-md bg-black/5 ring-1 ring-black/[0.03] dark:bg-white/5 dark:ring-white/[0.05]">
+                  <div
+                    className="absolute left-0 h-5 w-[32.5%] rounded-[4px] bg-gradient-to-b from-white/80 to-white/50 shadow-sm transition-transform duration-500 ease-[cubic-bezier(0.45,0.25,0.25,1)] dark:from-zinc-950/90 dark:to-zinc-950/70"
+                    style={{
+                      transform: `translateX(${
+                        theme === "system"
+                          ? "204%"
+                          : theme === "dark"
+                          ? "102%"
+                          : "2%"
+                      })`,
+                    }}
+                  />
+                  {[
+                    { value: "light", icon: Sun },
+                    { value: "dark", icon: Moon },
+                    { value: "system", icon: Monitor },
+                  ].map(({ value, icon: Icon }) => (
+                    <button
+                      key={value}
+                      onClick={() => setTheme(value)}
+                      className={cn(
+                        "relative z-20 flex w-1/3 items-center justify-center py-1 transition-colors duration-200",
+                        theme === value
+                          ? "text-foreground"
+                          : "text-muted-foreground/70 hover:text-foreground/80"
+                      )}
+                    >
+                      <Icon className="h-3 w-3 transition-all duration-300" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signout}>
               <LogOut />
               {t("user.signout")}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -66,6 +66,9 @@ import { formatDate } from "@/lib/dateFormate";
 import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
 import CreateTaskSheet from "@/components/tasks/CreateTaskSheet";
+import AiTasksSheet from "@/components/tasks/AiTasksSheet";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 // Define interfaces for props to fix TypeScript errors
 interface ScopeOptionProps {
@@ -249,6 +252,20 @@ const FloatingToolbar = () => {
   const [isCreateTaskSheetOpen, setIsCreateTaskSheetOpen] =
     React.useState(false);
 
+  const { toast } = useToast();
+
+  // Add state for AI tasks sheet
+  const [isAiTasksSheetOpen, setIsAiTasksSheetOpen] = useState(false);
+
+  // Handle closing the AiTasksSheet
+  const handleAiTasksSheetOpenChange = (open: boolean) => {
+    setIsAiTasksSheetOpen(open);
+    // Reset AI input when the sheet is closed
+    if (!open) {
+      setAiTaskInput("");
+    }
+  };
+
   return (
     <>
       {/* Toggle button shown when toolbar is hidden */}
@@ -349,66 +366,33 @@ const FloatingToolbar = () => {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
 
-                    {/* AI Task Creation */}
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                          <BrainCircuit className="mr-2 h-4 w-4" />
-                          {t("create.createWithAI")}
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle className="flex items-center gap-2">
-                            <BrainCircuit className="h-5 w-5 text-primary" />
-                            {t("create.createTaskWithAI")}
-                          </DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                          <p className="text-sm text-muted-foreground">
-                            {t("create.createWithAiDescription")}
-                          </p>
-                          <div className="relative">
-                            <Textarea
-                              placeholder={t("create.textareaPlaceholder")}
-                              className="pr-10 min-h-[100px]"
-                              value={aiTaskInput}
-                              onChange={(e) => setAiTaskInput(e.target.value)}
-                            />
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              type="button"
-                              className={`absolute right-2 bottom-2 ${
-                                isRecording ? "text-red-500 animate-pulse" : ""
-                              }`}
-                              onClick={toggleRecording}
-                            >
-                              <Mic className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        <DialogFooter className="flex justify-between gap-2">
-                          <DialogClose asChild>
-                            <Button variant="outline">
-                              {t("create.cancel")}
-                            </Button>
-                          </DialogClose>
-                          <DialogClose asChild>
-                            <Button
-                              className="gap-2"
-                              disabled={!aiTaskInput.trim()}
-                              onClick={processAiTask}
-                            >
-                              <Sparkles className="h-3.5 w-3.5" />
-                              {t("create.createTask")}
-                            </Button>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    {/* AI Task Creation - Fixed to always open dialog */}
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        // Always open the dialog
+                        const dialogElement =
+                          document.getElementById("ai-task-dialog");
+                        if (dialogElement) {
+                          const dialog = dialogElement.parentElement;
+                          if (dialog && dialog.tagName === "DIALOG") {
+                            (dialog as HTMLDialogElement).showModal();
+                          } else {
+                            // Fallback for when the dialog structure is different
+                            (
+                              document.querySelector(
+                                '[id="ai-task-dialog"]'
+                              ) as HTMLElement
+                            )?.click();
+                          }
+                        }
+                      }}
+                    >
+                      <BrainCircuit className="mr-2 h-4 w-4" />
+                      {t("create.createWithAI")}
+                    </DropdownMenuItem>
 
-                    {/* Manual Task Creation - Now opens the sheet instead of dialog */}
+                    {/* Manual Task Creation */}
                     <DropdownMenuItem
                       onSelect={(e) => {
                         e.preventDefault();
@@ -564,6 +548,73 @@ const FloatingToolbar = () => {
       <CreateTaskSheet
         open={isCreateTaskSheetOpen}
         onOpenChange={setIsCreateTaskSheetOpen}
+      />
+
+      {/* Dialog for AI prompt input - Fixed DialogTrigger */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <button className="hidden" id="ai-task-dialog">
+            Open AI Task Dialog
+          </button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BrainCircuit className="h-5 w-5 text-primary" />
+              {t("create.createTaskWithAI")}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              {t("create.createWithAiDescription")}
+            </p>
+            <div className="relative">
+              <Textarea
+                placeholder={t("create.textareaPlaceholder")}
+                className="pr-10 min-h-[100px]"
+                value={aiTaskInput}
+                onChange={(e) => setAiTaskInput(e.target.value)}
+              />
+              <Button
+                size="icon"
+                variant="ghost"
+                type="button"
+                className={`absolute right-2 bottom-2 ${
+                  isRecording ? "text-red-500 animate-pulse" : ""
+                }`}
+                onClick={toggleRecording}
+              >
+                <Mic className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <DialogFooter className="flex justify-between gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">{t("create.cancel")}</Button>
+            </DialogClose>
+            <DialogClose asChild>
+              <Button
+                className="gap-2"
+                disabled={!aiTaskInput.trim()}
+                onClick={() => {
+                  if (aiTaskInput.trim()) {
+                    setIsAiTasksSheetOpen(true);
+                  }
+                }}
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                {t("create.createTask")}
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Tasks Sheet */}
+      <AiTasksSheet
+        open={isAiTasksSheetOpen}
+        onOpenChange={handleAiTasksSheetOpenChange}
+        aiTaskInput={aiTaskInput}
       />
     </>
   );

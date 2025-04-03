@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Check,
   Clock,
@@ -30,6 +30,8 @@ import { useTasks, hasMoreTasks, getNextPage } from "@/lib/services/tasks";
 import { updateTaskCompleteStatus } from "@/lib/api/tasks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
+import ListViewLoading from "./listViewLoading";
+import ListViewCardLoading from "./listViewCardLoading";
 
 const ListView = () => {
   const t = useTranslations("tasks.listView");
@@ -48,6 +50,14 @@ const ListView = () => {
     unscheduledPage: 1,
     inprogressPage: 1,
     pageSize: 4, // Number of items per page
+  });
+
+  // Add states to track loading state for each section
+  const [loadingStates, setLoadingStates] = useState({
+    todo: false,
+    completed: false,
+    unscheduled: false,
+    inprogress: false,
   });
 
   // Initialize with today's date by default
@@ -116,27 +126,46 @@ const ListView = () => {
     pagination.pageSize
   );
 
-  // Handler for "Load More" buttons
-  const handleLoadMoreTodo = () =>
+  // Modify load more handlers to update loading states correctly
+  const handleLoadMoreTodo = async () => {
+    setLoadingStates((prev) => ({ ...prev, todo: true }));
     setPagination((prev) => ({
       ...prev,
       todoPage: getNextPage(prev.todoPage),
     }));
-  const handleLoadMoreCompleted = () =>
+    await refetch();
+    setLoadingStates((prev) => ({ ...prev, todo: false }));
+  };
+
+  const handleLoadMoreCompleted = async () => {
+    setLoadingStates((prev) => ({ ...prev, completed: true }));
     setPagination((prev) => ({
       ...prev,
       completedPage: getNextPage(prev.completedPage),
     }));
-  const handleLoadMoreUnscheduled = () =>
+    await refetch();
+    setLoadingStates((prev) => ({ ...prev, completed: false }));
+  };
+
+  const handleLoadMoreUnscheduled = async () => {
+    setLoadingStates((prev) => ({ ...prev, unscheduled: true }));
     setPagination((prev) => ({
       ...prev,
       unscheduledPage: getNextPage(prev.unscheduledPage),
     }));
-  const handleLoadMoreInprogress = () =>
+    await refetch();
+    setLoadingStates((prev) => ({ ...prev, unscheduled: false }));
+  };
+
+  const handleLoadMoreInprogress = async () => {
+    setLoadingStates((prev) => ({ ...prev, inprogress: true }));
     setPagination((prev) => ({
       ...prev,
       inprogressPage: getNextPage(prev.inprogressPage),
     }));
+    await refetch();
+    setLoadingStates((prev) => ({ ...prev, inprogress: false }));
+  };
 
   const { mutate: updateCompleteStatus } = useMutation({
     mutationFn: updateTaskCompleteStatus,
@@ -204,14 +233,7 @@ const ListView = () => {
     !unscheduledTasks.length &&
     !inprogressTasks.length
   ) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="flex flex-col items-center gap-2">
-          <LoaderCircle className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading tasks...</p>
-        </div>
-      </div>
-    );
+    return <ListViewLoading />;
   }
 
   // Handle error state
@@ -303,21 +325,21 @@ const ListView = () => {
                           />
                         ))}
                         {hasMoreUnscheduled && (
-                          <Button
-                            onClick={handleLoadMoreUnscheduled}
-                            variant="ghost"
-                            className="w-full text-muted-foreground"
-                            disabled={isLoading}
-                          >
-                            {isLoading ? (
-                              <>
-                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                                {t("loading")}
-                              </>
-                            ) : (
-                              t("loadMore")
+                          <>
+                            {loadingStates.unscheduled && (
+                              <ListViewCardLoading />
                             )}
-                          </Button>
+                            <Button
+                              onClick={handleLoadMoreUnscheduled}
+                              variant="ghost"
+                              className="w-full text-muted-foreground"
+                              disabled={loadingStates.unscheduled}
+                            >
+                              {loadingStates.unscheduled
+                                ? t("loading")
+                                : t("loadMore")}
+                            </Button>
+                          </>
                         )}
                       </>
                     ) : (
@@ -368,21 +390,17 @@ const ListView = () => {
                         />
                       ))}
                       {hasMoreTodo && (
-                        <Button
-                          onClick={handleLoadMoreTodo}
-                          variant="ghost"
-                          className="w-full text-muted-foreground"
-                          disabled={isLoading}
-                        >
-                          {isLoading ? (
-                            <>
-                              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                              {t("loading")}
-                            </>
-                          ) : (
-                            t("loadMore")
-                          )}
-                        </Button>
+                        <>
+                          {loadingStates.todo && <ListViewCardLoading />}
+                          <Button
+                            onClick={handleLoadMoreTodo}
+                            variant="ghost"
+                            className="w-full text-muted-foreground"
+                            disabled={loadingStates.todo}
+                          >
+                            {loadingStates.todo ? t("loading") : t("loadMore")}
+                          </Button>
+                        </>
                       )}
                     </>
                   ) : (
@@ -435,21 +453,19 @@ const ListView = () => {
                         />
                       ))}
                       {hasMoreInprogress && (
-                        <Button
-                          onClick={handleLoadMoreInprogress}
-                          variant="ghost"
-                          className="w-full text-muted-foreground"
-                          disabled={isLoading}
-                        >
-                          {isLoading ? (
-                            <>
-                              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                              {t("loading")}
-                            </>
-                          ) : (
-                            t("loadMore")
-                          )}
-                        </Button>
+                        <>
+                          {loadingStates.inprogress && <ListViewCardLoading />}
+                          <Button
+                            onClick={handleLoadMoreInprogress}
+                            variant="ghost"
+                            className="w-full text-muted-foreground"
+                            disabled={loadingStates.inprogress}
+                          >
+                            {loadingStates.inprogress
+                              ? t("loading")
+                              : t("loadMore")}
+                          </Button>
+                        </>
                       )}
                     </>
                   ) : (
@@ -504,21 +520,19 @@ const ListView = () => {
                       />
                     ))}
                     {hasMoreCompleted && (
-                      <Button
-                        onClick={handleLoadMoreCompleted}
-                        variant="ghost"
-                        className="w-full text-muted-foreground"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <>
-                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            {t("loading")}
-                          </>
-                        ) : (
-                          t("loadMore")
-                        )}
-                      </Button>
+                      <>
+                        {loadingStates.completed && <ListViewCardLoading />}
+                        <Button
+                          onClick={handleLoadMoreCompleted}
+                          variant="ghost"
+                          className="w-full text-muted-foreground"
+                          disabled={loadingStates.completed}
+                        >
+                          {loadingStates.completed
+                            ? t("loading")
+                            : t("loadMore")}
+                        </Button>
+                      </>
                     )}
                   </>
                 ) : (

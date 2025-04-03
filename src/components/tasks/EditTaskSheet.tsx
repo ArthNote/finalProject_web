@@ -337,6 +337,10 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
       });
       Promise.all([
         queryClient.refetchQueries({ queryKey: ["tasks"], type: "all" }),
+        queryClient.refetchQueries({
+          queryKey: ["calendar-tasks"],
+          type: "active",
+        }),
       ]).then(() => {
         setTimeout(() => onOpenChange(false), 100);
       });

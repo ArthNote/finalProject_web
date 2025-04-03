@@ -8,6 +8,8 @@ import TaskViewFilters, { DateRangeType } from "./TaskViewFilters";
 import { useLocale, useTranslations } from "next-intl";
 import { ErrorState } from "../error_state";
 import GridViewCard from "./gridViewCard";
+import GridViewLoading from "./gridViewLoading";
+import GridViewCardLoading from "./gridViewCardLoading";
 import { useTasks, hasMoreTasks, getNextPage } from "@/lib/services/tasks";
 
 const GridView = () => {
@@ -49,6 +51,13 @@ const GridView = () => {
 
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
 
+  const [loadingStates, setLoadingStates] = useState({
+    todo: false,
+    completed: false,
+    unscheduled: false,
+    inprogress: false,
+  });
+
   // Use our custom hook to get tasks
   const {
     todo: todoTasks,
@@ -86,27 +95,46 @@ const GridView = () => {
     pagination.pageSize
   );
 
-  // Handler for "Load More" buttons
-  const handleLoadMoreTodo = () =>
+  // Modify load more handlers to update loading states
+  const handleLoadMoreTodo = async () => {
+    setLoadingStates((prev) => ({ ...prev, todo: true }));
     setPagination((prev) => ({
       ...prev,
       todoPage: getNextPage(prev.todoPage),
     }));
-  const handleLoadMoreCompleted = () =>
+    await refetch();
+    setLoadingStates((prev) => ({ ...prev, todo: false }));
+  };
+
+  const handleLoadMoreCompleted = async () => {
+    setLoadingStates((prev) => ({ ...prev, completed: true }));
     setPagination((prev) => ({
       ...prev,
       completedPage: getNextPage(prev.completedPage),
     }));
-  const handleLoadMoreUnscheduled = () =>
+    await refetch();
+    setLoadingStates((prev) => ({ ...prev, completed: false }));
+  };
+
+  const handleLoadMoreUnscheduled = async () => {
+    setLoadingStates((prev) => ({ ...prev, unscheduled: true }));
     setPagination((prev) => ({
       ...prev,
       unscheduledPage: getNextPage(prev.unscheduledPage),
     }));
-  const handleLoadMoreInprogress = () =>
+    await refetch();
+    setLoadingStates((prev) => ({ ...prev, unscheduled: false }));
+  };
+
+  const handleLoadMoreInprogress = async () => {
+    setLoadingStates((prev) => ({ ...prev, inprogress: true }));
     setPagination((prev) => ({
       ...prev,
       inprogressPage: getNextPage(prev.inprogressPage),
     }));
+    await refetch();
+    setLoadingStates((prev) => ({ ...prev, inprogress: false }));
+  };
 
   // Get unique categories from tasks
   const categories = ["all"]; // We'll need to fetch categories from the server or add them dynamically
@@ -161,7 +189,7 @@ const GridView = () => {
     </div>
   );
 
-  // Handle loading state
+  // Handle initial loading state
   if (
     isLoading &&
     !todoTasks.length &&
@@ -169,14 +197,7 @@ const GridView = () => {
     !unscheduledTasks.length &&
     !inprogressTasks.length
   ) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="flex flex-col items-center gap-2">
-          <LoaderCircle className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading tasks...</p>
-        </div>
-      </div>
-    );
+    return <GridViewLoading />;
   }
 
   // Handle error state
@@ -250,6 +271,7 @@ const GridView = () => {
                         handleToggleScheduled={handleToggleScheduled}
                       />
                     ))}
+                    {loadingStates.unscheduled && <GridViewCardLoading />}
                   </div>
 
                   {/* Load More for unscheduled tasks */}
@@ -259,16 +281,11 @@ const GridView = () => {
                         onClick={handleLoadMoreUnscheduled}
                         variant="ghost"
                         className="w-full text-muted-foreground"
-                        disabled={isLoading}
+                        disabled={loadingStates.unscheduled}
                       >
-                        {isLoading ? (
-                          <>
-                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            {t("loading")}
-                          </>
-                        ) : (
-                          t("loadMore")
-                        )}
+                        {loadingStates.unscheduled
+                          ? t("loading")
+                          : t("loadMore")}
                       </Button>
                     </div>
                   )}
@@ -300,6 +317,7 @@ const GridView = () => {
                           handleToggleScheduled={handleToggleScheduled}
                         />
                       ))}
+                    {loadingStates.todo && <GridViewCardLoading />}
                   </div>
 
                   {/* Load More for todo tasks */}
@@ -309,16 +327,9 @@ const GridView = () => {
                         onClick={handleLoadMoreTodo}
                         variant="ghost"
                         className="w-full text-muted-foreground"
-                        disabled={isLoading}
+                        disabled={loadingStates.todo}
                       >
-                        {isLoading ? (
-                          <>
-                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            {t("loading")}
-                          </>
-                        ) : (
-                          t("loadMore")
-                        )}
+                        {loadingStates.todo ? t("loading") : t("loadMore")}
                       </Button>
                     </div>
                   )}
@@ -347,6 +358,7 @@ const GridView = () => {
                         handleToggleScheduled={handleToggleScheduled}
                       />
                     ))}
+                    {loadingStates.inprogress && <GridViewCardLoading />}
                   </div>
 
                   {/* Load More for in-progress tasks */}
@@ -356,16 +368,11 @@ const GridView = () => {
                         onClick={handleLoadMoreInprogress}
                         variant="ghost"
                         className="w-full text-muted-foreground"
-                        disabled={isLoading}
+                        disabled={loadingStates.inprogress}
                       >
-                        {isLoading ? (
-                          <>
-                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            {t("loading")}
-                          </>
-                        ) : (
-                          t("loadMore")
-                        )}
+                        {loadingStates.inprogress
+                          ? t("loading")
+                          : t("loadMore")}
                       </Button>
                     </div>
                   )}
@@ -396,6 +403,7 @@ const GridView = () => {
                         handleToggleScheduled={handleToggleScheduled}
                       />
                     ))}
+                  {loadingStates.completed && <GridViewCardLoading />}
                 </div>
 
                 {/* Load More for completed tasks */}
@@ -405,16 +413,9 @@ const GridView = () => {
                       onClick={handleLoadMoreCompleted}
                       variant="ghost"
                       className="w-full text-muted-foreground"
-                      disabled={isLoading}
+                      disabled={loadingStates.completed}
                     >
-                      {isLoading ? (
-                        <>
-                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                          {t("loading")}
-                        </>
-                      ) : (
-                        t("loadMore")
-                      )}
+                      {loadingStates.completed ? t("loading") : t("loadMore")}
                     </Button>
                   </div>
                 )}
