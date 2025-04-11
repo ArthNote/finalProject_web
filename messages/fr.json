@@ -317,6 +317,18 @@
         "saveText": "Économisez 20%"
       },
       "plans": {
+        "free": {
+          "title": "Gratuit",
+          "highlight": "Pour utilisation individuelle",
+          "price": "0€",
+          "yearlyPrice": "0€",
+          "features": {
+            "tasks": "Jusqu'à 10 tâches par mois",
+            "storage": "1 Go de stockage",
+            "access": "Accès web basique",
+            "support": "Support communautaire"
+          }
+        },
         "individual": {
           "title": "Individuel",
           "highlight": "Pour les individus qui veulent plus",
@@ -979,7 +991,13 @@
       "hours": "il y a {count}h",
       "days": "il y a {count}j"
     },
+    "edit": {
+      "title": "Modifier les informations du groupe",
+      "groupName": "Nom du groupe",
+      "error": "Une erreur s'est produite lors de la modification du groupe."
+    },
     "details": {
+      "groupInfo": "Infos du groupe",
       "groupDetails": "Détails du groupe",
       "chatDetails": "Détails de la conversation",
       "members": "Membres",
@@ -994,11 +1012,53 @@
         "muteNotifications": "Désactiver les notifications",
         "archiveChat": "Archiver la discussion",
         "blockUser": "Bloquer l'utilisateur",
-        "reportUser": "Signaler l'utilisateur"
+        "reportUser": "Signaler l'utilisateur",
+        "manageMembers": "Gérer les membres"
       },
       "search": {
         "title": "Rechercher dans la conversation",
         "placeholder": "Rechercher des messages..."
+      },
+      "edit": {
+        "title": "Modifier les informations du groupe",
+        "groupName": "Nom du groupe",
+        "error": "Une erreur s'est produite lors de la modification du groupe.",
+        "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "cancel": "Annuler"
+      },
+      "manageMembers": {
+        "title": "Gérer les membres",
+        "description": "Gérer les membres du groupe et leurs rôles",
+        "searchPlaceholder": "Rechercher des membres...",
+        "currentMembers": "Membres actuels",
+        "admin": "Administrateur",
+        "member": "Membre",
+        "addMembers": "Ajouter des membres",
+        "add": "Ajouter",
+        "close": "Fermer",
+        "success": {
+          "title": "Membres mis à jour",
+          "description": "Les membres du groupe ont été mis à jour avec succès"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la mise à jour des membres du groupe"
+        }
+      },
+      "deleteGroup": {
+        "title": "Supprimer le groupe",
+        "description": "Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action ne peut pas être annulée et tous les messages seront définitivement supprimés.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer le groupe",
+        "success": {
+          "title": "Groupe supprimé",
+          "description": "Le groupe a été supprimé avec succès"
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la suppression du groupe"
+        }
       }
     },
     "attachments": {
@@ -1047,7 +1107,6 @@
       }
     }
   },
-
   "chats": {
     "title": "Discussions",
     "subtitle": "Conversations récentes",
@@ -1507,6 +1566,49 @@
           }
         }
       }
+    },
+    "aiSheet": {
+      "title": "Tâches générées par l'IA",
+      "description": "Tâches générées selon votre saisie. Modifiez, supprimez ou enregistrez-les dans votre liste de tâches.",
+      "fieldPlaceholder": "Décrivez les tâches que vous souhaitez générer...",
+      "generatingTasks": "Génération des tâches...",
+      "noGeneratedTasks": "Aucune tâche générée",
+      "noGeneratedTasksDescription": "Essayez de modifier votre description pour être plus précis ou cliquez sur régénérer.",
+      "cancel": "Annuler",
+      "saveTasks": "Enregistrer {count} tâches",
+      "savingTasks": "Enregistrement de {count} tâches...",
+      "priority": "Priorité",
+      "high": "Élevée",
+      "medium": "Moyenne",
+      "low": "Faible",
+      "category": "Catégorie",
+      "scheduled": "Planifiée",
+      "save": "Enregistrer",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "unscheduled": "Non planifiée",
+      "toast": {
+        "aiTasksGenerated": {
+          "title": "Tâches IA générées",
+          "description": "Vos tâches ont été générées avec succès"
+        },
+        "generateError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la génération de vos tâches"
+        },
+        "tasksCreated": {
+          "title": "Tâches créées",
+          "description": "Vos tâches ont été créées avec succès"
+        },
+        "saveError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de l'enregistrement de vos tâches"
+        },
+        "tasksCleared": {
+          "title": "Tâches effacées",
+          "description": "Vos tâches ont été effacées avec succès"
+        }
+      }
     }
   },
   "calendar": {
@@ -1531,5 +1633,116 @@
     "high": "Élevée",
     "medium": "Moyenne",
     "low": "Faible"
+  },
+  "friends": {
+    "title": "Amis & Réseau",
+    "addFriend": "Ajouter un ami",
+    "addDialog": {
+      "title": "Ajouter un ami",
+      "description": "Trouvez et ajoutez de nouveaux amis à votre réseau",
+      "searchPlaceholder": "Rechercher par nom d'utilisateur, nom ou email...",
+      "searching": "Recherche en cours...",
+      "alreadyFriends": "Déjà amis",
+      "requestSent": "Demande envoyée",
+      "pendingResponse": "En attente de réponse",
+      "addFriend": "Ajouter",
+      "noUsersFound": "Aucun utilisateur trouvé",
+      "searchUsers": "Recherchez des utilisateurs à ajouter comme amis"
+    },
+    "searchPeople": "Rechercher des personnes...",
+    "tabs": {
+      "friends": "Amis",
+      "pending": "En attente"
+    },
+    "friendsList": {
+      "loadingFriends": "Chargement des amis...",
+      "searchEmpty": {
+        "title": "Aucune correspondance trouvée",
+        "description": "Aucun ami ne correspond à votre recherche {query}"
+      },
+      "noFriends": {
+        "title": "Pas encore d'amis",
+        "description": "Ajoutez des amis pour les voir ici",
+        "action": "Ajouter un ami"
+      },
+      "errorLoading": {
+        "title": "Erreur de chargement des amis",
+        "description": "Une erreur s'est produite lors du chargement de vos amis. Veuillez réessayer."
+      },
+      "friend": {
+        "viewProfile": "Voir le profil",
+        "message": "Message",
+        "removeFriend": "Retirer l'ami"
+      }
+    },
+    "pendingList": {
+      "loadingRequests": "Chargement des demandes...",
+      "searchEmpty": {
+        "title": "Aucune correspondance trouvée",
+        "description": "Aucune demande ne correspond à votre recherche {query}"
+      },
+      "received": "Reçues {count}",
+      "sentYouARequest": "Vous a envoyé une demande",
+      "accept": "Accepter",
+      "decline": "Refuser",
+      "sent": "Envoyées {count}",
+      "requestSent": "Demande envoyée",
+      "cancel": "Annuler",
+      "noRequestsMatch": "Aucune demande ne correspond à votre recherche",
+      "noPendingRequests": {
+        "title": "Aucune demande en attente",
+        "description": "Vous n'avez aucune demande d'ami en attente",
+        "action": "Trouver des amis"
+      },
+      "errorLoading": {
+        "title": "Impossible de charger les demandes",
+        "description": "Une erreur s'est produite lors du chargement de vos demandes d'ami"
+      }
+    },
+    "profileDialog": {
+      "title": "Profil de l'ami"
+    },
+    "toast": {
+      "errorSearch": {
+        "title": "Erreur de recherche",
+        "description": "Une erreur s'est produite lors de la recherche d'utilisateurs"
+      },
+      "requestSent": {
+        "title": "Demande d'ami envoyée",
+        "description": "Votre demande d'ami a été envoyée avec succès"
+      },
+      "errorSendRequest": {
+        "title": "Erreur d'envoi de la demande",
+        "description": "Une erreur s'est produite lors de l'envoi de votre demande d'ami"
+      },
+      "requestAccepted": {
+        "title": "Demande d'ami acceptée",
+        "description": "Vous avez accepté la demande d'ami avec succès"
+      },
+      "requestDeclined": {
+        "title": "Demande d'ami refusée",
+        "description": "Vous avez refusé la demande d'ami avec succès"
+      },
+      "errorRequestResponse": {
+        "title": "Erreur de réponse à la demande",
+        "description": "Une erreur s'est produite lors de la réponse à la demande d'ami"
+      },
+      "requestCancelled": {
+        "title": "Demande d'ami annulée",
+        "description": "Vous avez annulé la demande d'ami avec succès"
+      },
+      "errorCancelRequest": {
+        "title": "Erreur d'annulation de la demande",
+        "description": "Une erreur s'est produite lors de l'annulation de la demande d'ami"
+      },
+      "friendRemoved": {
+        "title": "Ami retiré",
+        "description": "Vous avez retiré l'ami avec succès"
+      },
+      "errorRemoveFriend": {
+        "title": "Erreur de suppression d'ami",
+        "description": "Une erreur s'est produite lors de la suppression de l'ami"
+      }
+    }
   }
 }

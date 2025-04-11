@@ -396,6 +396,18 @@
         "saveText": "Save 20%"
       },
       "plans": {
+        "free": {
+          "title": "Free",
+          "highlight": "For individual use",
+          "price": "$0",
+          "yearlyPrice": "$0",
+          "features": {
+            "tasks": "Up to 10 tasks per month",
+            "storage": "1GB storage",
+            "access": "Basic web access",
+            "support": "Community support"
+          }
+        },
         "individual": {
           "title": "Individual",
           "highlight": "For individuals who want more",
@@ -422,19 +434,6 @@
             "insights": "Team performance insights",
             "integration": "Integration with external tools",
             "admin": "Admin dashboard"
-          }
-        },
-        "enterprise": {
-          "title": "Enterprise",
-          "highlight": "For organizations with custom needs",
-          "priceLabel": "Contact Us",
-          "features": {
-            "team": "Everything in Team, plus:",
-            "automations": "Custom AI automations & workflows",
-            "manager": "Dedicated account manager",
-            "sla": "SLA-backed priority support",
-            "deployment": "On-premise deployment options",
-            "api": "API access for custom integrations"
           }
         }
       },
@@ -624,9 +623,9 @@
       },
       "currentSubscription": {
         "title": "Current Subscription",
+        "free": "Free Plan",
         "individual": "Individual Plan",
         "team": "Team Plan",
-        "enterprise": "Enterprise Plan",
         "renews": "Renews on {date}",
         "freeTrial": "Free Trial ends on {date}",
         "changePlan": "Change Plan"
@@ -1077,6 +1076,7 @@
     "details": {
       "groupDetails": "Group Details",
       "chatDetails": "Chat Details",
+      "groupInfo": "Group Info",
       "members": "Members",
       "participants": "Participants",
       "actions": {
@@ -1089,11 +1089,53 @@
         "muteNotifications": "Mute Notifications",
         "archiveChat": "Archive Chat",
         "blockUser": "Block User",
-        "reportUser": "Report User"
+        "reportUser": "Report User",
+        "manageMembers": "Manage Members"
       },
       "search": {
         "title": "Search in Conversation",
         "placeholder": "Search messages..."
+      },
+      "edit": {
+        "title": "Edit Group Info",
+        "groupName": "Group Name",
+        "error": "An error occurred while editing the group.",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel"
+      },
+      "manageMembers": {
+        "title": "Manage Members",
+        "description": "Manage group members and their roles",
+        "searchPlaceholder": "Search members...",
+        "currentMembers": "Current Members",
+        "admin": "Admin",
+        "member": "Member",
+        "addMembers": "Add Members",
+        "add": "Add",
+        "close": "Close",
+        "success": {
+          "title": "Members Updated",
+          "description": "Group members have been successfully updated"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred while updating group members"
+        }
+      },
+      "deleteGroup": {
+        "title": "Delete Group",
+        "description": "Are you sure you want to delete this group? This action cannot be undone and all messages will be permanently deleted.",
+        "cancel": "Cancel",
+        "confirm": "Delete Group",
+        "success": {
+          "title": "Group Deleted",
+          "description": "The group has been successfully deleted"
+        },
+        "error": {
+          "title": "Error",
+          "description": "An error occurred while deleting the group"
+        }
       }
     },
     "attachments": {
@@ -1473,6 +1515,49 @@
         }
       }
     },
+    "aiSheet": {
+      "title": "AI Generated Tasks",
+      "description": "Generated tasks based on your input. Edit, delete, or save them to your task list.",
+      "fieldPlaceholder": "Describe the tasks you want to generate...",
+      "generatingTasks": "Generating tasks...",
+      "noGeneratedTasks": "No tasks generated",
+      "noGeneratedTasksDescription": "Try modifying your prompt to be more specific or click regenerate.",
+      "cancel": "Cancel",
+      "saveTasks": "Save {count} Tasks",
+      "savingTasks": "Saving {count} tasks...",
+      "priority": "Priority",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "category": "Category",
+      "scheduled": "Scheduled",
+      "save": "Save",
+      "edit": "Edit",
+      "delete": "Delete",
+      "unscheduled": "Unscheduled",
+      "toast": {
+        "aiTasksGenerated": {
+          "title": "AI tasks generated",
+          "description": "Your tasks have been successfully generated"
+        },
+        "generateError": {
+          "title": "Error",
+          "description": "An error occurred while generating your tasks"
+        },
+        "tasksCreated": {
+          "title": "Tasks created",
+          "description": "Your tasks have been successfully created"
+        },
+        "saveError": {
+          "title": "Error",
+          "description": "An error occurred while saving your tasks"
+        },
+        "tasksCleared": {
+          "title": "Tasks cleared",
+          "description": "Your tasks have been successfully cleared"
+        }
+      }
+    },
     "gridView": {
       "updatingTasks": "Updating tasks...",
       "emptyState": {
@@ -1629,5 +1714,116 @@
     "high": "High",
     "medium": "Medium",
     "low": "Low"
+  },
+  "friends": {
+    "title": "Friends & Network",
+    "addFriend": "Add Friend",
+    "addDialog": {
+      "title": "Add Friend",
+      "description": "Find and add new friends to your network",
+      "searchPlaceholder": "Search by username, name, or email...",
+      "searching": "Searching...",
+      "alreadyFriends": "Already Friends",
+      "requestSent": "Request Sent",
+      "pendingResponse": "Pending Response",
+      "addFriend": "Add Friend",
+      "noUsersFound": "No users found",
+      "searchUsers": "Search for users to add as friends"
+    },
+    "searchPeople": "Search people...",
+    "tabs": {
+      "friends": "Friends",
+      "pending": "Pending"
+    },
+    "friendsList": {
+      "loadingFriends": "Loading friends...",
+      "searchEmpty": {
+        "title": "No matches found",
+        "description": "No friends match your search {query}"
+      },
+      "noFriends": {
+        "title": "No friends yet",
+        "description": "Add friends to see them here",
+        "action": "Add Friend"
+      },
+      "errorLoading": {
+        "title": "Error loading friends",
+        "description": "An error occurred while loading your friends. Please try again."
+      },
+      "friend": {
+        "viewProfile": "View Profile",
+        "message": "Message",
+        "removeFriend": "Remove Friend"
+      }
+    },
+    "pendingList": {
+      "loadingRequests": "Loading requests...",
+      "searchEmpty": {
+        "title": "No matches found",
+        "description": "No requests match your search {query}"
+      },
+      "received": "Received {count}",
+      "sentYouARequest": "Sent you a request",
+      "accept": "Accept",
+      "decline": "Decline",
+      "sent": "Sent {count}",
+      "requestSent": "Request Sent",
+      "cancel": "Cancel",
+      "noRequestsMatch": "No requests match your search",
+      "noPendingRequests": {
+        "title": "No pending requests",
+        "description": "You don't have any pending friend requests",
+        "action": "Find Friends"
+      },
+      "errorLoading": {
+        "title": "Could not load requests",
+        "description": "Something went wrong while loading your friend requests"
+      }
+    },
+    "profileDialog": {
+      "title": "Friend Profile"
+    },
+    "toast": {
+      "errorSearch": {
+        "title": "Error searching",
+        "description": "An error occurred while searching for users"
+      },
+      "requestSent": {
+        "title": "Friend request sent",
+        "description": "Your friend request has been sent successfully"
+      },
+      "errorSendRequest": {
+        "title": "Error sending request",
+        "description": "An error occurred while sending your friend request"
+      },
+      "requestAccepted": {
+        "title": "Friend request accepted",
+        "description": "You accepted the friend request successfully"
+      },
+      "requestDeclined": {
+        "title": "Friend request declined",
+        "description": "You declined the friend request successfully"
+      },
+      "errorRequestResponse": {
+        "title": "Error responding to request",
+        "description": "An error occurred while responding to the friend request"
+      },
+      "requestCancelled": {
+        "title": "Friend request cancelled",
+        "description": "You cancelled the friend request successfully"
+      },
+      "errorCancelRequest": {
+        "title": "Error cancelling request",
+        "description": "An error occurred while cancelling the friend request"
+      },
+      "friendRemoved": {
+        "title": "Friend removed",
+        "description": "You removed the friend successfully"
+      },
+      "errorRemoveFriend": {
+        "title": "Error removing friend",
+        "description": "An error occurred while removing the friend"
+      }
+    }
   }
 }

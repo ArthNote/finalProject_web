@@ -18,7 +18,7 @@ import { start } from "repl";
 import { authClient } from "@/lib/auth-client";
 
 interface PlanCardProps {
-  plan: "individual" | "team" | "enterprise";
+  plan: "individual" | "team" | "free";
   icon: LucideIcon;
   featured?: boolean;
   selected?: boolean;
@@ -77,7 +77,6 @@ const ChoosePlan = () => {
       const { error } = await authClient.subscription.upgrade({
         plan: selectedPlan,
         successUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/success?type=subscription`,
-        uiMode: "hosted",
         cancelUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/settings?tab=myplan&plan=${selectedPlan}&billing=${billingCycle}`,
         annual: billingCycle === "yearly",
       });
@@ -105,19 +104,7 @@ const ChoosePlan = () => {
     selected = false,
     onSelect,
   }: PlanCardProps) => {
-    const isEnterprise = plan === "enterprise";
-
     const PriceDisplay = () => {
-      if (isEnterprise) {
-        return (
-          <div className="mt-4 flex items-center gap-1.5">
-            <span className="text-xl font-medium">
-              {t("plans.enterprise.priceLabel")}
-            </span>
-          </div>
-        );
-      }
-
       const price =
         billingCycle === "monthly"
           ? t(`plans.${plan}.price`)
@@ -254,10 +241,10 @@ const ChoosePlan = () => {
         className="grid gap-6 md:grid-cols-1 xl:grid-cols-3"
       >
         <PlanCard
-          plan="team"
+          plan="free"
           icon={Users}
-          selected={selectedPlan === "team"}
-          onSelect={() => handleSelectPlan("team")}
+          selected={selectedPlan === "free"}
+          onSelect={() => handleSelectPlan("free")}
         />
         <PlanCard
           plan="individual"
@@ -267,16 +254,18 @@ const ChoosePlan = () => {
           onSelect={() => handleSelectPlan("individual")}
         />
         <PlanCard
-          plan="enterprise"
+          plan="team"
           icon={Building}
-          selected={selectedPlan === "enterprise"}
-          onSelect={() => handleSelectPlan("enterprise")}
+          selected={selectedPlan === "team"}
+          onSelect={() => handleSelectPlan("team")}
         />
       </RadioGroup>
 
       <div className="flex justify-end gap-4">
         <Button onClick={handleConfirmSelection} disabled={isSubmitting}>
-          {isSubmitting ? tT("noSubscription.submitting") : tT("noSubscription.action")}
+          {isSubmitting
+            ? tT("noSubscription.submitting")
+            : tT("noSubscription.action")}
         </Button>
       </div>
     </div>

@@ -1,11 +1,8 @@
-import React from 'react'
+import GoalsPage from "@/components/goals/goals";
+import React from "react";
 
 const page = () => {
-  return (
-    <div>
-      goals
-    </div>
-  )
-}
+  return <GoalsPage />;
+};
 
-export default page
+export default page;

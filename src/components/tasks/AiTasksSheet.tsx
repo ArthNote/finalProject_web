@@ -60,6 +60,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTranslations } from "next-intl";
+import { count } from "console";
 
 interface AiTasksSheetProps {
   open: boolean;
@@ -74,7 +75,7 @@ const AiTasksSheet = ({
 }: AiTasksSheetProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const t = useTranslations("tasks");
+  const t = useTranslations("tasks.aiSheet");
 
   // State for storing and modifying AI-generated tasks
   const [generatedTasks, setGeneratedTasks] = useState<TaskType[]>([]);
@@ -139,8 +140,8 @@ const AiTasksSheet = ({
     setPrompt("");
     setIsRegenerating(false);
     toast({
-      title: "Cleared",
-      description: "All generated tasks have been cleared",
+      title: t("toast.tasksCleared.title"),
+      description: t("toast.tasksCleared.description"),
     });
     // Close the sheet after clearing
     onOpenChange(false);
@@ -248,7 +249,7 @@ const AiTasksSheet = ({
             />
             <div className="flex flex-wrap gap-4">
               <div className="flex-1 min-w-[120px]">
-                <Label htmlFor={`priority-${task.id}`}>Priority</Label>
+                <Label htmlFor={`priority-${task.id}`}>{t("priority")}</Label>
                 <Select
                   value={task.priority}
                   onValueChange={(value) => {
@@ -260,17 +261,17 @@ const AiTasksSheet = ({
                   }}
                 >
                   <SelectTrigger id={`priority-${task.id}`}>
-                    <SelectValue placeholder="Priority" />
+                    <SelectValue placeholder={t("priority")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="high">{t("high")}</SelectItem>
+                    <SelectItem value="medium">{t("medium")}</SelectItem>
+                    <SelectItem value="low">{t("low")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <Label htmlFor={`category-${task.id}`}>Category</Label>
+                <Label htmlFor={`category-${task.id}`}>{t("category")}</Label>
                 <Input
                   id={`category-${task.id}`}
                   value={task.category}
@@ -293,7 +294,7 @@ const AiTasksSheet = ({
                   handleUpdateTask(updatedTask);
                 }}
               />
-              <Label htmlFor={`scheduled-${task.id}`}>Scheduled</Label>
+              <Label htmlFor={`scheduled-${task.id}`}>{t("scheduled")}</Label>
             </div>
           </CardContent>
           <CardFooter className="pt-2 justify-between">
@@ -304,7 +305,7 @@ const AiTasksSheet = ({
               disabled={saveTasksMutation.isPending}
             >
               <X className="h-4 w-4 mr-1" />
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               variant="default"
@@ -313,7 +314,7 @@ const AiTasksSheet = ({
               disabled={saveTasksMutation.isPending}
             >
               <Save className="h-4 w-4 mr-1" />
-              Save
+              {t("save")}
             </Button>
           </CardFooter>
         </Card>
@@ -345,11 +346,11 @@ const AiTasksSheet = ({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleEditTask(task)}>
                 <Edit className="h-4 w-4 mr-2" />
-                Edit
+                {t("edit")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleDeleteTask(task.id)}>
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                {t("delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -366,7 +367,7 @@ const AiTasksSheet = ({
             {task.scheduled ? (
               <Badge variant="outline" className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                Scheduled
+                {t("scheduled")}
               </Badge>
             ) : (
               <Badge
@@ -374,7 +375,7 @@ const AiTasksSheet = ({
                 className="flex items-center gap-1 border-dashed"
               >
                 <Clock className="h-3 w-3" />
-                Unscheduled
+                {t("unscheduled")}
               </Badge>
             )}
             {task.tags?.map((tag, i) => (
@@ -398,16 +399,13 @@ const AiTasksSheet = ({
           <SheetHeader className="p-6 pb-2">
             <SheetTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              AI Generated Tasks
+              {t("title")}
             </SheetTitle>
-            <SheetDescription>
-              Generated tasks based on your input. Edit, delete, or save them to
-              your task list.
-            </SheetDescription>
+            <SheetDescription>{t("description")}</SheetDescription>
 
             <div className="mt-4 relative">
               <Textarea
-                placeholder="Describe the tasks you want to generate..."
+                placeholder={t("fieldPlaceholder")}
                 className="pr-10 min-h-[80px]"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -458,16 +456,15 @@ const AiTasksSheet = ({
               <div className="flex flex-col items-center justify-center h-full">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 <p className="mt-2 text-muted-foreground">
-                  Generating tasks...
+                  {t("generatingTasks")}
                 </p>
               </div>
             ) : generatedTasks.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <AlertTriangle className="h-8 w-8 text-muted-foreground mb-2" />
-                <h3 className="font-medium">No tasks generated</h3>
+                <h3 className="font-medium">{t("noGeneratedTasks")}</h3>
                 <p className="text-sm text-muted-foreground mt-1 max-w-xs">
-                  Try modifying your prompt to be more specific or click
-                  regenerate.
+                  {t("noGeneratedTasksDescription")}
                 </p>
               </div>
             ) : (
@@ -491,7 +488,7 @@ const AiTasksSheet = ({
                   onClick={() => onOpenChange(false)}
                   disabled={saveTasksMutation.isPending}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
                 <Button
                   onClick={handleSaveAllTasks}
@@ -504,12 +501,16 @@ const AiTasksSheet = ({
                   {saveTasksMutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving {generatedTasks.length} tasks...
+                      {t("savingTasks", {
+                        count: generatedTasks.length,
+                      })}
                     </>
                   ) : (
                     <>
                       <Check className="mr-2 h-4 w-4" />
-                      Save {generatedTasks.length} Tasks
+                      {t("saveTasks", {
+                        count: generatedTasks.length,
+                      })}
                     </>
                   )}
                 </Button>

@@ -219,6 +219,7 @@
   }
   .prevent-scroll-shift {
     scrollbar-gutter: stable;
+
   }
 }
 

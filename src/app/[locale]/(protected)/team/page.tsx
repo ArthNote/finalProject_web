@@ -1,7 +1,15 @@
-import React from "react";
+"use client";
 
-const page = () => {
-  return <div>team</div>;
+import { Suspense } from "react";
+import TeamPage from "@/components/team/team";
+import { TeamProvider } from "@/components/team/team-context";
+
+const Page = () => {
+  return (
+    <TeamProvider>
+      <TeamPage />
+    </TeamProvider>
+  );
 };
 
-export default page;
+export default Page;

@@ -106,17 +106,13 @@ export function SignupForm({
               description: t("toast.success.description"),
             });
 
-            if (plan || billing) {
-              console.log("Plan or billing detected ", plan, billing);
-              const { data, error } = await authClient.subscription.upgrade({
-                plan: plan || "individual",
-                successUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/success?type=subscription`,
-                uiMode: "hosted",
-                cancelUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/pricing`,
-                annual: billing === "yearly",
-                returnUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/dashboard`,
-              });
-            }
+            const { data, error } = await authClient.subscription.upgrade({
+              plan: plan || "free",
+              successUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/success?type=subscription`,
+              cancelUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/pricing`,
+              annual: billing === "yearly",
+              returnUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${locale}/dashboard`,
+            });
           },
         }
       );

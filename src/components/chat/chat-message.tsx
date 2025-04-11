@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -7,16 +7,17 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Copy, Reply, Trash2, FileText } from "lucide-react";
+import { formatDate } from "@/lib/dateFormate";
 
 interface ChatMessageProps {
   sender: string;
   content: string;
-  time: string;
+  time: string | number | Date;
   isSender?: boolean;
   onReply?: () => void;
   onDelete?: () => void;
   status?: "sent" | "delivered" | "read";
-  type?: "text" | "file";
+  type?: "text" | "file" | "image";
   fileType?: string;
   fileName?: string;
   fileSize?: string;
@@ -53,17 +54,20 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
   const renderMessageStatus = () => {
     if (!isSender || !status) return null;
-    
+
     return (
       <span className="text-xs ml-2 opacity-70">
         {t(`message.status.${status}`)}
       </span>
     );
   };
+  const locale = useLocale() as "en" | "fr";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(content);
   };
+
+  const formattedTime = formatDate(time, "relative", locale);
 
   return (
     <div className={`mb-4 ${isSender ? "flex justify-end" : "flex"}`}>
@@ -76,7 +80,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 : "bg-slate-100 text-slate-900"
             }`}
           >
-            <div className={`font-medium text-sm`}>{sender}</div>
+            <div className={`font-medium text-sm`}>
+              {isSender ? t("you") : sender}
+            </div>
             <div className="break-words">
               {type === "file" ? renderFileContent() : content}
             </div>
@@ -85,8 +91,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 isSender ? "opacity-70" : "text-slate-500"
               }`}
             >
-              {time}
-              {renderMessageStatus()}
+              {(time as Date).toLocaleTimeString(locale, {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              {/* {renderMessageStatus()} */}
             </div>
           </div>
         </ContextMenuTrigger>

@@ -20,7 +20,7 @@ import { changePlan } from "@/lib/api/subscriptions";
 import { useRouter } from "@/i18n/navigation";
 
 interface PlanCardProps {
-  plan: "individual" | "team" | "enterprise";
+  plan: "individual" | "team" | "free";
   icon: LucideIcon;
   featured?: boolean;
   selected?: boolean;
@@ -50,14 +50,14 @@ const ChangePlan = ({
 
   // State for the selected plan and billing cycle
   const [selectedPlan, setSelectedPlan] = useState(
-    currentPlan as "individual" | "team" | "enterprise"
+    currentPlan as "individual" | "team" | "free"
   );
   const [billingCycle, setBillingCycle] = useState(
     currentBilling as "monthly" | "yearly"
   );
 
   const handleSelectPlan = (plan: string) => {
-    setSelectedPlan(plan as "individual" | "team" | "enterprise");
+    setSelectedPlan(plan as "individual" | "team" | "free");
   };
 
   const handleSelectBilling = (billing: string) => {
@@ -147,15 +147,13 @@ const ChangePlan = ({
     selected = false,
     onSelect,
   }: PlanCardProps) => {
-    const isEnterprise = plan === "enterprise";
+    const isFree = plan === "free";
 
     const PriceDisplay = () => {
-      if (isEnterprise) {
+      if (isFree) {
         return (
           <div className="mt-4 flex items-center gap-1.5">
-            <span className="text-xl font-medium">
-              {t("plans.enterprise.priceLabel")}
-            </span>
+            <span className="text-xl font-medium">{t("plans.free.price")}</span>
           </div>
         );
       }
@@ -294,10 +292,10 @@ const ChangePlan = ({
         className="grid gap-3 sm:gap-4 grid-cols-1  lg:grid-cols-3"
       >
         <PlanCard
-          plan="team"
+          plan="free"
           icon={Users}
-          selected={selectedPlan === "team"}
-          onSelect={isPending ? () => {} : () => handleSelectPlan("team")}
+          selected={selectedPlan === "free"}
+          onSelect={isPending ? () => {} : () => handleSelectPlan("free")}
         />
         <PlanCard
           plan="individual"
@@ -307,10 +305,10 @@ const ChangePlan = ({
           onSelect={isPending ? () => {} : () => handleSelectPlan("individual")}
         />
         <PlanCard
-          plan="enterprise"
+          plan="team"
           icon={Building}
-          selected={selectedPlan === "enterprise"}
-          onSelect={isPending ? () => {} : () => handleSelectPlan("enterprise")}
+          selected={selectedPlan === "team"}
+          onSelect={isPending ? () => {} : () => handleSelectPlan("team")}
         />
       </RadioGroup>
 
@@ -319,19 +317,16 @@ const ChangePlan = ({
           {tT("changePlan.cancel")}
         </Button>
         <Button
-          onClick={
-            selectedPlan === "enterprise" ? () => {} : handleConfirmSelection
-          }
+          onClick={handleConfirmSelection}
           disabled={
             isPending ||
-            (selectedPlan === currentPlan && billingCycle === currentBilling)
+            (selectedPlan === currentPlan &&
+              (billingCycle === currentBilling ||
+                (billingCycle === "yearly" && currentBilling === "year") ||
+                (billingCycle === "monthly" && currentBilling === "month")))
           }
         >
-          {isPending
-            ? tT("changePlan.processing")
-            : selectedPlan === "enterprise"
-            ? tT("changePlan.contactUs")
-            : tT("changePlan.confirm")}
+          {isPending ? tT("changePlan.processing") : tT("changePlan.confirm")}
         </Button>
       </div>
     </div>

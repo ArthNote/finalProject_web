@@ -17,7 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "@/i18n/navigation";
 
 interface PriceCardProps {
-  plan: "individual" | "team" | "enterprise";
+  plan: "individual" | "team" | "free";
   icon: LucideIcon;
   featured?: boolean;
 }
@@ -33,19 +33,9 @@ const PricingSection = () => {
     icon: Icon,
     featured = false,
   }: PriceCardProps) => {
-    const isEnterprise = plan === "enterprise";
+    const isFree = plan === "free";
 
     const PriceDisplay = () => {
-      if (isEnterprise) {
-        return (
-          <div className="mt-4 flex items-center gap-1.5">
-            <span className="text-xl font-medium">
-              {t("plans.enterprise.priceLabel")}
-            </span>
-          </div>
-        );
-      }
-
       const price =
         billingCycle === "monthly"
           ? t(`plans.${plan}.price`)
@@ -55,14 +45,18 @@ const PricingSection = () => {
         <div className="mt-4 flex flex-col gap-2">
           <div className="flex items-baseline gap-1.5">
             <span className="text-3xl font-bold">{price}</span>
-            <span className="text-sm text-muted-foreground font-medium">
-              {billingCycle === "monthly" ? t("monthly") : t("yearly")}
-            </span>
+            {!isFree && (
+              <span className="text-sm text-muted-foreground font-medium">
+                {billingCycle === "monthly" ? t("monthly") : t("yearly")}
+              </span>
+            )}
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <div className="h-1 w-1 rounded-full bg-primary"></div>
-            <span>{t("freeTrial.info")}</span>
-          </div>
+          {!isFree && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="h-1 w-1 rounded-full bg-primary"></div>
+              <span>{t("freeTrial.info")}</span>
+            </div>
+          )}
         </div>
       );
     };
@@ -80,23 +74,6 @@ const PricingSection = () => {
             : "hover:border-primary/50"
         )}
       >
-        {/* Free trial badge with credit card icon
-        <div className="absolute -top-3 right-4 z-10">
-          <div className="relative px-3 py-1 bg-primary/10 text-xs font-medium rounded-full flex items-center gap-1.5">
-            <svg
-              className="h-3 w-3 text-primary"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-              <line x1="1" y1="10" x2="23" y2="10" />
-            </svg>
-            {t("freeTrial.badge")}
-          </div>
-        </div> */}
-
         {featured && (
           <div className="absolute -top-3 left-0 right-0 mx-auto w-fit px-4 py-1 bg-primary rounded-full">
             <span className="text-xs font-medium text-primary-foreground flex items-center gap-1.5">
@@ -153,23 +130,19 @@ const PricingSection = () => {
           </div>
 
           <Link
-            href={
-              plan === "enterprise"
-                ? "/contact"
-                : {
-                    pathname: "/signup",
-                    query: {
-                      plan: plan,
-                      billing: billingCycle,
-                    },
-                  }
-            }
+            href={{
+              pathname: "/signup",
+              query: {
+                plan: plan,
+                billing: billingCycle,
+              },
+            }}
           >
             <Button
               className="mt-8 w-full transition-all duration-300 bg-primary hover:bg-primary/90 shadow-sm hover:shadow-lg"
               size="lg"
             >
-              {plan === "enterprise" ? t("contactUs") : t("getStarted")}
+              {t("getStarted")}
             </Button>
           </Link>
         </div>
@@ -188,9 +161,6 @@ const PricingSection = () => {
             className="flex flex-col items-center gap-4"
           >
             <div className="inline-block">
-              {/* <span className="block text-sm font-medium text-primary/80 mb-3 tracking-wider uppercase">
-                {t("subtitle")}
-              </span> */}
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight relative inline-block">
                 {t("title")}
                 <div className="absolute -bottom-2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -225,9 +195,9 @@ const PricingSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <PriceCard plan="team" icon={Users} />
+          <PriceCard plan="free" icon={Users} />
           <PriceCard plan="individual" icon={Rocket} featured />
-          <PriceCard plan="enterprise" icon={Building} />
+          <PriceCard plan="team" icon={Building} />
         </div>
       </div>
     </section>
