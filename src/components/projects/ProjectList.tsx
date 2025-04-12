@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { Heart, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Project } from "@/types/project";
-import { ViewMode } from "../types";
+import { ViewMode } from "../../types/projectTypes";
 import { useProjects } from "@/hooks/useProjects";
 import { Button } from "@/components/ui/button";
 import { DeleteProjectDialog } from "./DeleteProjectDialog";

@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProjectFiltersProps, SortBy } from "../types";
+import { ProjectFiltersProps, SortBy } from "../../types/projectTypes";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function ProjectFilters({
