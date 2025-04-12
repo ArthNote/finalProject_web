@@ -6,7 +6,14 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Copy, Reply, Trash2, FileText, CornerDownRight } from "lucide-react";
+import {
+  Copy,
+  Reply,
+  Trash2,
+  FileText,
+  CornerDownRight,
+  Image as ImageIcon,
+} from "lucide-react";
 import { formatDate } from "@/lib/dateFormate";
 import Image from "next/image";
 
@@ -28,6 +35,8 @@ interface ChatMessageProps {
     id: string;
     content: string;
     sender: string;
+    type?: "text" | "file" | "image";
+    fileName?: string;
   };
   onReplyClick?: (messageId: string) => void; // New prop for handling reply click
 }
@@ -104,7 +113,7 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
               href={content === "Uploading..." ? "#" : content}
               target="_blank"
               rel="noopener noreferrer"
-              className="block hover:bg-accent transition-colors"
+              className="block transition-colors"
               onClick={(e) => {
                 if (content === "Uploading...") {
                   e.preventDefault();
@@ -152,30 +161,48 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
     const getReplyPreview = () => {
       if (!replyTo) return null;
 
-      let previewContent = replyTo.content;
-      if (previewContent && previewContent.length > 50) {
-        previewContent = previewContent.substring(0, 50) + "...";
-      }
+      // Determine preview content and icon based on message type
+      const preview = {
+        text: {
+          content:
+            replyTo.content?.substring(0, 50) +
+            (replyTo.content?.length > 50 ? "..." : ""),
+          icon: null,
+        },
+        image: {
+          content: t("message.types.image"),
+          icon: <ImageIcon className="h-3 w-3 flex-shrink-0" />,
+        },
+        file: {
+          content: replyTo.fileName || t("message.types.file"),
+          icon: <FileText className="h-3 w-3 flex-shrink-0" />,
+        },
+      };
+
+      const { content: previewContent, icon: previewIcon } =
+        preview[replyTo.type || "text"];
 
       return (
         <div
-          className={`flex gap-1 items-center p-2 my-1 text-xs rounded cursor-pointer hover:bg-accent/50
-            ${
-              isSender
-                ? "bg-primary/20 text-primary-foreground/80"
-                : "bg-muted/50 text-foreground/80"
-            }`}
+          className={`flex gap-1 items-center p-2 my-1 text-xs rounded cursor-pointer 
+          ${
+            isSender
+              ? "bg-primary/50 text-primary-foreground/80"
+              : "bg-muted/50 text-foreground/80"
+          }`}
           onClick={(e) => {
             e.stopPropagation();
-            onReplyClick && onReplyClick(replyTo.id);
+            onReplyClick?.(replyTo.id);
           }}
-          title={t("message.clickToViewReply")}
         >
           <CornerDownRight className="h-3 w-3 flex-shrink-0" />
-          <div className="overflow-hidden">
+          <div className="overflow-hidden flex items-center gap-1">
             <span className="font-medium">{replyTo.sender}</span>
             <span className="mx-1">•</span>
-            <span className="italic truncate">{previewContent}</span>
+            <span className="italic flex items-center gap-1">
+              {previewIcon}
+              <span className="truncate">{previewContent}</span>
+            </span>
           </div>
         </div>
       );

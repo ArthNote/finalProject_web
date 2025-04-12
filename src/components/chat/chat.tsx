@@ -55,6 +55,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { GroupFormData } from "@/lib/api/chats";
 import { Checkbox } from "@/components/ui/checkbox";
+import useSocket from "@/hooks/use-socket";
 
 // Add this helper function near the top of the file
 function isFriendArray(data: FriendResponse["data"]): data is Friend[] {
@@ -87,6 +88,8 @@ export default function ChatComponent() {
     queryKey: ["friends"],
     queryFn: getFriends,
   });
+
+  const { onlineUsers } = useSocket();
 
   const { mutate: startChat, isPending: isStartingChat } = useMutation({
     mutationFn: (friendId: string) =>
@@ -156,41 +159,48 @@ export default function ChatComponent() {
   const chats = chatsResponse?.data ?? [];
 
   // Update filteredChats to handle both search and type filtering
-  const filteredChats = chats.filter((chat) => {
-    // Type filter
-    if (selectedType !== "all") {
-      if (selectedType === "individual" && chat.type !== "individual")
-        return false;
-      if (selectedType === "group" && chat.type !== "group") return false;
-    }
-
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-
-      // For group chats, search in group name
-      if (chat.type === "group" && chat.name) {
-        if (chat.name.toLowerCase().includes(query)) return true;
+  const filteredChats = chats
+    .filter((chat) => {
+      // Type filter
+      if (selectedType !== "all") {
+        if (selectedType === "individual" && chat.type !== "individual")
+          return false;
+        if (selectedType === "group" && chat.type !== "group") return false;
       }
 
-      // Search in participant usernames
-      const participantMatch = chat.participants.some(
-        (p) =>
-          p.user.id !== data?.user.id && // Don't match current user
-          (p.user.username.toLowerCase().includes(query) ||
-            p.user.email.toLowerCase().includes(query))
-      );
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
 
-      // Search in last message if exists
-      const messageMatch = chat.messages[0]?.content
-        ?.toLowerCase()
-        .includes(query);
+        // For group chats, search in group name
+        if (chat.type === "group" && chat.name) {
+          if (chat.name.toLowerCase().includes(query)) return true;
+        }
 
-      return participantMatch || messageMatch || false;
-    }
+        // Search in participant usernames
+        const participantMatch = chat.participants.some(
+          (p) =>
+            p.user.id !== data?.user.id && // Don't match current user
+            (p.user.username.toLowerCase().includes(query) ||
+              p.user.email.toLowerCase().includes(query))
+        );
 
-    return true;
-  });
+        // Search in last message if exists
+        const messageMatch = chat.messages[0]?.content
+          ?.toLowerCase()
+          .includes(query);
+
+        return participantMatch || messageMatch || false;
+      }
+
+      return true;
+    })
+    // Sort chats by the most recent message timestamp or updatedAt
+    .sort((a, b) => {
+      const aTimestamp = a.messages[0]?.createdAt || a.updatedAt;
+      const bTimestamp = b.messages[0]?.createdAt || b.updatedAt;
+      return new Date(bTimestamp).getTime() - new Date(aTimestamp).getTime();
+    });
 
   // Helper function to get chat display name
   const getChatDisplayName = (chat: Chat) => {
@@ -388,6 +398,7 @@ export default function ChatComponent() {
                   <div className="space-y-2">
                     {friends.map((friend) => {
                       const otherUser = getOtherUser(friend);
+                      const isOnline = onlineUsers.includes(otherUser.id);
                       return (
                         <div
                           key={friend.id}
@@ -407,7 +418,7 @@ export default function ChatComponent() {
                             <span
                               className={cn(
                                 "absolute bottom-0 right-0 h-3 w-3 rounded-full ring-2 ring-background",
-                                getStatusColor(friend.status || "offline")
+                                getStatusColor(isOnline ? "online" : "offline")
                               )}
                             />
                           </div>
@@ -512,7 +523,7 @@ export default function ChatComponent() {
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <p className="text-sm text-muted-foreground truncate">
+                          <p className="text-sm text-muted-foreground truncate whitespace-pre-wrap break-all line-clamp-1">
                             {chat.messages[0]?.content ?? "No messages yet"}
                           </p>
                           {/* Add unread count badge if needed */}
@@ -555,6 +566,8 @@ export default function ChatComponent() {
                     ))
                 : friends.map((friend) => {
                     const otherUser = getOtherUser(friend);
+                    const isOnline = onlineUsers.includes(otherUser.id);
+
                     return (
                       <div
                         key={friend.id}
@@ -574,7 +587,7 @@ export default function ChatComponent() {
                           <span
                             className={cn(
                               "absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full ring-2 ring-background",
-                              getStatusColor(friend.status || "offline")
+                              getStatusColor(isOnline ? "online" : "offline")
                             )}
                           />
                         </div>

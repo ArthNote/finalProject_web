@@ -1106,6 +1106,7 @@
       }
     },
     "message": {
+      "replyingTo": "Répondre à",
       "deleteSuccess": {
         "title": "Message supprimé",
         "description": "Le message a été supprimé avec succès"
@@ -1119,8 +1120,6 @@
         "reply": "Répondre",
         "delete": "Supprimer"
       },
-      "replyingTo": "En réponse à",
-      "clickToViewReply": "Cliquez pour voir le message original",
       "status": {
         "sent": "Envoyé",
         "delivered": "Distribué",
@@ -1413,6 +1412,10 @@
           "statusError": {
             "title": "Erreur",
             "description": "Une erreur s'est produite lors de la mise à jour du statut de complétion de votre tâche"
+          },
+          "unscheduledTask": {
+            "title": "Tâche non planifiée",
+            "description": "Planifiez la tâche pour changer son statut."
           }
         }
       },

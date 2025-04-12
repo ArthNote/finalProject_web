@@ -103,6 +103,14 @@ import { formatDate } from "@/lib/utils/date";
 import { SearchMessagesResponse } from "@/types/message";
 import { UploadDialog } from "@/components/chat/upload-dialog";
 
+interface ReplyToState {
+  id: string;
+  content: string;
+  sender: string;
+  type?: "text" | "file" | "image";
+  fileName?: string;
+}
+
 export default function ChatPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -123,11 +131,7 @@ export default function ChatPage() {
   const locale = useLocale() as "en" | "fr";
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
-  const [replyTo, setReplyTo] = useState<{
-    id: string;
-    content: string;
-    sender: string;
-  } | null>(null);
+  const [replyTo, setReplyTo] = useState<ReplyToState | null>(null);
 
   const queryClient = useQueryClient();
   const chatId = params.id.replace("chat-", "");
@@ -301,6 +305,7 @@ export default function ChatPage() {
               sender: {
                 username: replyTo.sender,
               },
+              type: replyTo.type,
             }
           : undefined,
       };
@@ -374,11 +379,12 @@ export default function ChatPage() {
 
   // Add a function to handle message reply
   const handleReplyToMessage = (message: Message) => {
-    // Set the message as reply target
     setReplyTo({
       id: message.id,
       content: message.content,
       sender: message.sender.username,
+      type: message.type,
+      fileName: message.fileName,
     });
 
     // Focus the input field
@@ -415,6 +421,7 @@ export default function ChatPage() {
           id: message.replyTo.id,
           content: message.replyTo.content,
           sender: message.replyTo.sender.username,
+          type: message.replyTo.type,
         }
       : undefined,
   });

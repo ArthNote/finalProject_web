@@ -33,6 +33,7 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "@/hooks/use-toast";
 import { Link, redirect, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { useSocket } from "@/contexts/SocketContext";
 
 export function NavUser({
   user,
@@ -49,11 +50,15 @@ export function NavUser({
   const t = useTranslations("nav");
   const router = useRouter();
   const locale = useLocale() as "en" | "fr";
+  const { socket } = useSocket();
 
   const signout = async () => {
     await authClient.signOut({
       fetchOptions: {
         onRequest: () => {
+          if (socket) {
+            socket.disconnect();
+          }
           toast({
             title: t("user.toast.signout.loading.title"),
             description: t("user.toast.signout.loading.description"),

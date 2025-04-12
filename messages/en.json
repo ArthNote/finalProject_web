@@ -1183,6 +1183,7 @@
       }
     },
     "message": {
+      "replyingTo": "Replying to",
       "deleteSuccess": {
         "title": "Message deleted",
         "description": "Message has been deleted successfully"
@@ -1196,8 +1197,6 @@
         "reply": "Reply",
         "delete": "Delete"
       },
-      "replyingTo": "Replying to",
-      "clickToViewReply": "Click to view original message",
       "status": {
         "sent": "Sent",
         "delivered": "Delivered",

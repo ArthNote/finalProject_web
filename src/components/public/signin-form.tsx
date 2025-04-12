@@ -93,6 +93,22 @@ export function SigninForm({
               description: t("toast.signing.description"),
             });
           },
+          onRetry(response) {
+            console.log("Retrying sign-in...");
+            console.log(response);
+            toast({
+              title: t("toast.signing.title"),
+              description: t("toast.signing.description"),
+            });
+          },
+          onError(context) {
+            console.error("Error during sign-in:", context.error);
+            toast({
+              title: t("toast.error.title"),
+              description: getAuthErrorMessage(context.error.code, locale),
+              variant: "destructive",
+            });
+          },
           onSuccess: (context) => {
             console.log("Success");
             if (context.data.twoFactorRedirect) {

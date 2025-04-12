@@ -29,6 +29,7 @@ export interface Message {
     sender: {
       username: string;
     };
+    type?: "text" | "file" | "image";
   };
 }
 
