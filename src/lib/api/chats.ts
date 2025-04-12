@@ -127,10 +127,13 @@ export async function deleteChat(chatId: string) {
   return response.json();
 }
 
-export async function sendMessage(chatId: string, data: CreateMessageData): Promise<CreateMessageResponse> {
+export async function sendMessage(
+  chatId: string,
+  data: CreateMessageData
+): Promise<CreateMessageResponse> {
   const response = await fetch(`${consts.backend}/messages/${chatId}`, {
     method: "POST",
-    credentials: "include", 
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },

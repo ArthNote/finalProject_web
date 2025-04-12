@@ -1850,5 +1850,151 @@
         "description": "An error occurred while removing the friend"
       }
     }
+  },
+  "Projects": {
+    "title": "Projects",
+    "newProject": "New Project",
+    "searchPlaceholder": "Search projects...",
+    "error": "Failed to load projects",
+    "projectNameRequired": "Project name is required",
+    "filters": {
+      "status": {
+        "label": "Status",
+        "options": {
+          "all": "All Status",
+          "not-started": "Not Started",
+          "active": "Active",
+          "on-hold": "On Hold",
+          "completed": "Completed"
+        }
+      },
+      "priority": {
+        "label": "Priority",
+        "options": {
+          "all": "All Priority",
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        }
+      },
+      "sort": {
+        "label": "Sort By",
+        "options": {
+          "lastUpdated": "Last Updated",
+          "dueDate": "Due Date",
+          "name": "Name"
+        }
+      }
+    },
+    "noProjects": {
+      "title": "No Projects Found",
+      "description": "You don't have any projects yet. Create a new project to get started."
+    },
+    "noSearchResults": {
+      "title": "No Projects Found",
+      "description": "No projects match your search criteria."
+    },
+    "create": {
+      "new": "New",
+      "title": "Create New Project",
+      "pickDate": "Pick a date",
+      "projectNameRequired": "Project name is required",
+      "form": {
+        "name": {
+          "label": "Project Name",
+          "placeholder": "Enter project name"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Enter project description"
+        },
+        "status": {
+          "label": "Status"
+        },
+        "priority": {
+          "label": "Priority"
+        },
+        "startDate": {
+          "label": "Start Date"
+        },
+        "endDate": {
+          "label": "End Date"
+        },
+        "tags": {
+          "label": "Tags",
+          "placeholder": "Add tags..."
+        }
+      },
+      "filters": {
+        "status": {
+          "label": "Status",
+          "options": {
+            "not-started": "Not Started",
+            "active": "Active",
+            "on-hold": "On Hold",
+            "completed": "Completed"
+          }
+        },
+        "priority": {
+          "label": "Priority",
+          "options": {
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High"
+          }
+        }
+      },
+      "submit": "Create Project",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "title": "Delete Project",
+      "description": "Are you sure you want to delete {name}? This action cannot be undone.",
+      "confirm": "Delete Project",
+      "cancel": "Cancel"
+    },
+    "toast": {
+      "createSuccess": {
+        "title": "Project Created",
+        "description": "Your project has been created successfully"
+      },
+      "createError": {
+        "title": "Error",
+        "description": "Failed to create project"
+      },
+      "updateSuccess": {
+        "title": "Project Updated",
+        "description": "Your project has been updated successfully"
+      },
+      "updateError": {
+        "title": "Error",
+        "description": "Failed to update project"
+      },
+      "deleteSuccess": {
+        "title": "Project Deleted",
+        "description": "Your project has been deleted successfully"
+      },
+      "deleteError": {
+        "title": "Error",
+        "description": "Failed to delete project"
+      }
+    },
+    "views": {
+      "progress": "Progress",
+      "priority": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "status": {
+        "not-started": "Not Started",
+        "active": "Active",
+        "on-hold": "On Hold",
+        "completed": "Completed"
+      },
+      "tasks": "Tasks",
+      "started": "Started {date}",
+      "due": "Due {date}"
+    }
   }
 }

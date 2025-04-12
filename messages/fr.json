@@ -1769,5 +1769,151 @@
         "description": "Une erreur s'est produite lors de la suppression de l'ami"
       }
     }
+  },
+  "Projects": {
+    "title": "Projets",
+    "newProject": "Nouveau Projet",
+    "searchPlaceholder": "Rechercher des projets...",
+    "error": "Échec du chargement des projets",
+    "projectNameRequired": "Le nom du projet est requis",
+    "filters": {
+      "status": {
+        "label": "Statut",
+        "options": {
+          "all": "Tous les statuts",
+          "not-started": "Non démarré",
+          "active": "Actif",
+          "on-hold": "En attente",
+          "completed": "Terminé"
+        }
+      },
+      "priority": {
+        "label": "Priorité",
+        "options": {
+          "all": "Toutes les priorités",
+          "low": "Faible",
+          "medium": "Moyenne",
+          "high": "Élevée"
+        }
+      },
+      "sort": {
+        "label": "Trier par",
+        "options": {
+          "lastUpdated": "Dernière mise à jour",
+          "dueDate": "Date d'échéance",
+          "name": "Nom"
+        }
+      }
+    },
+    "noProjects": {
+      "title": "Aucun projet trouvé",
+      "description": "Vous n'avez pas encore de projets. Créez un nouveau projet pour commencer."
+    },
+    "noSearchResults": {
+      "title": "Aucun projet trouvé",
+      "description": "Aucun projet ne correspond à vos critères de recherche."
+    },
+    "create": {
+      "new": "Nouveau",
+      "title": "Créer un nouveau projet",
+      "pickDate": "Choisir une date",
+      "projectNameRequired": "Le nom du projet est requis",
+      "form": {
+        "name": {
+          "label": "Nom du projet",
+          "placeholder": "Entrez le nom du projet"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Entrez la description du projet"
+        },
+        "status": {
+          "label": "Statut"
+        },
+        "priority": {
+          "label": "Priorité"
+        },
+        "startDate": {
+          "label": "Date de début"
+        },
+        "endDate": {
+          "label": "Date de fin"
+        },
+        "tags": {
+          "label": "Tags",
+          "placeholder": "Ajouter des tags..."
+        }
+      },
+      "filters": {
+        "status": {
+          "label": "Statut",
+          "options": {
+            "not-started": "Non démarré",
+            "active": "Actif",
+            "on-hold": "En attente",
+            "completed": "Terminé"
+          }
+        },
+        "priority": {
+          "label": "Priorité",
+          "options": {
+            "low": "Faible",
+            "medium": "Moyenne",
+            "high": "Élevée"
+          }
+        }
+      },
+      "submit": "Créer le projet",
+      "cancel": "Annuler"
+    },
+    "delete": {
+      "title": "Supprimer le projet",
+      "description": "Êtes-vous sûr de vouloir supprimer {name} ? Cette action ne peut pas être annulée.",
+      "confirm": "Supprimer le projet",
+      "cancel": "Annuler"
+    },
+    "toast": {
+      "createSuccess": {
+        "title": "Projet créé",
+        "description": "Votre projet a été créé avec succès"
+      },
+      "createError": {
+        "title": "Erreur",
+        "description": "Échec de la création du projet"
+      },
+      "updateSuccess": {
+        "title": "Projet mis à jour",
+        "description": "Votre projet a été mis à jour avec succès"
+      },
+      "updateError": {
+        "title": "Erreur",
+        "description": "Échec de la mise à jour du projet"
+      },
+      "deleteSuccess": {
+        "title": "Projet supprimé",
+        "description": "Votre projet a été supprimé avec succès"
+      },
+      "deleteError": {
+        "title": "Erreur",
+        "description": "Échec de la suppression du projet"
+      }
+    },
+    "views": {
+      "progress": "Progression",
+      "priority": {
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée"
+      },
+      "status": {
+        "not-started": "Non démarré",
+        "active": "Actif",
+        "on-hold": "En attente",
+        "completed": "Terminé"
+      },
+      "tasks": "Tâches",
+      "started": "Démarré le {date}",
+      "due": "Échéance le {date}"
+    }
   }
 }
