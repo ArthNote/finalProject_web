@@ -986,6 +986,22 @@
     "search": "Rechercher des conversations...",
     "you": "Vous",
     "typeMessage": "Écrivez un message...",
+    "upload": {
+      "title": "Envoyer un fichier",
+      "cancel": "Annuler",
+      "sending": "Envoi en cours...",
+      "send": "Envoyer"
+    },
+    "error": {
+      "upload": {
+        "title": "Erreur d'envoi",
+        "description": "Une erreur s'est produite lors de l'envoi du fichier",
+        "tooLarge": {
+          "title": "Fichier trop volumineux",
+          "description": "Le fichier que vous essayez d'envoyer est trop volumineux (max {size}). Veuillez sélectionner un fichier plus petit."
+        }
+      }
+    },
     "timeAgo": {
       "minutes": "il y a {count} min",
       "hours": "il y a {count}h",
@@ -1090,11 +1106,21 @@
       }
     },
     "message": {
+      "deleteSuccess": {
+        "title": "Message supprimé",
+        "description": "Le message a été supprimé avec succès"
+      },
+      "deleteError": {
+        "title": "Erreur de suppression",
+        "description": "Échec de la suppression du message"
+      },
       "actions": {
         "copy": "Copier",
         "reply": "Répondre",
         "delete": "Supprimer"
       },
+      "replyingTo": "En réponse à",
+      "clickToViewReply": "Cliquez pour voir le message original",
       "status": {
         "sent": "Envoyé",
         "delivered": "Distribué",
@@ -1387,10 +1413,6 @@
           "statusError": {
             "title": "Erreur",
             "description": "Une erreur s'est produite lors de la mise à jour du statut de complétion de votre tâche"
-          },
-          "unscheduledTask": {
-            "title": "Tâche non planifiée",
-            "description": "Planifiez la tâche pour changer son statut."
           }
         }
       },

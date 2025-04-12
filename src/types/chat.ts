@@ -21,6 +21,15 @@ export interface Message {
   type: "text" | "file" | "image";
   fileName?: string;
   fileSize?: number;
+  // Add reply functionality
+  replyToId?: string;
+  replyTo?: {
+    id: string;
+    content: string;
+    sender: {
+      username: string;
+    };
+  };
 }
 
 export interface Chat {
