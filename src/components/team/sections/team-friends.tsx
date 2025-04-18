@@ -47,6 +47,8 @@ import EmptyState from "@/components/empty_state";
 import { UserPlus2, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
+import { createChat } from "@/lib/api/chats";
+import { useRouter } from "@/i18n/navigation";
 
 // Add this helper function at the top of the file, before the component
 function isRequestData(
@@ -77,6 +79,7 @@ const TeamFriends = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userSearchLoading, setUserSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchUserResult[]>([]);
+  const router = useRouter();
   const [selectedProfile, setSelectedProfile] = useState<{
     username: string;
     email: string;
@@ -119,6 +122,24 @@ const TeamFriends = () => {
     queryKey: ["friend-requests"],
     queryFn: getFriendRequests,
   });
+
+  const { mutate: startChat, isPending: isStartingChat } = useMutation({
+    mutationFn: (friendId: string) =>
+      createChat({
+        participantIds: [friendId],
+        type: "individual",
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
+      if (data.data && "id" in data.data) {
+        handleChatSelect(data.data.id);
+      }
+    },
+  });
+
+  function handleChatSelect(chatId: string) {
+    router.push(`/chats/chat-${chatId}`);
+  }
 
   // Mutations
   const { mutate: sendRequest } = useMutation({
@@ -242,9 +263,7 @@ const TeamFriends = () => {
   const getOtherUser = (friend: Friend) => {
     // Return the other user's data (not the current user)
     const myUserId = data?.user.id;
-    return friend.sender.id === myUserId
-      ? friend.receiver
-      : friend.sender;
+    return friend.sender.id === myUserId ? friend.receiver : friend.sender;
   };
 
   const renderFriendItem = (friend: Friend) => {
@@ -272,15 +291,19 @@ const TeamFriends = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setSelectedProfile(otherUser)}>
+              <DropdownMenuItem
+                onClick={() =>
+                  setSelectedProfile({
+                    username: otherUser.username,
+                    email: otherUser.email,
+                    image: otherUser.image || "",
+                  })
+                }
+              >
                 <User className="h-4 w-4 mr-2" />
                 {t("friendsList.friend.viewProfile")}
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  /* TODO: Implement messaging */
-                }}
-              >
+              <DropdownMenuItem onClick={() => startChat(otherUser.id)}>
                 <MessageSquare className="h-4 w-4 mr-2" />
                 {t("friendsList.friend.message")}
               </DropdownMenuItem>
@@ -317,33 +340,44 @@ const TeamFriends = () => {
   };
 
   const getActionButton = (user: SearchUserResult) => {
-    if (user.friendshipStatus === "accepted") {
+    // Check if there's a pending request
+    const pendingRequest =
+      requestsData?.data && isRequestData(requestsData.data)
+        ? [...requestsData.data.sent, ...requestsData.data.received].find(
+            (request) =>
+              request.sender.id === user.id || request.receiver?.id === user.id
+          )
+        : null;
+
+    // Check if they're already friends
+    const isFriendAlready =
+      friendsData?.data && Array.isArray(friendsData.data)
+        ? friendsData.data.some(
+            (friend): friend is Friend =>
+              isFriend(friend) && getOtherUser(friend).id === user.id
+          )
+        : false;
+
+    if (isFriendAlready) {
       return (
-        <Button size="sm" variant="secondary" disabled>
+        <Button variant="secondary" size="sm" disabled>
           {t("addDialog.alreadyFriends")}
         </Button>
       );
     }
 
-    if (user.hasPendingRequest) {
+    if (pendingRequest) {
       return (
-        <Button size="sm" variant="secondary" disabled>
-          {t("addDialog.requestSent")}
-        </Button>
-      );
-    }
-
-    if (user.friendshipStatus === "pending") {
-      return (
-        <Button size="sm" variant="secondary" disabled>
-          {t("addDialog.pendingResponse")}
+        <Button variant="secondary" size="sm" disabled>
+          {t("addDialog.pending")}
         </Button>
       );
     }
 
     return (
-      <Button size="sm" variant="default" onClick={() => sendRequest(user.id)}>
-        {t("addDialog.addFriend")}
+      <Button variant="default" size="sm" onClick={() => sendRequest(user.id)}>
+        <UserPlus className="h-4 w-4 mr-2" />
+        {t("addDialog.add")}
       </Button>
     );
   };
@@ -410,7 +444,9 @@ const TeamFriends = () => {
                             <AvatarFallback>{user.username[0]}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="text-sm font-medium">{user.name}</p>
+                            <p className="text-sm font-medium">
+                              {user.username}
+                            </p>
                             <p className="text-xs text-muted-foreground">
                               @{user.username}
                             </p>

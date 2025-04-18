@@ -354,7 +354,7 @@ const ListView = () => {
               </Collapsible>
             )}
 
-          {/* Todo Tasks Section - Only show when filter is "all" or "scheduled" */}
+      
           {(scheduledFilter === "all" || scheduledFilter === "scheduled") && (
             <Collapsible
               open={tasksOpen.todo}

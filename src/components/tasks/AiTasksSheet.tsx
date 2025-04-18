@@ -66,12 +66,14 @@ interface AiTasksSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   aiTaskInput: string;
+  projectId?: string;
 }
 
 const AiTasksSheet = ({
   open,
   onOpenChange,
   aiTaskInput,
+  projectId,
 }: AiTasksSheetProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -91,6 +93,7 @@ const AiTasksSheet = ({
       const tasksWithIds = data.data.map((task) => ({
         ...task,
         id: `temp-${Math.random().toString(36).substring(2, 9)}`, // Generate a unique temporary ID
+        projectId: projectId || undefined,
       }));
       setGeneratedTasks(tasksWithIds);
       setIsRegenerating(false);
@@ -113,13 +116,21 @@ const AiTasksSheet = ({
   const saveTasksMutation = useMutation({
     mutationFn: (tasks: TaskType[]) => saveTasks(tasks),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ["tasks"], type: "all" });
+      Promise.all([
+        queryClient.refetchQueries({ queryKey: ["tasks"], type: "all" }),
+        queryClient.refetchQueries({
+          queryKey: ["project", projectId],
+          type: "all",
+        }),
+      ]).then(() => {
+        setTimeout(() => onOpenChange(false), 100);
+      });
       toast({
         title: t("toast.tasksCreated.title"),
         description: t("toast.tasksCreated.description"),
       });
       // Close the sheet after saving
-      onOpenChange(false);
+
       // Clear state
       setGeneratedTasks([]);
       setPrompt("");

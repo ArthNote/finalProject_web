@@ -13,11 +13,21 @@ import {
 } from "lucide-react";
 import { type NavItem } from "@/types/navigation";
 import { useTranslations } from "next-intl";
+import { useProjects } from "@/hooks/useProjects";
 
 export function MySidebar() {
   const t = useTranslations("nav.sidebar");
 
-  const navigationItems: NavItem[] = [
+  // Fetch projects with sorting by updatedAt
+  const { data: projects } = useProjects({
+    sortBy: "updatedAt",
+    sortOrder: "desc",
+  });
+
+  // Get latest 3 updated projects
+  const latestProjects = projects?.slice(0, 3) || [];
+
+  const baseNavigationItems: NavItem[] = [
     {
       title: t("dashboard"),
       url: "/dashboard",
@@ -66,21 +76,19 @@ export function MySidebar() {
       type: "",
       isActive: false,
     },
-    {
-      title: "project 1",
-      url: "/projects/1",
-      icon: Folder,
-      type: t("latestProjects"),
-      isActive: false,
-    },
-    {
-      title: "project 2",
-      url: "/projects/2",
-      icon: Folder,
-      type: t("latestProjects"),
-      isActive: false,
-    },
   ];
+
+  // Create navigation items for latest projects
+  const latestProjectItems: NavItem[] = latestProjects.map((project) => ({
+    title: project.name,
+    url: `/projects/project-${project.id}`,
+    icon: Folder,
+    type: t("latestProjects"),
+    isActive: false,
+  }));
+
+  // Combine base navigation items with latest project items
+  const navigationItems = [...baseNavigationItems, ...latestProjectItems];
 
   return <AppSidebar navItems={navigationItems} />;
 }

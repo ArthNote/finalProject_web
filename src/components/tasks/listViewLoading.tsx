@@ -8,7 +8,7 @@ const ListViewLoading = () => {
     <div className="space-y-6">
       <TaskViewFiltersLoading />
 
-      {/* Todo Section */}
+      
       <div className="space-y-3">
         <div className="flex items-center justify-between border-b pb-2">
           <div className="flex items-center gap-2">

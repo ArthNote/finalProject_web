@@ -223,7 +223,7 @@ const TeamPage = () => {
                 </div>
                 {/* Desktop Tabs */}
 
-                <TabsList className="hidden md:grid grid-cols-6 w-full max-w-2xl bg-background/80 p-1">
+                <TabsList className="hidden md:grid grid-cols-6 w-full max-w-3xl bg-background/80 p-1 ">
                   <TabsTrigger
                     value="overview"
                     className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"

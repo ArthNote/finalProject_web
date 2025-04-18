@@ -1178,9 +1178,14 @@
           "cancel": "Annuler",
           "create": "Créer la tâche",
           "creating": "Création en cours...",
-
           "basicInfo": {
             "title": "Base",
+            "projectLabel": "Projet",
+            "selectProject": "Sélectionner un projet",
+            "projectPlaceholder": "Rechercher des projets...",
+            "loadingProjects": "Chargement des projets...",
+            "noProjectsFound": "Aucun projet trouvé",
+            "projectDescription": "Associer cette tâche à un projet",
             "titleLabel": "Titre de la tâche*",
             "titlePlaceholder": "Entrez le titre de la tâche",
             "descriptionLabel": "Description",
@@ -1423,6 +1428,7 @@
       "noInProgressTasks": "Aucune tâche en cours trouvée"
     },
     "detailsSheet": {
+      "project": "Projet",
       "notSpecified": "Non spécifié",
       "durationMinutes": "{count} minutes",
       "durationHours": "{count, plural, one {# heure} other {# heures}}",
@@ -1814,6 +1820,8 @@
       "description": "Aucun projet ne correspond à vos critères de recherche."
     },
     "create": {
+      "createWithAI": "Créer avec l'IA",
+      "createManually": "Créer manuellement",
       "new": "Nouveau",
       "title": "Créer un nouveau projet",
       "pickDate": "Choisir une date",
@@ -1864,7 +1872,27 @@
         }
       },
       "submit": "Créer le projet",
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "update": "Mettre à jour le projet",
+      "editTitle": "Modifier le projet",
+      "toast": {
+        "createSuccess": {
+          "title": "Projet créé",
+          "description": "Votre projet a été créé avec succès"
+        },
+        "createError": {
+          "title": "Erreur",
+          "description": "Échec de la création du projet"
+        },
+        "updateSuccess": {
+          "title": "Projet mis à jour",
+          "description": "Votre projet a été mis à jour avec succès"
+        },
+        "updateError": {
+          "title": "Erreur",
+          "description": "Échec de la mise à jour du projet"
+        }
+      }
     },
     "delete": {
       "title": "Supprimer le projet",
@@ -1898,6 +1926,11 @@
         "description": "Échec de la suppression du projet"
       }
     },
+    "errorState": {
+      "title": "Erreur lors du chargement des projets",
+      "description": "Une erreur s'est produite lors du chargement de vos projets. Veuillez réessayer.",
+      "action": "Réessayer"
+    },
     "views": {
       "progress": "Progression",
       "priority": {
@@ -1914,6 +1947,87 @@
       "tasks": "Tâches",
       "started": "Démarré le {date}",
       "due": "Échéance le {date}"
+    },
+    "createdOn": "Créé le {date}",
+    "status": {
+      "all": "Tous les statuts",
+      "not-started": "Non démarré",
+      "active": "Actif",
+      "on-hold": "En attente",
+      "completed": "Terminé",
+      "todo": "À faire",
+      "inprogress": "En cours",
+      "unscheduled": "Non planifié",
+      "scheduled": "Planifié"
+    },
+    "priority": {
+      "all": "Toutes les priorités",
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée"
+    },
+    "editProject": {
+      "title": "Modifier le projet"
+    },
+    "deleteProject": "Supprimer le projet",
+    "timeline": "Chronologie :",
+    "ongoing": "En cours",
+    "daysRemaining": "{count} jours restants",
+    "projectProgress": "Progression du projet",
+    "completed": "Terminé",
+    "notStarted": "Non démarré",
+    "active": "Actif",
+    "onHold": "En attente",
+    "inprogress": "En cours",
+    "unscheduled": "Non planifié",
+    "review": "À revoir",
+    "todo": "À faire",
+    "newTask": "Nouvelle tâche",
+    "projectTasks": "Tâches du projet",
+    "table": {
+      "task": "Tâche",
+      "status": "Statut",
+      "priority": "Priorité",
+      "dueDate": "Date d'échéance",
+      "noDateSet": "Aucune date définie",
+      "editTask": "Modifier la tâche",
+      "markCompleted": "Marquer comme terminée",
+      "markInProgress": "Marquer comme en cours",
+      "deleteTask": "Supprimer la tâche",
+      "search": "Rechercher...",
+      "noResults": "Aucun résultat.",
+      "rowsPerPage": "Lignes par page",
+      "pagePerPage": "Page {page} sur {total}",
+      "viewTaskDetails": "Voir les détails de la tâche",
+      "setPriority": {
+        "title": "Définir la priorité",
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée"
+      },
+      "setStatus": {
+        "title": "Définir le statut",
+        "todo": "À faire",
+        "inprogress": "En cours",
+        "unscheduled": "Non planifiée",
+        "completed": "Terminée"
+      },
+      "filter": {
+        "status": "Statut",
+        "all": "Tous",
+        "priority": "Priorité"
+      }
+    },
+    "createWithAI": "Créer avec l'IA",
+    "createManually": "Créer manuellement",
+    "toolbar": {
+      "create": {
+        "createTaskWithAI": "Créer une tâche avec l'IA",
+        "createWithAiDescription": "Décrivez votre tâche en langage naturel et notre IA la planifiera de manière appropriée.",
+        "createTask": "Créer une tâche",
+        "textareaPlaceholder": "Exemple : Planifier une réunion d'équipe d'une heure demain après-midi",
+        "cancel": "Annuler"
+      }
     }
   }
 }

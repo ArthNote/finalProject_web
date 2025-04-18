@@ -1,3 +1,5 @@
+import { Project } from "./project";
+
 export interface TaskType {
   id: string;
   title: string;
@@ -16,6 +18,12 @@ export interface TaskType {
   status?: string; // Added status field for kanban view
   order?: number; // Added order field for kanban sorting
   assignedTo?: AssignedUser[]; // Changed to include user details
+  projectId?: string;
+  project?: {
+    id: string;
+    name: string;
+    ownerId: string;
+  };
 }
 
 export interface AssignedUser {

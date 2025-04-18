@@ -1255,9 +1255,14 @@
           "cancel": "Cancel",
           "create": "Create Task",
           "creating": "Creating...",
-
           "basicInfo": {
             "title": "Basic Info",
+            "projectLabel": "Project",
+            "selectProject": "Select a project",
+            "projectPlaceholder": "Search projects...",
+            "loadingProjects": "Loading projects...",
+            "noProjectsFound": "No projects found",
+            "projectDescription": "Associate this task with a project",
             "titleLabel": "Task Title*",
             "titlePlaceholder": "Enter task title",
             "descriptionLabel": "Description",
@@ -1501,6 +1506,7 @@
       }
     },
     "detailsSheet": {
+      "project": "Project",
       "notSpecified": "Not Specified",
       "durationMinutes": "{count} minutes",
       "durationHours": "{count, plural, one {# hour} other {# hours}}",
@@ -1895,9 +1901,12 @@
       "description": "No projects match your search criteria."
     },
     "create": {
+      "createWithAI": "Create with AI",
+      "createManually": "Create Manually",
       "new": "New",
       "title": "Create New Project",
       "pickDate": "Pick a date",
+      "update": "Update Project",
       "projectNameRequired": "Project name is required",
       "form": {
         "name": {
@@ -1944,14 +1953,38 @@
           }
         }
       },
+      "editTitle": "Edit Project",
       "submit": "Create Project",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "toast": {
+        "createSuccess": {
+          "title": "Project Created",
+          "description": "Your project has been created successfully"
+        },
+        "createError": {
+          "title": "Error",
+          "description": "Failed to create project"
+        },
+        "updateSuccess": {
+          "title": "Project Updated",
+          "description": "Your project has been updated successfully"
+        },
+        "updateError": {
+          "title": "Error",
+          "description": "Failed to update project"
+        }
+      }
     },
     "delete": {
       "title": "Delete Project",
       "description": "Are you sure you want to delete {name}? This action cannot be undone.",
       "confirm": "Delete Project",
       "cancel": "Cancel"
+    },
+    "errorState": {
+      "title": "Error loading projects",
+      "description": "An error occurred while loading your projects. Please try again.",
+      "action": "Retry"
     },
     "toast": {
       "createSuccess": {
@@ -1995,6 +2028,88 @@
       "tasks": "Tasks",
       "started": "Started {date}",
       "due": "Due {date}"
+    },
+    "createdOn": "Created {date}",
+    "status": {
+      "all": "All Status",
+      "not-started": "Not Started",
+      "active": "Active",
+      "on-hold": "On Hold",
+      "completed": "Completed",
+      "todo": "To Do",
+      "inprogress": "In Progress",
+      "unscheduled": "Unscheduled",
+      "scheduled": "Scheduled"
+    },
+    "priority": {
+      "all": "All Priority",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "editProject": {
+      "title": "Edit Project"
+    },
+    "deleteProject": "Delete Project",
+    "timeline": "Timeline:",
+    "ongoing": "Ongoing",
+    "daysRemaining": "{count} days remaining",
+    "projectProgress": "Project Progress",
+    "completed": "Completed",
+    "notStarted": "Not Started",
+    "active": "Active",
+    "onHold": "On Hold",
+    "inprogress": "In Progress",
+    "unscheduled": "Unscheduled",
+    "review": "Review",
+    "todo": "To Do",
+    "newTask": "New Task",
+    "projectTasks": "Project Tasks",
+    "table": {
+      "task": "Task",
+      "viewTaskDetails": "View Task Details",
+      "status": "Status",
+      "priority": "Priority",
+      "dueDate": "Due Date",
+      "noDateSet": "No date set",
+      "editTask": "Edit Task",
+      "markCompleted": "Mark as Completed",
+      "markInProgress": "Mark as In Progress",
+      "deleteTask": "Delete Task",
+      "search": "Search...",
+      "noResults": "No results.",
+      "rowsPerPage": "Rows per page",
+      "pagePerPage": "Page {page} of {total}",
+
+      "setPriority": {
+        "title": "Set Priority",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "setStatus": {
+        "title": "Set Status",
+        "todo": "To Do",
+        "inprogress": "In Progress",
+        "unscheduled": "Unscheduled",
+        "completed": "Completed"
+      },
+      "filter": {
+        "status": "Status",
+        "all": "All",
+        "priority": "Priority"
+      }
+    },
+    "createWithAI": "Create with AI",
+    "createManually": "Create Manually",
+    "toolbar": {
+      "create": {
+        "createTaskWithAI": "Create Task with AI",
+        "createWithAiDescription": "Describe your task in natural language and our AI will schedule it appropriately.",
+        "createTask": "Create Task",
+        "textareaPlaceholder": "Example: Schedule a 1-hour team meeting tomorrow afternoon",
+        "cancel": "Cancel"
+      }
     }
   }
 }

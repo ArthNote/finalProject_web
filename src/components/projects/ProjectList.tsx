@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Heart, Trash } from "lucide-react";
+import { Eye, Heart, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Project } from "@/types/project";
 import { ViewMode } from "../../types/projectTypes";
@@ -15,6 +15,7 @@ import { useProjects } from "@/hooks/useProjects";
 import { Button } from "@/components/ui/button";
 import { DeleteProjectDialog } from "./DeleteProjectDialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useRouter } from "@/i18n/navigation";
 
 interface ProjectListProps {
   projects: Project[];
@@ -28,17 +29,22 @@ export function ProjectList({
   searchQuery,
 }: ProjectListProps) {
   const { deleteProject } = useProjects();
+
   const [projectToDelete, setProjectToDelete] = React.useState<Project | null>(
     null
   );
+  const [isDeleting, setisDeleting] = React.useState(false);
 
   const handleDelete = async () => {
     if (projectToDelete) {
+      setisDeleting(true);
       try {
         await deleteProject(projectToDelete.id);
         setProjectToDelete(null);
       } catch (error) {
         console.error("Error deleting project:", error);
+      } finally {
+        setisDeleting(false);
       }
     }
   };
@@ -62,6 +68,7 @@ export function ProjectList({
           onOpenChange={(open) => !open && setProjectToDelete(null)}
           onConfirm={handleDelete}
           projectName={projectToDelete?.name ?? ""}
+          isDeleting={isDeleting}
         />
       </>
     );
@@ -83,6 +90,7 @@ export function ProjectList({
         onOpenChange={(open) => !open && setProjectToDelete(null)}
         onConfirm={handleDelete}
         projectName={projectToDelete?.name ?? ""}
+        isDeleting={isDeleting}
       />
     </>
   );
@@ -96,6 +104,10 @@ function GridViewProject({
   onDelete: () => void;
 }) {
   const t = useTranslations("Projects.views");
+  const router = useRouter();
+  const handleRoute = async (id: string) => {
+    router.push("/projects/project-" + id);
+  };
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="p-4 md:p-6 space-y-4">
@@ -110,9 +122,14 @@ function GridViewProject({
             </p>
           </div>
           <div className="flex gap-1 md:gap-2 flex-shrink-0">
-            {/* <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Edit className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-            </Button> */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => handleRoute(project.id)}
+            >
+              <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -142,7 +159,7 @@ function GridViewProject({
         </div>
 
         {/* Team */}
-        <div className="flex justify-between items-center">
+        {/* <div className="flex justify-between items-center">
           <div className="flex -space-x-2">
             <Avatar
               key={project.owner.id}
@@ -169,7 +186,7 @@ function GridViewProject({
           <div className="text-sm text-muted-foreground">
             {project.tasks.length} {t("tasks")}
           </div>
-        </div>
+        </div> */}
 
         {/* Dates */}
         <div className="flex justify-between text-xs md:text-sm text-muted-foreground">
@@ -199,6 +216,10 @@ function ListViewProject({
   onDelete: () => void;
 }) {
   const t = useTranslations("Projects.views");
+  const router = useRouter();
+  const handleRoute = async (id: string) => {
+    router.push("/projects/project-" + id);
+  };
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -207,9 +228,14 @@ function ListViewProject({
             <div className="flex items-start justify-between">
               <h3 className="font-semibold truncate">{project.name}</h3>
               <div className="flex gap-1 sm:hidden">
-                {/* <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Edit className="h-4 w-4 text-gray-400" />
-                </Button> */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => handleRoute(project.id)}
+                >
+                  <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                </Button>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -267,7 +293,7 @@ function ListViewProject({
           </div>
 
           {/* Team */}
-          <div className="hidden md:flex -space-x-2">
+          {/* <div className="hidden md:flex -space-x-2">
             <Avatar
               key={project.owner.id}
               className="border-2 border-background h-8 w-8"
@@ -289,7 +315,7 @@ function ListViewProject({
                 +{project.members.length - 2}
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* Due Date */}
           {project.endDate && (
@@ -305,6 +331,14 @@ function ListViewProject({
             {/* <Button variant="ghost" size="icon" className="h-8 w-8">
               <Edit className="h-4 w-4 text-gray-400 hover:text-gray-600" />
             </Button> */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => handleRoute(project.id)}
+            >
+              <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"

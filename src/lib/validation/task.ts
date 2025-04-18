@@ -31,15 +31,21 @@ export function createTaskValidators(
     date: z.date().nullable().optional(),
     startTime: z.date().nullable().optional(),
     endTime: z.date().nullable().optional(),
-    parentId: z.string().nullable().optional(), // Explicitly allow null or undefined
+    parentId: z.string().nullable().optional(),
     tags: z.array(z.string()).optional().default([]),
     assignedTo: z.array(z.string()).optional().default([]),
     resources: z.array(taskResourceSchema).optional().default([]),
+    projectId: z.string().optional(),
     duration: z
       .number()
       .min(5, { message: t("validation.task.durationTooShort") })
-      .nullable() // Allow null values
-      .optional(), // Allow undefined values
+      .nullable()
+      .optional(),
+    status: z
+      .enum(["unscheduled", "todo", "inprogress", "completed"])
+      .optional()
+      .default("unscheduled"),
+    order: z.number().optional().default(0),
   });
 
   return { taskSchema };

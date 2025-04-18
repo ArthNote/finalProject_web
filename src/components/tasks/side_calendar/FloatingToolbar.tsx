@@ -20,7 +20,7 @@ import {
 import {
   BarChart2,
   BrainCircuit,
-  Calendar as CalendarIcon, // Fix naming conflict with the Calendar component
+  Calendar as CalendarIcon, 
   CalendarDays,
   CalendarRange,
   Check,
@@ -405,7 +405,7 @@ const FloatingToolbar = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Optimize Button - Now opens a sheet instead of dropdown */}
+                
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button

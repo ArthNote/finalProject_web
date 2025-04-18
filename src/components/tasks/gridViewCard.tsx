@@ -14,7 +14,7 @@ import {
 import { Check, Clock, MoreHorizontal } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { TaskType } from "@/types/task";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { enUS, fr } from "date-fns/locale";

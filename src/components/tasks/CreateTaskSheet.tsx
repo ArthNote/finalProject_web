@@ -34,7 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import {
   CalendarIcon,
   Check,
@@ -72,9 +72,11 @@ import { sampleTasks } from "@/lib/taskService";
 import { useLocale, useTranslations } from "next-intl";
 import { enUS, fr } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
+import { useProjects } from "@/hooks/useProjects";
 interface CreateTaskSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  projectId?: string;
 }
 
 type TeamMember = {
@@ -84,9 +86,16 @@ type TeamMember = {
   avatar?: string;
 };
 
+type Project = {
+  id: string;
+  name: string;
+  description?: string;
+};
+
 const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   open,
   onOpenChange,
+  projectId,
 }) => {
   const locale = useLocale() as "en" | "fr";
   const t = useTranslations("tasks.toolbar.create.manual");
@@ -95,11 +104,10 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const [tagInput, setTagInput] = React.useState("");
   const [resourceName, setResourceName] = React.useState("");
   const [resourceType, setResourceType] = React.useState("");
-  const [resourceCategory, setResourceCategory] = React.useState<
+  const [resourceCategory, setResourceCategory] = useState<
     "file" | "link" | "note"
   >("link");
   const [resourceUrl, setResourceUrl] = React.useState("");
-
   // State for parent task and assignees
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -108,12 +116,13 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const [searchTaskValue, setSearchTaskValue] = useState("");
   const [openTaskCombobox, setOpenTaskCombobox] = useState(false);
   const [openAssignCombobox, setOpenAssignCombobox] = useState(false);
+  const [searchProjectValue, setSearchProjectValue] = useState("");
+  const [openProjectCombobox, setOpenProjectCombobox] = useState(false);
 
   const queryClient = useQueryClient();
 
   const tValidation = useTranslations();
-  const { taskSchema } = createTaskValidators(tValidation);
-
+  const { taskSchema } = createTaskValidators(tValidation); // Set default values for the form - explicitly include projectId from props
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -129,8 +138,20 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
       assignedTo: [],
       resources: [],
       parentId: undefined,
+      projectId: projectId || undefined, // Explicitly set the projectId from props
     },
+  }); // Fetch projects data with a single query
+  const { data: projects, isLoading } = useProjects({
+    search: searchProjectValue || "",
   });
+
+  // Simple direct approach: Set projectId on component mount
+  useEffect(() => {
+    if (projectId) {
+      console.log("Setting projectId:", projectId);
+      form.setValue("projectId", projectId);
+    }
+  }, [projectId, form]);
 
   // Watch values from the form
   const isScheduled = form.watch("scheduled");
@@ -138,15 +159,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const resources = form.watch("resources") || [];
   const assignedTo = form.watch("assignedTo") || [];
   const parentId = form.watch("parentId");
-
-  // Fetch tasks and team members when the sheet opens
-  useEffect(() => {
-    if (open) {
-      loadTasks();
-      loadTeamMembers();
-    }
-  }, [open]);
-
+  const selectedProjectId = form.watch("projectId");
   const loadTasks = async () => {
     try {
       setIsLoadingTasks(true);
@@ -158,7 +171,13 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
       setIsLoadingTasks(false);
     }
   };
-
+  // Fetch tasks and team members when the sheet opens
+  useEffect(() => {
+    if (open) {
+      loadTasks();
+      loadTeamMembers();
+    }
+  }, [open]);
   const loadTeamMembers = async () => {
     try {
       setIsLoadingTeamMembers(true);
@@ -230,7 +249,6 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
               .includes(searchTaskValue.toLowerCase()))
       )
     : tasks;
-
   const selectedTask = tasks.find((task) => task.id === parentId);
 
   const getInitials = (name: string) => {
@@ -253,6 +271,10 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
       form.reset();
       Promise.all([
         queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.refetchQueries({
+          queryKey: ["project", projectId],
+          type: "all",
+        }),
       ]).then(() => {
         setTimeout(() => onOpenChange(false), 100);
       });
@@ -277,6 +299,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
         duration: values.duration || 0,
         endTime: values.endTime || null,
         parentId: values.parentId || null,
+
         priority: values.priority,
         // Ensure each resource has a defined id
         resources: values.resources.map((resource) => ({
@@ -287,6 +310,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
         startTime: values.startTime || null,
         tags: values.tags,
         title: values.title,
+        projectId: selectedProjectId || undefined,
         assignedTo: values.assignedTo.map((userId) => {
           const member = teamMembers.find((m) => m.id === userId);
           return {
@@ -326,7 +350,101 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
               <ScrollArea className="h-[calc(100vh-250px)] pr-3">
                 <div className="p-1">
                   <TabsContent value="basic" className="space-y-6 mt-0">
-                    {/* Basic fields - unchanged */}
+                    <FormField
+                      control={form.control}
+                      disabled={isPending}
+                      name="projectId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("basicInfo.projectLabel")}</FormLabel>
+                          <Popover
+                            open={openProjectCombobox}
+                            onOpenChange={setOpenProjectCombobox}
+                          >
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  className={cn(
+                                    "w-full justify-between",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                  onClick={() =>
+                                    setOpenProjectCombobox(!openProjectCombobox)
+                                  }
+                                >
+                                  {isLoading ? (
+                                    <div className="flex items-center gap-2">
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                      <span>
+                                        {t("basicInfo.loadingProjects")}
+                                      </span>
+                                    </div>
+                                  ) : field.value && projects ? (
+                                    <div className="flex items-center gap-2 truncate">
+                                      <span className="truncate">
+                                        {projects.find(
+                                          (p) => p.id === field.value
+                                        )?.name || t("basicInfo.selectProject")}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    t("basicInfo.selectProject")
+                                  )}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]">
+                              <Command>
+                                <CommandInput
+                                  placeholder={t(
+                                    "basicInfo.projectPlaceholder"
+                                  )}
+                                  value={searchProjectValue}
+                                  onValueChange={setSearchProjectValue}
+                                  className="h-9"
+                                />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    {t("basicInfo.noProjectsFound")}
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {projects?.map((project) => (
+                                      <CommandItem
+                                        key={project.id}
+                                        onSelect={() => {
+                                          form.setValue(
+                                            "projectId",
+                                            project.id
+                                          );
+                                          setOpenProjectCombobox(false);
+                                          setSearchProjectValue("");
+                                        }}
+                                        className="flex items-center gap-2"
+                                      >
+                                        <span className="truncate">
+                                          {project.name}
+                                        </span>
+                                        {field.value === project.id && (
+                                          <Check className="ml-auto h-4 w-4" />
+                                        )}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormDescription>
+                            {t("basicInfo.projectDescription")}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <FormField
                       control={form.control}
                       disabled={isPending}

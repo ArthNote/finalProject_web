@@ -10,9 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,83 +36,100 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Plus } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useProjects } from "@/hooks/useProjects";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CreateProjectData } from "@/types/project";
+import { Project, UpdateProjectData } from "@/types/project";
 import { enUS, fr } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 
-export function CreateProjectDialog() {
-  const t = useTranslations("Projects.create");
-  const [open, setOpen] = React.useState(false);
-  const { createProject } = useProjects();
+interface EditProjectDialogProps {
+  project: Project;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function EditProjectDialog({
+  project,
+  open,
+  onOpenChange,
+}: EditProjectDialogProps) {
   const [isPending, setIsPending] = React.useState(false);
+  const t = useTranslations("Projects.create");
   const locale = useLocale() as "en" | "fr";
+  const { updateProject, useProject } = useProjects();
   const queryClient = useQueryClient();
   const formSchema = z.object({
     name: z.string().min(1, t("projectNameRequired")).max(100),
     description: z.string().max(500),
     status: z.enum(["not-started", "active", "on-hold", "completed"]),
     priority: z.enum(["low", "medium", "high"]),
-    progress: z.number().min(0).max(100).default(0),
+    progress: z.number().min(0).max(100),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
-    tags: z.array(z.string()).default([]),
   });
 
   type FormValues = z.infer<typeof formSchema>;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-
     defaultValues: {
-      status: "not-started",
-      priority: "medium",
-      progress: 0,
-      tags: [],
+      name: project.name,
+      description: project.description,
+      status: project.status as
+        | "not-started"
+        | "active"
+        | "on-hold"
+        | "completed",
+      priority: project.priority as "low" | "medium" | "high",
+      progress: project.progress,
+      startDate: project.startDate ? new Date(project.startDate) : undefined,
+      endDate: project.endDate ? new Date(project.endDate) : undefined,
     },
   });
 
   const onSubmit = async (data: FormValues) => {
     try {
       setIsPending(true);
-      createProject(data as CreateProjectData);
-      setOpen(false);
+      updateProject({
+        id: project.id,
+        data: data as UpdateProjectData,
+      });
+      onOpenChange(false);
       form.reset();
-      queryClient.refetchQueries({ queryKey: ["projects"], type: "all" });
       queryClient.invalidateQueries({ queryKey: ["projects"], type: "all" });
-
+      queryClient.refetchQueries({ queryKey: ["projects"], type: "all" });
+      queryClient.invalidateQueries({
+        queryKey: ["project", project.id],
+        type: "all",
+      });
+      queryClient.refetchQueries({
+        queryKey: ["project", project.id],
+        type: "all",
+      });
       toast({
-        title: t("toast.createSuccess.title"),
-        description: t("toast.createSuccess.description"),
+        title: t("toast.updateSuccess.title"),
+        description: t("toast.updateSuccess.description"),
       });
     } catch (error) {
-      console.error("Failed to create project:", error);
+      console.error("Failed to update project:", error);
       toast({
-        title: t("toast.createSuccess.title"),
-        description: t("toast.createSuccess.description"),
+        title: t("toast.updateError.title"),
+        description: t("toast.updateError.description"),
+        variant: "destructive",
       });
-      setOpen(false);
     } finally {
       setIsPending(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="lg" className="whitespace-nowrap">
-          <Plus className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">{t("title")}</span>
-          <span className="sm:hidden">{t("new")}</span>
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogTitle>{t("editTitle")}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[80vh]">
           <div className="p-1">
@@ -123,6 +138,7 @@ export function CreateProjectDialog() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-6"
               >
+                {/* Basic form fields */}
                 <FormField
                   control={form.control}
                   name="name"
@@ -245,7 +261,9 @@ export function CreateProjectDialog() {
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "PPP")
+                                  format(field.value, "PPP", {
+                                    locale: locale === "fr" ? fr : enUS,
+                                  })
                                 ) : (
                                   <span>{t("pickDate")}</span>
                                 )}
@@ -256,16 +274,8 @@ export function CreateProjectDialog() {
                           <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
                               mode="single"
-                              variant="compact"
                               selected={field.value}
                               onSelect={field.onChange}
-                              disabled={(date: Date) => {
-                                const endDate = form.getValues("endDate");
-                                return (
-                                  date < new Date() ||
-                                  (endDate ? date > endDate : false)
-                                );
-                              }}
                               initialFocus
                               lang={locale}
                               locale={locale === "en" ? enUS : fr}
@@ -294,7 +304,9 @@ export function CreateProjectDialog() {
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "PPP")
+                                  format(field.value, "PPP", {
+                                    locale: locale === "fr" ? fr : enUS,
+                                  })
                                 ) : (
                                   <span>{t("pickDate")}</span>
                                 )}
@@ -305,14 +317,13 @@ export function CreateProjectDialog() {
                           <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
                               mode="single"
-                              variant="compact"
                               selected={field.value}
                               onSelect={field.onChange}
-                              disabled={(date: Date) => {
-                                const startDate = form.getValues("startDate");
-                                return date < (startDate || new Date());
-                              }}
                               initialFocus
+                              disabled={(date) =>
+                                date <
+                                (form.getValues("startDate") || new Date())
+                              }
                               lang={locale}
                               locale={locale === "en" ? enUS : fr}
                             />
@@ -327,16 +338,17 @@ export function CreateProjectDialog() {
                 <div className="flex flex-col sm:flex-row justify-end gap-2">
                   <Button
                     variant="outline"
-                    onClick={() => setOpen(false)}
+                    onClick={() => onOpenChange(false)}
                     type="button"
+                    disabled={isPending}
                   >
                     {t("cancel")}
                   </Button>
-                  <Button type="submit">
+                  <Button type="submit" disabled={isPending}>
                     {isPending && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {t("submit")}
+                    {t("update")}
                   </Button>
                 </div>
               </form>

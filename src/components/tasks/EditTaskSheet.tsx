@@ -71,6 +71,7 @@ import { sampleTasks } from "@/lib/taskService";
 import { useLocale, useTranslations } from "next-intl";
 import { enUS, fr } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
+import { useProjects } from "@/hooks/useProjects";
 
 interface EditTaskSheetProps {
   open: boolean;
@@ -97,6 +98,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
   const [tagInput, setTagInput] = React.useState("");
   const [resourceName, setResourceName] = React.useState("");
   const [resourceType, setResourceType] = React.useState("");
+  const [openProjectCombobox, setOpenProjectCombobox] = useState(false);
   const [resourceCategory, setResourceCategory] = React.useState<
     "file" | "link" | "note"
   >("link");
@@ -114,6 +116,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
   const [searchTaskValue, setSearchTaskValue] = useState("");
   const [openTaskCombobox, setOpenTaskCombobox] = useState(false);
   const [openAssignCombobox, setOpenAssignCombobox] = useState(false);
+  const [searchProjectValue, setSearchProjectValue] = useState("");
 
   const tValidation = useTranslations();
   const { taskSchema } = createTaskValidators(tValidation);
@@ -134,6 +137,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
       resources: task.resources || [],
       parentId: task.parentId || null, // Explicitly set null when parentId is falsy
       duration: task.duration || 0,
+      projectId: task.projectId || null || undefined,
     },
   });
 
@@ -154,6 +158,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
         resources: task.resources || [],
         parentId: task.parentId || null, // Explicitly set null when parentId is falsy
         duration: task.duration || null, // Use null instead of 0
+        projectId: task.projectId || null || undefined,
       });
     }
   }, [task, open, form]);
@@ -164,6 +169,11 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
   const resources = form.watch("resources") || [];
   const assignedTo = form.watch("assignedTo") || [];
   const parentId = form.watch("parentId");
+  const projectId = form.watch("projectId");
+
+  const { data: projects, isLoading } = useProjects({
+    search: searchProjectValue || "",
+  });
 
   // Fetch tasks and team members when the sheet opens
   useEffect(() => {
@@ -338,6 +348,10 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
       Promise.all([
         queryClient.refetchQueries({ queryKey: ["tasks"], type: "all" }),
         queryClient.refetchQueries({
+          queryKey: ["project", task.projectId],
+          type: "all",
+        }),
+        queryClient.refetchQueries({
           queryKey: ["calendar-tasks"],
           type: "active",
         }),
@@ -377,6 +391,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
         startTime: values.startTime || null,
         tags: values.tags,
         title: values.title,
+        projectId: projectId || undefined,
         assignedTo: values.assignedTo.map((userId) => {
           const member = teamMembers.find((m) => m.id === userId);
           return {
@@ -415,6 +430,100 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                 <div className="p-1">
                   <TabsContent value="basic" className="space-y-6 mt-0">
                     {/* Basic fields */}
+                    <FormField
+                      control={form.control}
+                      disabled={isPending}
+                      name="projectId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("basicInfo.projectLabel")}</FormLabel>
+                          <Popover
+                            open={openProjectCombobox}
+                            onOpenChange={setOpenProjectCombobox}
+                          >
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  className={cn(
+                                    "w-full justify-between",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                  onClick={() =>
+                                    setOpenProjectCombobox(!openProjectCombobox)
+                                  }
+                                >
+                                  {isLoading ? (
+                                    <div className="flex items-center gap-2">
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                      <span>
+                                        {t("basicInfo.loadingProjects")}
+                                      </span>
+                                    </div>
+                                  ) : field.value && projects ? (
+                                    <div className="flex items-center gap-2 truncate">
+                                      <span className="truncate">
+                                        {projects.find(
+                                          (p) => p.id === field.value
+                                        )?.name || t("basicInfo.selectProject")}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    t("basicInfo.selectProject")
+                                  )}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]">
+                              <Command>
+                                <CommandInput
+                                  placeholder={t(
+                                    "basicInfo.projectPlaceholder"
+                                  )}
+                                  value={searchProjectValue}
+                                  onValueChange={setSearchProjectValue}
+                                  className="h-9"
+                                />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    {t("basicInfo.noProjectsFound")}
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {projects?.map((project) => (
+                                      <CommandItem
+                                        key={project.id}
+                                        onSelect={() => {
+                                          form.setValue(
+                                            "projectId",
+                                            project.id
+                                          );
+                                          setOpenProjectCombobox(false);
+                                          setSearchProjectValue("");
+                                        }}
+                                        className="flex items-center gap-2"
+                                      >
+                                        <span className="truncate">
+                                          {project.name}
+                                        </span>
+                                        {field.value === project.id && (
+                                          <Check className="ml-auto h-4 w-4" />
+                                        )}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormDescription>
+                            {t("basicInfo.projectDescription")}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <FormField
                       control={form.control}
                       disabled={isPending}

@@ -2,6 +2,9 @@
 
 import React, { createContext, useContext, useState } from "react";
 import { TeamDetails, TeamMember } from "@/types/team";
+import { authClient } from "@/lib/auth-client";
+import { useQuery } from "@tanstack/react-query";
+import { getSubscription } from "@/lib/api/subscriptions";
 
 const mockTeamData: TeamDetails = {
   id: "1",
@@ -59,8 +62,23 @@ const TeamContext = createContext<{
 
 export const TeamProvider = ({ children }: { children: React.ReactNode }) => {
   const [team, setTeam] = useState<TeamDetails>(mockTeamData);
-  // Check if team has an active subscription
-  const hasTeamSub = true;
+
+  const {
+    data: subscription,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["subscription"],
+    queryFn: getSubscription,
+    refetchOnWindowFocus: true,
+  });
+
+  if (error) {
+    console.error("Error fetching subscription:", error);
+  }
+
+  const hasTeamSub = subscription?.data?.plan === "team" || false;
 
   const updateTeam = (updates: Partial<TeamDetails>) => {
     setTeam((prev) => ({ ...prev, ...updates }));

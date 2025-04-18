@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useLocale, useTranslations } from "next-intl";
 import {
   getProjects,
   getProject,
@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/projects";
 import { SortBy, SortOrder } from "@/types/projectTypes";
 import { CreateProjectData, UpdateProjectData } from "@/types/project";
+import { toast } from "./use-toast";
 
 interface ProjectFilters {
   search?: string;
@@ -21,6 +22,7 @@ interface ProjectFilters {
 
 export function useProjects(filters?: ProjectFilters) {
   const queryClient = useQueryClient();
+  const t = useTranslations("Projects");
 
   const { data, error, isLoading } = useQuery({
     queryKey: ["projects", filters],
@@ -30,40 +32,45 @@ export function useProjects(filters?: ProjectFilters) {
   const createMutation = useMutation({
     mutationFn: (data: CreateProjectData) => createProjectApi(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      toast.success("Project created successfully");
+      queryClient.invalidateQueries({ queryKey: ["projects"], type: "all" });
+      queryClient.refetchQueries({ queryKey: ["projects"], type: "all" });
     },
-    onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create project"
-      );
-    },
+    onError: (error) => {},
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateProjectData }) =>
       updateProjectApi(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      toast.success("Project updated successfully");
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["project", data.data.id],
+        type: "all",
+      });
+      queryClient.refetchQueries({
+        queryKey: ["project", data.data.id],
+        type: "all",
+      });
     },
-    onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update project"
-      );
-    },
+    onError: (error) => {},
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteProjectApi(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      toast.success("Project deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["projects"], type: "all" });
+      queryClient.refetchQueries({ queryKey: ["projects"], type: "all" });
+
+      toast({
+        title: t("toast.deleteSuccess.title"),
+        description: t("toast.deleteSuccess.description"),
+      });
     },
     onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to delete project"
-      );
+      toast({
+        title: t("toast.deleteError.title"),
+        description: t("toast.deleteError.description") + " " + error.message,
+        variant: "destructive",
+      });
     },
   });
 

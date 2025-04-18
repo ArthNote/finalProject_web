@@ -296,7 +296,7 @@ const GridView = () => {
             </div>
           )}
 
-          {/* Todo Tasks */}
+       
           {(scheduledFilter === "all" || scheduledFilter === "scheduled") && (
             <div className="space-y-4">
               <h3 className="font-medium text-base border-b pb-2">
@@ -428,6 +428,7 @@ const GridView = () => {
       )}
 
       {/* Task Details Sheet */}
+      {/* TODO: make the logic for taskcomplete and task scheduled */}
       <TaskDetailsSheet
         task={selectedTask}
         onOpenChange={(open) => !open && setSelectedTask(null)}

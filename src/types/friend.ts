@@ -21,3 +21,12 @@ export interface FriendResponse {
   success: boolean;
   data: Friend[] | SearchUserResult[];
 }
+
+export interface FriendRequest {
+  id: string;
+  status: "pending" | "accepted" | "rejected";
+  sender: User;
+  receiver: User;
+  createdAt: string;
+  updatedAt: string;
+}
