@@ -1678,6 +1678,7 @@
       "loading": "Loading...",
       "loadMore": "Load More Tasks",
       "card": {
+        "unscheduleTask": "Unschedule Task",
         "viewDetails": "View Details",
         "editTask": "Edit Task",
         "moveTo": "Move to..",
@@ -1720,6 +1721,20 @@
             "description": "Schedule the task to change its status."
           }
         }
+      },
+      "toast": {
+        "unscheduledTask": {
+          "title": "Task unscheduled",
+          "description": "Schedule the task to change its status."
+        },
+        "taskMoved": {
+          "title": "Task moved",
+          "description": "Your task has been successfully moved to the new column"
+        },
+        "moveError": {
+          "title": "Error moving task",
+          "description": "An error occurred while moving your task to the new column"
+        }
       }
     }
   },
@@ -1750,6 +1765,7 @@
     "title": "Friends & Network",
     "addFriend": "Add Friend",
     "addDialog": {
+      "add": "Add",
       "title": "Add Friend",
       "description": "Find and add new friends to your network",
       "searchPlaceholder": "Search by username, name, or email...",
@@ -2109,6 +2125,268 @@
         "createTask": "Create Task",
         "textareaPlaceholder": "Example: Schedule a 1-hour team meeting tomorrow afternoon",
         "cancel": "Cancel"
+      }
+    }
+  },
+  "team": {
+    "overview": {
+      "stats": {
+        "activeMembers": "Active Members",
+        "totalActiveMembers": "Total Active Team Members",
+        "tasksInProgress": "Tasks In Progress",
+        "tasksBeingWorkedOn": "Tasks Currently Being Worked On",
+        "completionRate": "Completion Rate",
+        "tasksCompletedThisMonth": "Tasks Completed This Month",
+        "resources": "Resources",
+        "totalResources": "Total Shared Resources"
+      },
+      "noTeamPlan": {
+        "title": "Welcome to Teams",
+        "description": "Upgrade to a team plan to unlock collaboration features",
+        "action": "Upgrade to Team Plan"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "tasks": "Tasks",
+        "members": "Members",
+        "resources": "Resources",
+        "settings": "Settings",
+        "friends": "Friends"
+      },
+      "overview": {
+        "currentPlan": "Current Plan",
+        "trial": "Trial",
+        "active": "Active",
+        "cancelled": "Cancelled",
+        "teamSeats": "Team Seats",
+        "seatUsage": "{count} of {total} used",
+        "storage": "Storage",
+        "storageUsage": "{count} of {total} used",
+        "renewsOn": "Renews on {date}"
+      },
+      "activity": {
+        "title": "Recent Activity",
+        "description": "Latest updates and changes in your team",
+        "viewAll": "View all activity",
+        "action": {
+          "created": "created",
+          "updated": "updated",
+          "deleted": "deleted"
+        },
+        "type": {
+          "task": "Task",
+          "team": "Team",
+          "resource": "Resource",
+          "member": "Member"
+        }
+      }
+    },
+    "members": {
+      "inviteDialog": {
+        "title": "Invite Team Members",
+        "description": "Invite your team members to collaborate on tasks and projects",
+        "searchPlaceholder": "Search by username, name or email...",
+        "searching": "Searching...",
+        "invite": "Invite",
+        "noUsersFound": "No users found",
+        "searchUsers": "Search for users to invite",
+        "toast": {
+          "errorSearch": {
+            "title": "Error searching",
+            "description": "An error occurred while searching for users"
+          },
+          "inviteSuccess": {
+            "title": "Invitation sent",
+            "description": "Your invitation has been sent successfully to {email}"
+          },
+          "inviteError": {
+            "title": "Error sending invitation",
+            "description": "An error occurred while sending the invitation to {email}"
+          }
+        }
+      },
+      "title": "Team Members",
+      "description": "Manage your team members and their roles",
+      "invite": "Invite Members",
+      "searchPlaceholder": "Search members...",
+      "table": {
+        "member": "Member",
+        "role": "Role",
+        "actions": "Actions",
+        "roles": {
+          "admin": "Admin",
+          "member": "Member",
+          "owner": "Owner"
+        },
+        "makeAdmin": "Make Admin",
+        "makeMember": "Make Member",
+        "remove": "Remove Member",
+        "toast": {
+          "removeSuccess": {
+            "title": "Member removed",
+            "description": "The member has been successfully removed from the team"
+          },
+          "removeError": {
+            "title": "Error removing member",
+            "description": "An error occurred while removing the member from the team"
+          },
+          "roleUpdated": {
+            "title": "Role updated",
+            "description": "The member's role has been successfully updated"
+          },
+          "roleUpdateError": {
+            "title": "Error updating role",
+            "description": "An error occurred while updating the member's role"
+          }
+        }
+      },
+      "emptyState": {
+        "title": "No Team Members",
+        "description": "You don't have any team members yet. Invite some to get started.",
+        "action": "Invite Members"
+      },
+      "emptySearch": {
+        "title": "No Matches Found",
+        "description": "No team members match your search {query}"
+      }
+    },
+    "tasks": {
+      "title": "Team Tasks",
+      "description": "{count} active Tasks",
+      "newTask": "New Task",
+      "createWithAI": "Create with AI",
+      "createManually": "Create Manually",
+      "table": {
+        "task": "Task",
+        "assignee": "Assignee",
+        "unassigned": "Unassigned",
+        "priority": {
+          "label": "Priority",
+          "high": "High",
+          "medium": "Medium",
+          "low": "Low"
+        },
+        "status": {
+          "label": "Status",
+          "todo": "To Do",
+          "inprogress": "In Progress",
+          "unscheduled": "Unscheduled",
+          "completed": "Completed"
+        },
+        "dueDate": "Due Date",
+        "noDateSet": "No date set",
+        "editTask": "Edit Task",
+        "viewTask": "View Task",
+        "changeStatus": "Change Status",
+        "assignees": "Assignees",
+        "currentAssignees": "Current Assignees {count}",
+        "removeAll": "Remove All",
+        "noAssignees": "No assignees",
+        "addAssignee": "Add Assignee",
+        "setPriority": {
+          "label": "Set Priority",
+          "high": "High Priority",
+          "medium": "Medium Priority",
+          "low": "Low Priority"
+        },
+        "deleteTask": "Delete Task"
+      },
+      "toast": {
+        "updateSuccess": {
+          "title": "Task updated",
+          "description": "Your task has been successfully updated"
+        },
+        "updateError": {
+          "title": "Error",
+          "description": "An error occurred while updating your task"
+        }
+      }
+    },
+    "resources": {
+      "title": "Shared Resources",
+      "description": "Manage your shared resources",
+      "addLink": {
+        "addLink": "Add Link",
+        "title": "Add Resource Link",
+        "titleLabel": "Resource Title",
+        "urlLabel": "Resource URL",
+        "urlPlaceholder": "https://example.com",
+        "titlePlaceholder": "Enter resource title",
+        "cancel": "Cancel",
+        "add": "Add"
+      },
+      "uploadFile": "Upload File",
+      "searchPlaceholder": "Search resources...",
+      "tabs": {
+        "links": "Links",
+        "files": "Files"
+      },
+      "files": {
+        "name": "Name",
+        "size": "Size",
+        "uploadedBy": "Uploaded By",
+        "uploadedOn": "Uploaded On",
+        "actions": {
+          "label": "Actions",
+          "download": "Download",
+          "delete": "Delete"
+        },
+        "nofilesSearch": "No files found matching your search"
+      },
+      "links": {
+        "title": "Title",
+        "url": "URL",
+        "uploadedBy": "Uploaded By",
+        "uploadedOn": "Uploaded On",
+        "actions": {
+          "label": "Actions",
+          "delete": "Delete",
+          "open": "Open",
+          "copy": "Copy Link"
+        },
+        "nolinksSearch": "No links found matching your search"
+      },
+      "toast": {
+        "createSuccess": {
+          "title": "Resource created",
+          "description": "Your resource has been successfully created"
+        },
+        "createError": {
+          "title": "Error",
+          "description": "An error occurred while creating your resource"
+        },
+        "deleteSuccess": {
+          "title": "Resource deleted",
+          "description": "Your resource has been successfully deleted"
+        },
+        "deleteError": {
+          "title": "Error",
+          "description": "An error occurred while deleting your resource"
+        },
+        "copySuccess": {
+          "title": "Link copied",
+          "description": "The resource link has been copied to your clipboard"
+        },
+        "copyError": {
+          "title": "Error copying link",
+          "description": "An error occurred while copying the resource link"
+        },
+        "downloadSuccess": {
+          "title": "File downloaded",
+          "description": "The resource file has been downloaded successfully"
+        },
+        "downloadError": {
+          "title": "Error downloading file",
+          "description": "An error occurred while downloading the resource file"
+        },
+        "fileTooLarge": {
+          "title": "File too large",
+          "description": "The file you are trying to upload is too large. Please select a smaller file. Maximum size is 40MB."
+        },
+        "errorReneringFile": {
+          "title": "Error rendering file",
+          "description": "An error occurred while rendering the file. Please try again."
+        }
       }
     }
   }

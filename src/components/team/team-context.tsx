@@ -5,6 +5,7 @@ import { TeamDetails, TeamMember } from "@/types/team";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 import { getSubscription } from "@/lib/api/subscriptions";
+import { getTeamData } from "@/lib/api/teams";
 
 const mockTeamData: TeamDetails = {
   id: "1",
@@ -48,16 +49,21 @@ const mockTeamData: TeamDetails = {
       role: "member",
     },
   ],
+  activity: [],
+  tasks: [],
+  resources: [],
 };
 
 const TeamContext = createContext<{
   team: TeamDetails;
   hasTeamSub: boolean;
   updateTeam: (team: Partial<TeamDetails>) => void;
+  orgId: string;
 }>({
   team: mockTeamData,
   hasTeamSub: false,
   updateTeam: () => {},
+  orgId: "",
 });
 
 export const TeamProvider = ({ children }: { children: React.ReactNode }) => {
@@ -65,27 +71,53 @@ export const TeamProvider = ({ children }: { children: React.ReactNode }) => {
 
   const {
     data: subscription,
-    isLoading,
-    error,
-    refetch,
+    isLoading: subLoading,
+    error: subError,
   } = useQuery({
     queryKey: ["subscription"],
     queryFn: getSubscription,
     refetchOnWindowFocus: true,
   });
 
-  if (error) {
-    console.error("Error fetching subscription:", error);
-  }
-
   const hasTeamSub = subscription?.data?.plan === "team" || false;
+
+  const { data, isPending: orgLoading } = authClient.useActiveOrganization();
+
+  const {
+    data: teamData,
+    isLoading: teamLoading,
+    error: teamError,
+  } = useQuery({
+    queryKey: ["team", `org-${data?.id}`],
+    queryFn: getTeamData,
+    refetchOnWindowFocus: true,
+  });
+
+  if (teamLoading) {
+    return <div>Loading...</div>;
+  }
 
   const updateTeam = (updates: Partial<TeamDetails>) => {
     setTeam((prev) => ({ ...prev, ...updates }));
   };
 
+  if (subLoading || orgLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!teamData) {
+    return <div>Error: {teamError?.message || "Failed to load team data"}</div>;
+  }
+
   return (
-    <TeamContext.Provider value={{ team, hasTeamSub, updateTeam }}>
+    <TeamContext.Provider
+      value={{
+        team: teamData.data,
+        hasTeamSub,
+        updateTeam,
+        orgId: data?.id || "",
+      }}
+    >
       {children}
     </TeamContext.Provider>
   );

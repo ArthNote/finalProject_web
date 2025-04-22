@@ -280,35 +280,29 @@ export async function updateTaskStatus(data: {
 export async function updateTaskKanban(data: {
   id: string;
   status: string;
-  order: number;
+
+  destinationIndex?: number;
 }): Promise<CrudTaskResponse> {
-  const { id, status, order } = data;
+  const { id, status, destinationIndex } = data;
   try {
-    // Ensure order is a valid number that's greater than 0
-    const safeOrder = Math.max(1, Number.isFinite(order) ? order : 1000);
-
-    console.log(
-      `API Call: Updating task ${id} to status ${status} with order ${safeOrder}`
-    );
-
     const response = await fetch(`${consts.backend}/tasks/kanban/${id}`, {
       method: "PUT",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ status: status, order: safeOrder }),
+      body: JSON.stringify({
+        status,
+
+        destinationIndex,
+      }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Server responded with ${response.status}: ${errorText}`);
       throw new Error(`Failed to update task status: ${response.status}`);
     }
 
-    const result = await response.json();
-    console.log("API response:", result);
-    return result;
+    return await response.json();
   } catch (error) {
     console.error("Error updating task status:", error);
     throw error;

@@ -3,6 +3,7 @@ import {
   usernameClient,
   twoFactorClient,
   inferAdditionalFields,
+  organizationClient,
 } from "better-auth/client/plugins";
 import { stripeClient } from "@better-auth/stripe/client";
 
@@ -19,6 +20,11 @@ export const authClient = createAuthClient({
         lang: {
           type: "string",
         },
+      },
+    }),
+    organizationClient({
+      teams: {
+        enabled: true,
       },
     }),
   ],

@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import {
   UserPlus,
   MoreHorizontal,
@@ -34,59 +33,12 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { InviteMemberDialog } from "../invite-member-dialog";
-
-// Mock data for team members
-const initialMembers = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    email: "sarah@example.com",
-    role: "Owner",
-    avatar: "SJ",
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    email: "michael@example.com",
-    role: "Admin",
-    avatar: "MC",
-  },
-  {
-    id: 3,
-    name: "Jessica Williams",
-    email: "jessica@example.com",
-    role: "Admin",
-    avatar: "JW",
-  },
-  {
-    id: 4,
-    name: "David Miller",
-    email: "david@example.com",
-    role: "Member",
-    avatar: "DM",
-  },
-  {
-    id: 5,
-    name: "Emily Davis",
-    email: "emily@example.com",
-    role: "Member",
-    avatar: "ED",
-  },
-  {
-    id: 6,
-    name: "Ryan Wilson",
-    email: "ryan@example.com",
-    role: "Member",
-    avatar: "RW",
-  },
-  {
-    id: 7,
-    name: "Olivia Brown",
-    email: "olivia@example.com",
-    role: "Member",
-    avatar: "OB",
-  },
-];
+import { useTeam } from "../team-context";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslations } from "next-intl";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 const EmptyState = ({
   searchQuery,
@@ -94,38 +46,44 @@ const EmptyState = ({
 }: {
   searchQuery: string;
   setInviteOpen: (open: boolean) => void;
-}) => (
-  <div className="flex flex-col items-center justify-center py-12 text-center">
-    <Users className="h-8 w-8 text-muted-foreground mb-4" />
-    {searchQuery ? (
-      <>
-        <h3 className="text-lg font-semibold">No members found</h3>
-        <p className="text-muted-foreground">
-          No team members match your search query
-        </p>
-      </>
-    ) : (
-      <>
-        <h3 className="text-lg font-semibold">No team members yet</h3>
-        <p className="text-muted-foreground">
-          Start by inviting members to your team
-        </p>
-        <Button onClick={() => setInviteOpen(true)} className="mt-4">
-          <UserPlus className="h-4 w-4 mr-2" />
-          Invite Member
-        </Button>
-      </>
-    )}
-  </div>
-);
+}) => {
+  const t = useTranslations("team.members");
+
+  return (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <Users className="h-8 w-8 text-muted-foreground mb-4" />
+      {searchQuery ? (
+        <>
+          <h3 className="text-lg font-semibold">{t("emptySearch.title")}</h3>
+          <p className="text-muted-foreground">
+            {t("emptySearch.description", {
+              query: searchQuery,
+            })}
+          </p>
+        </>
+      ) : (
+        <>
+          <h3 className="text-lg font-semibold">{t("emptyState.title")}</h3>
+          <p className="text-muted-foreground">{t("emptyState.description")}</p>
+          <Button onClick={() => setInviteOpen(true)} className="mt-4">
+            <UserPlus className="h-4 w-4 mr-2" />
+            {t("emptyState.action")}
+          </Button>
+        </>
+      )}
+    </div>
+  );
+};
 
 const MembersManagement = () => {
-  const [members, setMembers] = useState(initialMembers);
+  const t = useTranslations("team.members");
   const [inviteOpen, setInviteOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { team, orgId } = useTeam();
+  const queryClient = useQueryClient();
 
   // Filter members based on search query
-  const filteredMembers = members.filter(
+  const filteredMembers = team.members.filter(
     (member) =>
       member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -133,36 +91,107 @@ const MembersManagement = () => {
   );
 
   // Mock function to handle member invite
-  const handleInvite = (email: string) => {
-    toast.success(`Invitation sent to ${email}`);
+  const handleInvite = async (email: string) => {
+    await authClient.organization.inviteMember({
+      email: email,
+      role: "member",
+      teamId: team.id,
+      fetchOptions: {
+        onSuccess(context) {
+          toast({
+            title: t("inviteDialog.toast.inviteSuccess.title"),
+            description: t("inviteDialog.toast.inviteSuccess.description", {
+              email: email,
+            }),
+          });
+        },
+        onError(context) {
+          toast({
+            title: t("inviteDialog.toast.inviteError.title"),
+            description: t("inviteDialog.toast.inviteError.description", {
+              email: email,
+            }),
+            variant: "destructive",
+          });
+        },
+      },
+    });
     setInviteOpen(false);
-  };
-
-  // Mock function to change role
-  const handleRoleChange = (memberId: number, newRole: string) => {
-    setMembers(
-      members.map((member) =>
-        member.id === memberId ? { ...member, role: newRole } : member
-      )
-    );
-    toast.success("Member role updated successfully");
-  };
-
-  // Mock function to remove member
-  const handleRemoveMember = (memberId: number) => {
-    setMembers(members.filter((member) => member.id !== memberId));
-    toast.success("Member removed from team");
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case "Owner":
+      case "owner":
         return <ShieldAlert className="h-4 w-4 text-primary" />;
-      case "Admin":
+      case "admin":
         return <ShieldCheck className="h-4 w-4 text-priority-medium" />;
       default:
         return <Shield className="h-4 w-4 text-muted-foreground" />;
     }
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    await authClient.organization.removeMember({
+      memberIdOrEmail: memberId,
+      organizationId: orgId,
+      fetchOptions: {
+        onSuccess(context) {
+          toast({
+            title: t("table.toast.removeSuccess.title"),
+            description: t("table.toast.removeSuccess.description"),
+          });
+
+          queryClient.invalidateQueries({
+            queryKey: ["team", `org-${orgId}`],
+            type: "all",
+          });
+          queryClient.refetchQueries({
+            queryKey: ["team", `org-${orgId}`],
+            type: "all",
+          });
+        },
+        onError(context) {
+          toast({
+            title: t("table.toast.removeError.title"),
+            description: t("table.toast.removeError.description"),
+            variant: "destructive",
+          });
+        },
+      },
+    });
+  };
+
+  // Mock function to handle role change
+  const handleRoleChange = async (memberId: string, newRole: string) => {
+    await authClient.organization.updateMemberRole({
+      memberId: memberId,
+      role: newRole as "member" | "admin",
+      fetchOptions: {
+        onSuccess(context) {
+          toast({
+            title: t("table.toast.roleUpdated.title"),
+            description: t("table.toast.roleUpdated.description", {
+              role: t(`table.roles.${newRole}`),
+            }),
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["team", `org-${orgId}`],
+            type: "all",
+          });
+          queryClient.refetchQueries({
+            queryKey: ["team", `org-${orgId}`],
+            type: "all",
+          });
+        },
+        onError(context) {
+          toast({
+            title: t("table.toast.roleUpdateError.title"),
+            description: t("table.toast.roleUpdateError.description"),
+            variant: "destructive",
+          });
+        },
+      },
+    });
   };
 
   return (
@@ -170,18 +199,16 @@ const MembersManagement = () => {
       <CardHeader className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
           <div>
-            <CardTitle>Team Members</CardTitle>
-            <CardDescription>
-              Manage your team members and their roles
-            </CardDescription>
+            <CardTitle>{t("title")}</CardTitle>
+            <CardDescription>{t("description")}</CardDescription>
           </div>
           <Button onClick={() => setInviteOpen(true)}>
             <UserPlus className="h-4 w-4 mr-2" />
-            Invite Member
+            {t("invite")}
           </Button>
         </div>
         <Input
-          placeholder="Search members..."
+          placeholder={t("searchPlaceholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full sm:max-w-sm"
@@ -192,9 +219,11 @@ const MembersManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Member</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("table.member")}</TableHead>
+                <TableHead>{t("table.role")}</TableHead>
+                <TableHead className="text-right">
+                  {t("table.actions")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -202,9 +231,13 @@ const MembersManagement = () => {
                 <TableRow key={member.id}>
                   <TableCell>
                     <div className="flex items-center space-x-3">
-                      <div className="h-8 w-8 rounded-full bg-muted items-center justify-center text-xs font-medium hidden md:flex">
-                        {member.avatar}
-                      </div>
+                      <Avatar>
+                        <AvatarImage src={member.avatar} />
+                        <AvatarFallback className="hidden md:flex">
+                          {member.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+
                       <div>
                         <p className="font-medium">{member.name}</p>
                         <p className="text-sm text-muted-foreground hidden md:flex">
@@ -216,7 +249,9 @@ const MembersManagement = () => {
                   <TableCell>
                     <div className="flex items-center space-x-1">
                       {getRoleIcon(member.role)}
-                      <span className="hidden md:flex">{member.role}</span>
+                      <span className="hidden md:flex">
+                        {t(`table.roles.${member.role}`)}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
@@ -231,35 +266,37 @@ const MembersManagement = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        {member.role !== "Owner" && (
+                        {member.role !== "owner" && (
                           <>
                             <DropdownMenuItem
                               onClick={() =>
-                                handleRoleChange(member.id, "Admin")
+                                handleRoleChange(member.id, "admin")
                               }
+                              disabled={member.role === "admin"}
                             >
-                              Make Admin
+                              {t("table.makeAdmin")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() =>
-                                handleRoleChange(member.id, "Member")
+                                handleRoleChange(member.id, "member")
                               }
+                              disabled={member.role === "member"}
                             >
-                              Make Member
+                              {t("table.makeMember")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                           </>
                         )}
                         <DropdownMenuItem
                           onClick={() => handleRemoveMember(member.id)}
-                          disabled={member.role === "Owner"}
+                          disabled={member.role === "owner"}
                           className={
-                            member.role === "Owner"
+                            member.role === "owner"
                               ? "cursor-not-allowed opacity-50"
                               : "text-destructive"
                           }
                         >
-                          Remove from Team
+                          {t("table.remove")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

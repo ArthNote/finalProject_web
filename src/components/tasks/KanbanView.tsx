@@ -15,14 +15,20 @@ import { updateTaskScheduled } from "@/lib/taskService";
 import TaskDetailsSheet from "./side_calendar/TaskDetailsSheet";
 import { TaskFilterParams, TaskType } from "@/types/task";
 import TaskViewFilters, { DateRangeType } from "./TaskViewFilters";
-import { DndContext } from "@dnd-kit/core";
+// Remove direct import of keepPreviousData and useQuery
+// import { keepPreviousData, useQuery } from "@tanstack/react-query";
+// Remove direct import of getTasks
+// import { getTasks } from "@/lib/api/tasks";
 import { useLocale, useTranslations } from "next-intl";
 import { ErrorState } from "../error_state";
 import KanbanColumn from "./kanban/KanbanColumn";
 import { Column } from "./kanban/types";
-import { useDragAndDrop } from "./kanban/useDragAndDrop";
+// Import useTasks and related functions from tasks service
 import { useTasks, hasMoreTasks, getNextPage } from "@/lib/services/tasks";
-import KanbanViewLoading from "./kanban/KanbanViewLoading";
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
+import { updateTaskKanban, updateTaskStatus } from "@/lib/api/tasks";
+import { toast } from "@/hooks/use-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const KanbanView = () => {
   const t = useTranslations("tasks.kanbanView");
@@ -118,61 +124,29 @@ const KanbanView = () => {
     pagination.pageSize
   );
 
-  // Update handler for "Load More" buttons to return promises
-  const handleLoadMoreTodo = () => {
-    return new Promise<void>((resolve) => {
-      setPagination((prev) => ({
-        ...prev,
-        todoPage: getNextPage(prev.todoPage),
-      }));
-      setTimeout(resolve, 500); // Add small delay to allow state to update
-    });
-  };
-
-  const handleLoadMoreCompleted = () => {
-    return new Promise<void>((resolve) => {
-      setPagination((prev) => ({
-        ...prev,
-        completedPage: getNextPage(prev.completedPage),
-      }));
-      setTimeout(resolve, 500);
-    });
-  };
-
-  const handleLoadMoreUnscheduled = () => {
-    return new Promise<void>((resolve) => {
-      setPagination((prev) => ({
-        ...prev,
-        unscheduledPage: getNextPage(prev.unscheduledPage),
-      }));
-      setTimeout(resolve, 500);
-    });
-  };
-
-  const handleLoadMoreInprogress = () => {
-    return new Promise<void>((resolve) => {
-      setPagination((prev) => ({
-        ...prev,
-        inprogressPage: getNextPage(prev.inprogressPage),
-      }));
-      setTimeout(resolve, 500);
-    });
-  };
+  // Update handler for "Load More" buttons
+  const handleLoadMoreTodo = () =>
+    setPagination((prev) => ({
+      ...prev,
+      todoPage: getNextPage(prev.todoPage),
+    }));
+  const handleLoadMoreCompleted = () =>
+    setPagination((prev) => ({
+      ...prev,
+      completedPage: getNextPage(prev.completedPage),
+    }));
+  const handleLoadMoreUnscheduled = () =>
+    setPagination((prev) => ({
+      ...prev,
+      unscheduledPage: getNextPage(prev.unscheduledPage),
+    }));
+  const handleLoadMoreInprogress = () =>
+    setPagination((prev) => ({
+      ...prev,
+      inprogressPage: getNextPage(prev.inprogressPage),
+    }));
 
   // Setup drag and drop
-  const {
-    draggingTaskId,
-    dragOverTaskId,
-    dragOverColumnId,
-    dragPosition,
-    handleDragStart,
-    handleDragOver,
-    handleDragLeave,
-    handleDrop,
-    handleDragEnd,
-  } = useDragAndDrop({
-    onDragComplete: () => refetch(),
-  });
 
   const categories = ["all"];
 
@@ -298,6 +272,41 @@ const KanbanView = () => {
     refetch();
   };
 
+  const queryClient = useQueryClient();
+
+  const { mutate: updateMove } = useMutation({
+    mutationFn: updateTaskKanban,
+    onSuccess: () => {
+      // Immediately refetch tasks to update UI without waiting for background invalidation
+      refetch();
+
+      // Also invalidate any related queries
+      queryClient.invalidateQueries({
+        queryKey: ["tasks-by-date"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["tasks"],
+        type: "all",
+      });
+      queryClient.refetchQueries({
+        queryKey: ["tasks"],
+        type: "all",
+      });
+
+      toast({
+        title: t("toast.taskMoved.title"),
+        description: t("toast.taskMoved.description"),
+      });
+    },
+    onError: () => {
+      toast({
+        title: t("toast.moveError.title"),
+        description: t("toast.moveError.description"),
+        variant: "destructive",
+      });
+    },
+  });
+
   const getTasksForColumn = (columnId: string) => {
     // Map our API task lists to the appropriate columns
     if (columnId === "todo") {
@@ -319,7 +328,14 @@ const KanbanView = () => {
     !unscheduledTasks.length &&
     !inprogressTasks.length
   ) {
-    return <KanbanViewLoading />;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex flex-col items-center gap-2">
+          <LoaderCircle className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading tasks...</p>
+        </div>
+      </div>
+    );
   }
 
   if (isError) {
@@ -330,6 +346,94 @@ const KanbanView = () => {
       action: t("errorState.retry"),
     });
   }
+
+  const handleDragEnd = async (result: DropResult) => {
+    const { source, destination, draggableId } = result;
+
+    // Return if dropped outside a droppable area
+    if (!destination) return;
+
+    try {
+      // Get the task that was dragged
+      const allTasks = [
+        ...todoTasks,
+        ...completedTasks,
+        ...unscheduledTasks,
+        ...inprogressTasks,
+      ];
+      const draggedTask = allTasks.find((task) => task.id === draggableId);
+
+      if (!draggedTask) return;
+
+      // Prevent moving unscheduled tasks to other columns
+      if (!draggedTask.scheduled && destination.droppableId !== "unscheduled") {
+        toast({
+          title: t("toast.unscheduledTask.title"),
+          description: t("toast.unscheduledTask.description"),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update task status and order with source and destination indices
+      updateMove({
+        id: draggableId,
+        status: destination.droppableId,
+        // order: destination.index,
+        // sourceIndex: source.index,
+        destinationIndex: destination.index,
+      });
+
+      // Show success toast
+
+      // Refetch to ensure data consistency
+      await refetch();
+    } catch (error) {
+      console.error("Error moving task:", error);
+      toast({
+        title: t("toast.moveError.title"),
+        description: t("toast.moveError.description"),
+        variant: "destructive",
+      });
+      await refetch();
+    }
+  };
+
+  // Add this helper function
+  const reorderRestOfTasks = async (tasks: TaskType[], startOrder: number) => {
+    // Update the order of all subsequent tasks
+    const updatePromises = tasks.map((task, index) => {
+      const newOrder = startOrder + index;
+      return updateTaskKanban({
+        id: task.id,
+        status: task.status || "todo",
+      });
+    });
+
+    await Promise.all(updatePromises);
+  };
+
+  // Add this helper function to calculate the new order
+  const calculateNewOrder = (
+    tasks: TaskType[],
+    startIndex: number,
+    endIndex: number
+  ): number => {
+    // If moving to start of list
+    if (endIndex === 0) {
+      return tasks[0]?.order ? tasks[0].order - 1000 : 1000;
+    }
+
+    // If moving to end of list
+    if (endIndex >= tasks.length - 1) {
+      return (tasks[tasks.length - 1]?.order ?? 0) + 1000;
+    }
+
+    // Moving between two tasks
+    const prevTask = tasks[endIndex - 1];
+    const nextTask = tasks[endIndex];
+    return ((prevTask?.order ?? 0) + (nextTask?.order ?? 0)) / 2;
+  };
 
   return (
     <div className="space-y-6">
@@ -372,7 +476,7 @@ const KanbanView = () => {
           </p>
         </div>
       ) : (
-        <DndContext>
+        <DragDropContext onDragEnd={handleDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-6">
             {columns.map((column) => {
               const tasks = getTasksForColumn(column.id);
@@ -404,23 +508,13 @@ const KanbanView = () => {
                   column={column}
                   tasks={tasks}
                   columns={columns}
-                  dragOverColumnId={dragOverColumnId}
-                  dragOverTaskId={dragOverTaskId}
-                  dragPosition={dragPosition}
-                  draggingTaskId={draggingTaskId}
                   isLoading={isLoading}
                   hasMore={hasMore}
                   onLoadMore={handleLoadMore}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
                   onFilterByColumn={setColumnFilter}
                   onAddTask={handleAddTask}
                   onDeleteColumn={handleDeleteColumn}
                   onTaskClick={setSelectedTask}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                  onTaskDragOver={handleDragOver}
                   onEditTask={handleEditTask}
                   onToggleComplete={handleToggleComplete}
                   onDeleteTask={handleDeleteTask}
@@ -429,7 +523,7 @@ const KanbanView = () => {
               );
             })}
           </div>
-        </DndContext>
+        </DragDropContext>
       )}
 
       <TaskDetailsSheet

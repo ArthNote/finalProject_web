@@ -19,6 +19,8 @@ export interface TaskType {
   order?: number; // Added order field for kanban sorting
   assignedTo?: AssignedUser[]; // Changed to include user details
   projectId?: string;
+  createdAt?: Date;
+  teamId?: string;
   project?: {
     id: string;
     name: string;

@@ -36,6 +36,7 @@ export function createTaskValidators(
     assignedTo: z.array(z.string()).optional().default([]),
     resources: z.array(taskResourceSchema).optional().default([]),
     projectId: z.string().optional(),
+    teamId: z.string().optional(),
     duration: z
       .number()
       .min(5, { message: t("validation.task.durationTooShort") })

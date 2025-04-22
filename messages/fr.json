@@ -1556,6 +1556,7 @@
       "loading": "Chargement...",
       "loadMore": "Charger plus de tâches",
       "card": {
+        "unscheduleTask": "Annuler la planification",
         "viewDetails": "Voir les détails",
         "moveTo": "Déplacer vers...",
         "markInComplete": "Marquer comme non terminée",
@@ -1595,6 +1596,20 @@
             "title": "Tâche non planifiée",
             "description": "Planifiez la tâche pour changer son statut."
           }
+        }
+      },
+      "toast": {
+        "unscheduledTask": {
+          "title": "Tâche non planifiée",
+          "description": "Planifiez la tâche pour changer son statut."
+        },
+        "taskMoved": {
+          "title": "Tâche déplacée",
+          "description": "Votre tâche a été déplacée avec succès vers la nouvelle colonne"
+        },
+        "moveError": {
+          "title": "Erreur de déplacement",
+          "description": "Une erreur s'est produite lors du déplacement de votre tâche vers la nouvelle colonne"
         }
       }
     },
@@ -1669,6 +1684,7 @@
     "title": "Amis & Réseau",
     "addFriend": "Ajouter un ami",
     "addDialog": {
+      "add": "Ajouter",
       "title": "Ajouter un ami",
       "description": "Trouvez et ajoutez de nouveaux amis à votre réseau",
       "searchPlaceholder": "Rechercher par nom d'utilisateur, nom ou email...",
@@ -2027,6 +2043,268 @@
         "createTask": "Créer une tâche",
         "textareaPlaceholder": "Exemple : Planifier une réunion d'équipe d'une heure demain après-midi",
         "cancel": "Annuler"
+      }
+    }
+  },
+  "team": {
+    "overview": {
+      "stats": {
+        "activeMembers": "Membres actifs",
+        "totalActiveMembers": "Nombre total de membres d'équipe actifs",
+        "tasksInProgress": "Tâches en cours",
+        "tasksBeingWorkedOn": "Tâches actuellement en cours de traitement",
+        "completionRate": "Taux de complétion",
+        "tasksCompletedThisMonth": "Tâches terminées ce mois-ci",
+        "resources": "Ressources",
+        "totalResources": "Total des ressources partagées"
+      },
+      "noTeamPlan": {
+        "title": "Bienvenue dans les équipes",
+        "description": "Passez à un forfait équipe pour débloquer les fonctionnalités de collaboration",
+        "action": "Passer au forfait équipe"
+      },
+      "tabs": {
+        "overview": "Vue d'ensemble",
+        "tasks": "Tâches",
+        "members": "Membres",
+        "resources": "Ressources",
+        "settings": "Paramètres",
+        "friends": "Amis"
+      },
+      "overview": {
+        "currentPlan": "Forfait actuel",
+        "trial": "Essai",
+        "active": "Actif",
+        "cancelled": "Annulé",
+        "teamSeats": "Places d'équipe",
+        "seatUsage": "{count} sur {total} utilisées",
+        "storage": "Stockage",
+        "storageUsage": "{count} sur {total} utilisés",
+        "renewsOn": "Se renouvelle le {date}"
+      },
+      "activity": {
+        "title": "Activité récente",
+        "description": "Dernières mises à jour et changements dans votre équipe",
+        "viewAll": "Voir toute l'activité",
+        "action": {
+          "created": "a créé",
+          "updated": "a mis à jour",
+          "deleted": "a supprimé"
+        },
+        "type": {
+          "task": "Tâche",
+          "team": "Équipe",
+          "resource": "Ressource",
+          "member": "Membre"
+        }
+      }
+    },
+    "members": {
+      "inviteDialog": {
+        "title": "Inviter des membres d'équipe",
+        "description": "Invitez les membres de votre équipe à collaborer sur les tâches et projets",
+        "searchPlaceholder": "Rechercher par nom d'utilisateur, nom ou email...",
+        "searching": "Recherche en cours...",
+        "invite": "Inviter",
+        "noUsersFound": "Aucun utilisateur trouvé",
+        "searchUsers": "Recherchez des utilisateurs à inviter",
+        "toast": {
+          "errorSearch": {
+            "title": "Erreur de recherche",
+            "description": "Une erreur s'est produite lors de la recherche d'utilisateurs"
+          },
+          "inviteSuccess": {
+            "title": "Invitation envoyée",
+            "description": "Votre invitation a été envoyée avec succès à {email}"
+          },
+          "inviteError": {
+            "title": "Erreur d'envoi de l'invitation",
+            "description": "Une erreur s'est produite lors de l'envoi de l'invitation à {email}"
+          }
+        }
+      },
+      "title": "Membres de l'équipe",
+      "description": "Gérez les membres de votre équipe et leurs rôles",
+      "invite": "Inviter des membres",
+      "searchPlaceholder": "Rechercher des membres...",
+      "table": {
+        "member": "Membre",
+        "role": "Rôle",
+        "actions": "Actions",
+        "roles": {
+          "admin": "Administrateur",
+          "member": "Membre",
+          "owner": "Propriétaire"
+        },
+        "makeAdmin": "Promouvoir administrateur",
+        "makeMember": "Définir comme membre",
+        "remove": "Retirer le membre",
+        "toast": {
+          "removeSuccess": {
+            "title": "Membre retiré",
+            "description": "Le membre a été retiré de l'équipe avec succès"
+          },
+          "removeError": {
+            "title": "Erreur de suppression",
+            "description": "Une erreur s'est produite lors du retrait du membre de l'équipe"
+          },
+          "roleUpdated": {
+            "title": "Rôle mis à jour",
+            "description": "Le rôle du membre a été mis à jour avec succès"
+          },
+          "roleUpdateError": {
+            "title": "Erreur de mise à jour",
+            "description": "Une erreur s'est produite lors de la mise à jour du rôle du membre"
+          }
+        }
+      },
+      "emptyState": {
+        "title": "Aucun membre d'équipe",
+        "description": "Vous n'avez pas encore de membres d'équipe. Invitez-en pour commencer.",
+        "action": "Inviter des membres"
+      },
+      "emptySearch": {
+        "title": "Aucune correspondance trouvée",
+        "description": "Aucun membre d'équipe ne correspond à votre recherche {query}"
+      }
+    },
+    "tasks": {
+      "title": "Tâches d'équipe",
+      "description": "{count} tâches actives",
+      "newTask": "Nouvelle tâche",
+      "createWithAI": "Créer avec l'IA",
+      "createManually": "Créer manuellement",
+      "table": {
+        "task": "Tâche",
+        "assignee": "Responsable",
+        "unassigned": "Non assigné",
+        "priority": {
+          "label": "Priorité",
+          "high": "Élevée",
+          "medium": "Moyenne",
+          "low": "Faible"
+        },
+        "status": {
+          "label": "Statut",
+          "todo": "À faire",
+          "inprogress": "En cours",
+          "unscheduled": "Non planifiée",
+          "completed": "Terminée"
+        },
+        "dueDate": "Date d'échéance",
+        "noDateSet": "Aucune date définie",
+        "editTask": "Modifier la tâche",
+        "viewTask": "Voir la tâche",
+        "changeStatus": "Changer le statut",
+        "assignees": "Responsables",
+        "currentAssignees": "Responsables actuels {count}",
+        "removeAll": "Tout supprimer",
+        "noAssignees": "Aucun responsable",
+        "addAssignee": "Ajouter un responsable",
+        "setPriority": {
+          "label": "Définir la priorité",
+          "high": "Priorité élevée",
+          "medium": "Priorité moyenne",
+          "low": "Priorité faible"
+        },
+        "deleteTask": "Supprimer la tâche"
+      },
+      "toast": {
+        "updateSuccess": {
+          "title": "Tâche mise à jour",
+          "description": "Votre tâche a été mise à jour avec succès"
+        },
+        "updateError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la mise à jour de votre tâche"
+        }
+      }
+    },
+    "resources": {
+      "title": "Ressources partagées",
+      "description": "Gérez vos ressources partagées",
+      "addLink": {
+        "addLink": "Ajouter un lien",
+        "title": "Ajouter un lien de ressource",
+        "titleLabel": "Titre de la ressource",
+        "urlLabel": "URL de la ressource",
+        "urlPlaceholder": "https://exemple.com",
+        "titlePlaceholder": "Entrez le titre de la ressource",
+        "cancel": "Annuler",
+        "add": "Ajouter"
+      },
+      "uploadFile": "Téléverser un fichier",
+      "searchPlaceholder": "Rechercher des ressources...",
+      "tabs": {
+        "links": "Liens",
+        "files": "Fichiers"
+      },
+      "files": {
+        "name": "Nom",
+        "size": "Taille",
+        "uploadedBy": "Téléversé par",
+        "uploadedOn": "Téléversé le",
+        "actions": {
+          "label": "Actions",
+          "download": "Télécharger",
+          "delete": "Supprimer"
+        },
+        "nofilesSearch": "Aucun fichier ne correspond à votre recherche"
+      },
+      "links": {
+        "title": "Titre",
+        "url": "URL",
+        "uploadedBy": "Ajouté par",
+        "uploadedOn": "Ajouté le",
+        "actions": {
+          "label": "Actions",
+          "delete": "Supprimer",
+          "open": "Ouvrir",
+          "copy": "Copier le lien"
+        },
+        "nolinksSearch": "Aucun lien ne correspond à votre recherche"
+      },
+      "toast": {
+        "createSuccess": {
+          "title": "Ressource créée",
+          "description": "Votre ressource a été créée avec succès"
+        },
+        "createError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la création de votre ressource"
+        },
+        "deleteSuccess": {
+          "title": "Ressource supprimée",
+          "description": "Votre ressource a été supprimée avec succès"
+        },
+        "deleteError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la suppression de votre ressource"
+        },
+        "copySuccess": {
+          "title": "Lien copié",
+          "description": "Le lien de la ressource a été copié dans votre presse-papiers"
+        },
+        "copyError": {
+          "title": "Erreur de copie du lien",
+          "description": "Une erreur s'est produite lors de la copie du lien de la ressource"
+        },
+        "downloadSuccess": {
+          "title": "Fichier téléchargé",
+          "description": "Le fichier de ressource a été téléchargé avec succès"
+        },
+        "downloadError": {
+          "title": "Erreur de téléchargement",
+          "description": "Une erreur s'est produite lors du téléchargement du fichier de ressource"
+        },
+        "fileTooLarge": {
+          "title": "Fichier trop volumineux",
+          "description": "Le fichier que vous essayez de téléverser est trop volumineux. Veuillez sélectionner un fichier plus petit. La taille maximale est de 40 Mo."
+        },
+        "errorReneringFile": {
+          "title": "Erreur d'affichage du fichier",
+          "description": "Une erreur s'est produite lors de l'affichage du fichier. Veuillez réessayer."
+        }
       }
     }
   }

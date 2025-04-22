@@ -76,6 +76,13 @@ const TaskDetailsSheet: React.FC<TaskDetailsSheetProps> = ({
           queryKey: ["project", task?.projectId],
           type: "all",
         }),
+        queryClient.invalidateQueries({
+          queryKey: ["team"],
+          type: "all",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["tasks-by-date"],
+        }),
       ]).then(() => {
         setTimeout(() => onOpenChange(false), 100);
       });

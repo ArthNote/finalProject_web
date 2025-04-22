@@ -159,6 +159,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
         parentId: task.parentId || null, // Explicitly set null when parentId is falsy
         duration: task.duration || null, // Use null instead of 0
         projectId: task.projectId || null || undefined,
+        teamId: task.teamId || undefined,
       });
     }
   }, [task, open, form]);
@@ -351,9 +352,16 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
           queryKey: ["project", task.projectId],
           type: "all",
         }),
+        queryClient.invalidateQueries({
+          queryKey: ["tasks-by-date"],
+        }),
         queryClient.refetchQueries({
           queryKey: ["calendar-tasks"],
           type: "active",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["team"],
+          type: "all",
         }),
       ]).then(() => {
         setTimeout(() => onOpenChange(false), 100);
@@ -404,6 +412,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
         order: 0,
         status: values.scheduled ? "todo" : "unscheduled",
         id: task.id,
+        teamId: task.teamId,
       },
     });
   };

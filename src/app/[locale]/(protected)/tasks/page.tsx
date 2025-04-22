@@ -10,6 +10,7 @@ import GridView from "@/components/tasks/GridView";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import TimelineCalendar from "@/components/tasks/side_calendar/TimelineCalendar";
 import { delay } from "@/lib/utils";
+import Kan from "./kanban";
 
 const Page = () => {
   const { viewMode } = useCalendarStore();

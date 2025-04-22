@@ -77,6 +77,8 @@ interface CreateTaskSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   projectId?: string;
+  teamId?: string;
+  orgId?: string;
 }
 
 type TeamMember = {
@@ -94,8 +96,10 @@ type Project = {
 
 const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   open,
+  teamId,
   onOpenChange,
   projectId,
+  orgId,
 }) => {
   const locale = useLocale() as "en" | "fr";
   const t = useTranslations("tasks.toolbar.create.manual");
@@ -138,6 +142,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
       assignedTo: [],
       resources: [],
       parentId: undefined,
+      teamId: teamId || undefined, // Explicitly set the teamId from props
       projectId: projectId || undefined, // Explicitly set the projectId from props
     },
   }); // Fetch projects data with a single query
@@ -275,6 +280,13 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
           queryKey: ["project", projectId],
           type: "all",
         }),
+        queryClient.invalidateQueries({
+          queryKey: ["tasks-by-date"],
+        }),
+        queryClient.refetchQueries({
+          queryKey: ["team"],
+          type: "all",
+        }),
       ]).then(() => {
         setTimeout(() => onOpenChange(false), 100);
       });
@@ -299,7 +311,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
         duration: values.duration || 0,
         endTime: values.endTime || null,
         parentId: values.parentId || null,
-
+        teamId: teamId || undefined,
         priority: values.priority,
         // Ensure each resource has a defined id
         resources: values.resources.map((resource) => ({

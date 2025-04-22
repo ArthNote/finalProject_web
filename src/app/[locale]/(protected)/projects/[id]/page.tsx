@@ -347,12 +347,13 @@ export default function ProjectDetailsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit}>
-                {t("table.editTask")}
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleViewDetails}>
                 {t("table.viewTaskDetails")}
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleEdit}>
+                {t("table.editTask")}
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>

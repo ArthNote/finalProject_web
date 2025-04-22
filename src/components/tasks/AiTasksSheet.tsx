@@ -67,6 +67,8 @@ interface AiTasksSheetProps {
   onOpenChange: (open: boolean) => void;
   aiTaskInput: string;
   projectId?: string;
+  teamId?: string;
+  orgId?: string;
 }
 
 const AiTasksSheet = ({
@@ -74,6 +76,8 @@ const AiTasksSheet = ({
   onOpenChange,
   aiTaskInput,
   projectId,
+  teamId,
+  orgId,
 }: AiTasksSheetProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -94,6 +98,7 @@ const AiTasksSheet = ({
         ...task,
         id: `temp-${Math.random().toString(36).substring(2, 9)}`, // Generate a unique temporary ID
         projectId: projectId || undefined,
+        teamId: teamId || undefined,
       }));
       setGeneratedTasks(tasksWithIds);
       setIsRegenerating(false);
@@ -120,6 +125,10 @@ const AiTasksSheet = ({
         queryClient.refetchQueries({ queryKey: ["tasks"], type: "all" }),
         queryClient.refetchQueries({
           queryKey: ["project", projectId],
+          type: "all",
+        }),
+        queryClient.refetchQueries({
+          queryKey: ["team"],
           type: "all",
         }),
       ]).then(() => {

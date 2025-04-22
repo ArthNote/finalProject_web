@@ -27,6 +27,9 @@ import {
   CheckCircle2,
   XCircle,
   X,
+  BrainCircuit,
+  Keyboard,
+  Eye,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -39,7 +42,17 @@ import {
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { DataTable } from "@/components/ui/data-table";
-import { toast } from "sonner";
+
+import { useTeam } from "../team-context";
+import AiTasksSheet from "@/components/tasks/AiTasksSheet";
+import CreateTaskSheet from "@/components/tasks/CreateTaskSheet";
+import React from "react";
+import { useTranslations } from "next-intl";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateTaskPriority, updateTaskStatus } from "@/lib/api/tasks";
+import { toast } from "@/hooks/use-toast";
+import EditTaskSheet from "@/components/tasks/EditTaskSheet";
+import TaskDetailsSheet from "@/components/tasks/side_calendar/TaskDetailsSheet";
 
 const initialMembers = [
   { id: 1, name: "John Doe", avatar: "JD" },
@@ -49,213 +62,6 @@ const initialMembers = [
   { id: 5, name: "Alex Chen", avatar: "AC" },
 ];
 
-const mockTasks: TaskType[] = [
-  {
-    id: "1",
-    title: "Update documentation",
-    description: "Update the API documentation with new endpoints",
-    priority: "high",
-    category: "Documentation",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 120,
-    status: "In Progress",
-    assignedTo: [{ id: "1", name: "John Doe" }],
-  },
-  {
-    id: "2",
-    title: "Fix navigation bug",
-    description: "Investigate and fix the navigation issues",
-    priority: "medium",
-    category: "Development",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 180,
-    status: "Todo",
-    assignedTo: [{ id: "2", name: "Jane Smith" }],
-  },
-  {
-    id: "3",
-    title: "Implement user authentication",
-    description: "Add OAuth2 authentication flow",
-    priority: "high",
-    category: "Security",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 240,
-    status: "Todo",
-    assignedTo: [{ id: "3", name: "Mike Johnson" }],
-  },
-  {
-    id: "4",
-    title: "Optimize database queries",
-    description: "Improve performance of main dashboard queries",
-    priority: "medium",
-    category: "Backend",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 160,
-    status: "In Progress",
-    assignedTo: [{ id: "4", name: "Sarah Wilson" }],
-  },
-  {
-    id: "5",
-    title: "Design system updates",
-    description: "Update component library with new design tokens",
-    priority: "low",
-    category: "Design",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 90,
-    status: "Review",
-    assignedTo: [{ id: "5", name: "Alex Chen" }],
-  },
-  {
-    id: "6",
-    title: "Mobile responsiveness",
-    description: "Fix responsive layout issues on mobile devices",
-    priority: "high",
-    category: "Frontend",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 150,
-    status: "Todo",
-    assignedTo: [{ id: "6", name: "Emily Brown" }],
-  },
-  {
-    id: "7",
-    title: "Unit test coverage",
-    description: "Increase test coverage to 80%",
-    priority: "medium",
-    category: "Testing",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 200,
-    status: "In Progress",
-    assignedTo: [{ id: "7", name: "David Lee" }],
-  },
-  {
-    id: "8",
-    title: "API versioning",
-    description: "Implement API versioning system",
-    priority: "medium",
-    category: "Backend",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 180,
-    status: "Todo",
-    assignedTo: [{ id: "8", name: "Lisa Wang" }],
-  },
-  {
-    id: "9",
-    title: "Performance monitoring",
-    description: "Set up application performance monitoring",
-    priority: "low",
-    category: "DevOps",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 140,
-    status: "Review",
-    assignedTo: [{ id: "9", name: "Tom Anderson" }],
-  },
-  {
-    id: "10",
-    title: "Security audit",
-    description: "Conduct security vulnerability assessment",
-    priority: "high",
-    category: "Security",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 300,
-    status: "Todo",
-    assignedTo: [{ id: "10", name: "Rachel Kim" }],
-  },
-  {
-    id: "11",
-    title: "Code refactoring",
-    description: "Refactor legacy code modules",
-    priority: "medium",
-    category: "Development",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 240,
-    status: "In Progress",
-    assignedTo: [{ id: "11", name: "Chris Martin" }],
-  },
-  {
-    id: "12",
-    title: "User feedback integration",
-    description: "Implement user feedback collection system",
-    priority: "low",
-    category: "Frontend",
-    completed: false,
-    scheduled: true,
-    date: new Date(),
-    parentId: null,
-    resources: [],
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 160,
-    status: "Todo",
-    assignedTo: [{ id: "12", name: "Anna White" }],
-  },
-];
-
 // Add a function to check if a user is assigned
 const isUserAssigned = (task: TaskType, userId: number) => {
   return task.assignedTo?.some((user) => user.id === userId.toString());
@@ -263,7 +69,7 @@ const isUserAssigned = (task: TaskType, userId: number) => {
 
 const TaskStatusOptions = [
   { label: "Todo", value: "todo", icon: Circle },
-  { label: "In Progress", value: "in-progress", icon: Check },
+  { label: "In Progress", value: "inprogress", icon: Check },
   { label: "Completed", value: "completed", icon: CheckCircle2 },
 ];
 
@@ -272,270 +78,445 @@ interface TeamTasksProps {
   compact?: boolean;
 }
 
-const columns: ColumnDef<TaskType>[] = [
-  {
-    accessorKey: "title",
-    header: "Task",
-    cell: ({ row }) => (
-      <div className="space-y-1">
-        <p className="font-medium">{row.original.title}</p>
-        <p className="text-sm text-muted-foreground line-clamp-1 hidden md:block">
-          {row.original.description}
-        </p>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "assignedTo",
-    header: "Assignee",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <User className="h-4 w-4 text-muted-foreground hidden md:block" />
-        {row.original.assignedTo?.[0]?.name || "Unassigned"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "priority",
-    header: "Priority",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Circle
-          className={`h-3 w-3 ${
-            row.original.priority === "high"
-              ? "text-red-500"
-              : row.original.priority === "medium"
-              ? "text-yellow-500"
-              : "text-green-500"
-          }`}
-        />
-        <span className="capitalize">{row.original.priority}</span>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => <Badge variant="secondary">{row.original.status}</Badge>,
-  },
-  {
-    accessorKey: "date",
-    header: "Due Date",
-    cell: ({ row }) =>
-      row.original.date ? (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Calendar className="h-4 w-4" />
-          {new Date(row.original.date).toLocaleDateString()}
+const TeamTasks = ({ limit, compact = false }: TeamTasksProps) => {
+  const t = useTranslations("team.tasks");
+  const { team, orgId } = useTeam();
+  const tasks = limit ? team.tasks.slice(0, limit) : team.tasks;
+  const [isAiTasksSheetOpen, setIsAiTasksSheetOpen] = React.useState(false);
+  const [isCreateTaskSheetOpen, setIsCreateTaskSheetOpen] =
+    React.useState(false);
+  const [aiTaskInput, setAiTaskInput] = React.useState("");
+  const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+  const [taskToEdit, setTaskToEdit] = React.useState<TaskType | null>(null);
+  const [isEditTaskSheetOpen, setIsEditTaskSheetOpen] = React.useState(false);
+  const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
+
+  const queryClient = useQueryClient();
+
+  const { mutate: updatePriority } = useMutation({
+    mutationFn: updateTaskPriority,
+    onSuccess: () => {
+      Promise.all([
+        queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.refetchQueries({ queryKey: ["team"], type: "all" }),
+      ]);
+      toast({
+        title: t("toast.updateSuccess.title"),
+        description: t("toast.updateSuccess.description"),
+      });
+    },
+    onError: () => {
+      toast({
+        title: t("toast.updateError.title"),
+        description: t("toast.updateError.description"),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const { mutate: updateStatus } = useMutation({
+    mutationFn: async (params: { id: string; status: string }) => {
+      const result = await updateTaskStatus(params);
+      return result;
+    },
+    onSuccess: () => {
+      Promise.all([
+        queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.refetchQueries({ queryKey: ["team"], type: "all" }),
+      ]);
+      toast({
+        title: t("toast.updateSuccess.title"),
+        description: t("toast.updateSuccess.description"),
+      });
+    },
+    onError: () => {
+      toast({
+        title: t("toast.updateError.title"),
+        description: t("toast.updateError.description"),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const columns: ColumnDef<TaskType>[] = [
+    {
+      accessorKey: "title",
+      header: t("table.task"),
+      cell: ({ row }) => (
+        <div className="space-y-1">
+          <p className="font-medium">{row.original.title}</p>
+          <p className="text-sm text-muted-foreground line-clamp-1 hidden md:block">
+            {row.original.description}
+          </p>
         </div>
-      ) : (
-        <span className="text-sm text-muted-foreground">No date set</span>
       ),
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const task = row.original;
-
-      const handleStatusChange = (status: string) => {
-        toast.success(`Task "${task.title}" status updated to ${status}`);
-      };
-
-      const handleAssign = (userId: string) => {
-        // Add user to assignees if not already assigned
-        if (!isUserAssigned(task, Number(userId))) {
-          toast.success(`User assigned to task "${task.title}"`);
-        }
-      };
-
-      const handleUnassign = (userId: string) => {
-        toast.success(`User unassigned from task "${task.title}"`);
-      };
-
-      const handleClearAssignees = () => {
-        toast.success(`All assignees removed from task "${task.title}"`);
-      };
-
-      const handlePriorityChange = (priority: "high" | "medium" | "low") => {
-        toast.success(`Task priority changed to ${priority}`);
-      };
-
-      const handleEdit = () => {
-        toast.success("Opening task edit modal");
-      };
-
-      const handleDelete = () => {
-        toast.error("Task deleted");
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem onClick={handleEdit}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Task
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
-
-            {/* Status Submenu */}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Check className="mr-2 h-4 w-4" />
-                Change Status
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="w-48">
-                {TaskStatusOptions.map((status) => (
-                  <DropdownMenuItem
-                    key={status.value}
-                    onClick={() => handleStatusChange(status.value)}
-                  >
-                    <status.icon className="mr-2 h-4 w-4" />
-                    {status.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-
-            {/* Updated Assignment Submenu */}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <User2 className="mr-2 h-4 w-4" />
-                Assignees
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="w-56">
-                <div className="px-2 py-1.5">
-                  <p className="text-xs font-medium text-muted-foreground mb-2">
-                    Current Assignees ({task.assignedTo?.length || 0})
-                  </p>
+    },
+    {
+      accessorKey: "assignedTo",
+      header: t("table.assignee"),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          {row.original.assignedTo && row.original.assignedTo.length > 0 ? (
+            <div className="flex -space-x-2">
+              {row.original.assignedTo.map((user, index) => (
+                <div
+                  key={user.id}
+                  className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs border-2 border-background"
+                  title={user.name}
+                >
+                  {user.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </div>
-                <DropdownMenuSeparator />
-                {task.assignedTo && task.assignedTo.length > 0 ? (
-                  <>
-                    {task.assignedTo.map((assignee) => (
-                      <DropdownMenuItem
-                        key={assignee.id}
-                        onClick={() => handleUnassign(assignee.id)}
-                      >
-                        <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center">
-                            <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs mr-2">
-                              {assignee.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
+              ))}
+            </div>
+          ) : (
+            <>
+              <User className="h-4 w-4 text-muted-foreground hidden md:block" />
+              {t("table.unassigned")}
+            </>
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "priority",
+      header: t("table.priority.label"),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Circle
+            className={`h-3 w-3 ${
+              row.original.priority === "high"
+                ? "text-red-500"
+                : row.original.priority === "medium"
+                ? "text-yellow-500"
+                : "text-green-500"
+            }`}
+          />
+          <span className="capitalize">
+            {t(`table.priority.${row.original.priority}`)}
+          </span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: t("table.status.label"),
+      cell: ({ row }) => (
+        <Badge variant="secondary">
+          {t(`table.status.${row.original.status}`)}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "date",
+      header: t("table.dueDate"),
+      cell: ({ row }) =>
+        row.original.date ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+            {new Date(row.original.date).toLocaleDateString()}
+          </div>
+        ) : (
+          <span className="text-sm text-muted-foreground">
+            {t("table.noDateSet")}
+          </span>
+        ),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const task = row.original;
+
+        const handleStatusChange = (status: string) => {
+          if (task.scheduled) {
+            updateStatus({
+              id: task.id,
+              status: status,
+            });
+          } else {
+            console.error("Task is not scheduled yet");
+          }
+        };
+
+        const handlePriorityChange = (priority: string) => {
+          updatePriority({
+            id: task.id,
+            priority: priority,
+          });
+        };
+
+        const handleEdit = () => {
+          setTaskToEdit(task);
+          setIsEditTaskSheetOpen(true);
+        };
+
+        const handleViewDetails = () => {
+          setSelectedTask(task);
+          setDetailsSheetOpen(true);
+        };
+
+        const handleDelete = () => {
+          setSelectedTask(task);
+          setDetailsSheetOpen(true);
+        };
+
+        const isDisabled = (status: string) => {
+          if (status === "unscheduled" && !task.scheduled) {
+            return true;
+          } else if (
+            status === "todo" &&
+            (!task.scheduled || (task.status === "todo" && !task.completed))
+          ) {
+            return true;
+          } else if (
+            status === "inprogress" &&
+            (!task.scheduled ||
+              (task.status === "inprogress" && !task.completed))
+          ) {
+            return true;
+          } else if (
+            status === "completed" &&
+            (!task.scheduled || task.completed)
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        };
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={handleViewDetails}>
+                <Eye className="mr-2 h-4 w-4" />
+                {t("table.viewTask")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleEdit}>
+                <Edit className="mr-2 h-4 w-4" />
+                {t("table.editTask")}
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* Status Submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Check className="mr-2 h-4 w-4" />
+                  {t("table.changeStatus")}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-48">
+                  {TaskStatusOptions.map((status) => (
+                    <DropdownMenuItem
+                      key={status.value}
+                      onClick={() => handleStatusChange(status.value)}
+                      disabled={isDisabled(status.value)}
+                    >
+                      <status.icon className="mr-2 h-4 w-4" />
+                      {t(`table.status.${status.value}`)}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* Updated Assignment Submenu */}
+              {/* <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <User2 className="mr-2 h-4 w-4" />
+                  {t("table.assignees")}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-56">
+                  <div className="px-2 py-1.5">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">
+                      {t("table.currentAssignees", {
+                        count: task.assignedTo?.length || 0,
+                      })}
+                    </p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  {task.assignedTo && task.assignedTo.length > 0 ? (
+                    <>
+                      {task.assignedTo.map((assignee) => (
+                        <DropdownMenuItem
+                          key={assignee.id}
+                          onClick={() => handleUnassign(assignee.id)}
+                        >
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center">
+                              <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs mr-2">
+                                {assignee.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </div>
+                              <span>{assignee.name}</span>
                             </div>
-                            <span>{assignee.name}</span>
+                            <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
                           </div>
-                          <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                        </DropdownMenuItem>
+                      ))}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={handleClearAssignees}
+                        className="text-destructive"
+                      >
+                        <Trash className="mr-2 h-4 w-4" />
+                        {t("table.removeAll")}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  ) : (
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                      {t("table.noAssignees")}
+                    </div>
+                  )}
+                  <div className="px-2 py-1.5">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">
+                      {t("table.addAssignee")}
+                    </p>
+                  </div>
+                  {initialMembers
+                    .filter((member) => !isUserAssigned(task, member.id))
+                    .map((member) => (
+                      <DropdownMenuItem
+                        key={member.id}
+                        onClick={() => handleAssign(member.id.toString())}
+                      >
+                        <div className="flex items-center">
+                          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs mr-2">
+                            {member.avatar}
+                          </div>
+                          {member.name}
                         </div>
                       </DropdownMenuItem>
                     ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={handleClearAssignees}
-                      className="text-destructive"
-                    >
-                      <Trash className="mr-2 h-4 w-4" />
-                      Remove All
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                ) : (
-                  <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                    No assignees
-                  </div>
-                )}
-                <div className="px-2 py-1.5">
-                  <p className="text-xs font-medium text-muted-foreground mb-2">
-                    Add Assignee
-                  </p>
-                </div>
-                {initialMembers
-                  .filter((member) => !isUserAssigned(task, member.id))
-                  .map((member) => (
-                    <DropdownMenuItem
-                      key={member.id}
-                      onClick={() => handleAssign(member.id.toString())}
-                    >
-                      <div className="flex items-center">
-                        <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs mr-2">
-                          {member.avatar}
-                        </div>
-                        {member.name}
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub> */}
 
-            {/* Priority Submenu */}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Tag className="mr-2 h-4 w-4" />
-                Set Priority
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="w-48">
-                <DropdownMenuItem onClick={() => handlePriorityChange("high")}>
-                  <Circle className="mr-2 h-4 w-4 text-red-500" />
-                  High Priority
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handlePriorityChange("medium")}
-                >
-                  <Circle className="mr-2 h-4 w-4 text-yellow-500" />
-                  Medium Priority
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePriorityChange("low")}>
-                  <Circle className="mr-2 h-4 w-4 text-green-500" />
-                  Low Priority
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
+              {/* Priority Submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Tag className="mr-2 h-4 w-4" />
+                  {t("table.setPriority.label")}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-48">
+                  <DropdownMenuItem
+                    onClick={() => handlePriorityChange("high")}
+                    disabled={task.priority === "high"}
+                  >
+                    <Circle className="mr-2 h-4 w-4 text-red-500" />
+                    {t("table.setPriority.high")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handlePriorityChange("medium")}
+                    disabled={task.priority === "medium"}
+                  >
+                    <Circle className="mr-2 h-4 w-4 text-yellow-500" />
+                    {t("table.setPriority.medium")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handlePriorityChange("low")}
+                    disabled={task.priority === "low"}
+                  >
+                    <Circle className="mr-2 h-4 w-4 text-green-500" />
+                    {t("table.setPriority.low")}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
 
-            <DropdownMenuSeparator />
+              <DropdownMenuSeparator />
 
-            <DropdownMenuItem
-              className="text-destructive"
-              onClick={handleDelete}
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              Delete Task
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+              <DropdownMenuItem
+                className="text-destructive"
+                onClick={handleDelete}
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                {t("table.deleteTask")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
-  },
-];
-
-const TeamTasks = ({ limit, compact = false }: TeamTasksProps) => {
-  const tasks = limit ? mockTasks.slice(0, limit) : mockTasks;
-
+  ];
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-          <div>
-            <CardTitle>Team Tasks</CardTitle>
-            <CardDescription>{mockTasks.length} active tasks</CardDescription>
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+            <div>
+              <CardTitle>{t("title")}</CardTitle>
+              <CardDescription>
+                {t("description", { count: tasks.length })}
+              </CardDescription>
+            </div>
+            {!compact && (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button className="flex items-center">
+                    <Plus className="h-4 w-4 mr-2" />
+                    <span>{t("newTask")}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem onClick={() => setIsAiTasksSheetOpen(true)}>
+                    <BrainCircuit className="mr-2 h-4 w-4" />
+                    {t("createWithAI")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setIsCreateTaskSheetOpen(true)}
+                  >
+                    <Keyboard className="mr-2 h-4 w-4" />
+                    {t("createManually")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
-          {!compact && (
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Task
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <DataTable columns={columns} data={tasks} searchKey="title" />
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent>
+          <DataTable columns={columns} data={tasks} searchKey="title" />
+        </CardContent>
+      </Card>
+      {/* AI Tasks Sheet */}
+      <AiTasksSheet
+        open={isAiTasksSheetOpen}
+        onOpenChange={(open) => {
+          setIsAiTasksSheetOpen(open);
+          if (!open) {
+            setAiTaskInput("");
+          }
+        }}
+        aiTaskInput={aiTaskInput}
+        teamId={team.id}
+        orgId={orgId}
+      />
+      {/* Create Task Sheet */}
+      <CreateTaskSheet
+        open={isCreateTaskSheetOpen}
+        onOpenChange={setIsCreateTaskSheetOpen}
+        teamId={team.id}
+        orgId={orgId}
+      />
+      <EditTaskSheet
+        open={isEditTaskSheetOpen}
+        onOpenChange={setIsEditTaskSheetOpen}
+        task={taskToEdit}
+      />
+      {/* TODO: make the logic for taskcomplete and task scheduled */}
+      <TaskDetailsSheet
+        task={detailsSheetOpen ? selectedTask : null}
+        onOpenChange={setDetailsSheetOpen}
+        onTaskComplete={() => {}}
+        onTaskScheduled={() => {}}
+      />
+    </>
   );
 };
 

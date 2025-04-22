@@ -101,6 +101,10 @@ const TimelineCalendar = () => {
       queryClient.invalidateQueries({
         queryKey: ["tasks-by-date"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["tasks"],
+        type: "all",
+      });
       queryClient.refetchQueries({
         queryKey: ["tasks"],
         type: "all",
