@@ -26,9 +26,14 @@ export default async function middleware(request: NextRequest) {
   // Determine locale from URL
   const locale = nextUrl.pathname.startsWith("/fr") ? "fr" : "en";
 
+  // Get the base URL for redirects
+  const baseUrl =
+    process.env.NEXT_PUBLIC_NODE === "development"
+      ? process.env.NEXT_PUBLIC_FRONTEND_URL
+      : process.env.NEXT_PUBLIC_FRONTEND_URL_PROD;
+
   // Use regex to detect URLs that are just a locale; e.g. '/en' or '/fr/'
   const isLocaleOnly = /^\/(?:en|fr)\/?$/.test(nextUrl.pathname);
-  // Check if current path (without locale) is a public route
 
   // Remove the locale segment so further checks work as intended
   const pathnameWithoutLocale =
@@ -60,23 +65,22 @@ export default async function middleware(request: NextRequest) {
   if (isLocaleOnly || isPublicRoute) {
     if (isLoggedIn) {
       // Authenticated users are not allowed to access just /en or /fr
-      const dashboardUrl = `/${locale}/dashboard`;
-      return NextResponse.redirect(new URL(dashboardUrl, nextUrl));
+      const dashboardUrl = new URL(`/${locale}/dashboard`, baseUrl);
+      return NextResponse.redirect(dashboardUrl);
     }
     // Unauthenticated users can access the locale root
     return intlMiddleware(request);
   }
-  // --- End new logic for locale-only path ---
 
   // For non-root paths:
   // If not logged in and not on a public route, redirect to login.
   if (!isLoggedIn && !isPublicRoute) {
-    return NextResponse.redirect(
-      new URL(
-        `/signin?callbackUrl=${encodeURIComponent(pathnameWithoutLocale)}`,
-        nextUrl
-      )
+    const signinUrl = new URL(`/${locale}/signin`, baseUrl);
+    signinUrl.searchParams.set(
+      "callbackUrl",
+      `/${locale}${pathnameWithoutLocale}`
     );
+    return NextResponse.redirect(signinUrl);
   }
 
   // Default: apply internationalization
