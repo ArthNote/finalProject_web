@@ -54,6 +54,10 @@ export default async function middleware(request: NextRequest) {
     }
   );
 
+  NextResponse.json(session, {
+    status: 200,
+  });
+
   const isLoggedIn = !!session;
 
   // --- Begin new logic for locale-only path ---
