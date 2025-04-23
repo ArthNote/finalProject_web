@@ -43,7 +43,11 @@ export default async function middleware(request: NextRequest) {
 
   // Get session for all routes
   const { data: session } = await betterFetch<Session>(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/get-session`,
+    `${
+      process.env.NEXT_PUBLIC_NODE === "development"
+        ? process.env.NEXT_PUBLIC_BACKEND_URL
+        : process.env.NEXT_PUBLIC_BACKEND_URL_PROD
+    }/api/auth/get-session`,
     {
       baseURL: request.nextUrl.origin,
       headers: { cookie: request.headers.get("cookie") || "" },
