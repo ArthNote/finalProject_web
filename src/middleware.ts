@@ -65,7 +65,7 @@ export default async function middleware(request: NextRequest) {
   if (isLocaleOnly || isPublicRoute) {
     if (isLoggedIn) {
       // Authenticated users are not allowed to access just /en or /fr
-      const dashboardUrl = new URL(`/${locale}/dashboard`, baseUrl);
+      const dashboardUrl = new URL(`/dashboard`, baseUrl);
       return NextResponse.redirect(dashboardUrl);
     }
     // Unauthenticated users can access the locale root
@@ -75,7 +75,7 @@ export default async function middleware(request: NextRequest) {
   // For non-root paths:
   // If not logged in and not on a public route, redirect to login.
   if (!isLoggedIn && !isPublicRoute) {
-    const signinUrl = new URL(`/${locale}/signin`, baseUrl);
+    const signinUrl = new URL(`/signin`, baseUrl);
     signinUrl.searchParams.set(
       "callbackUrl",
       `/${locale}${pathnameWithoutLocale}`
