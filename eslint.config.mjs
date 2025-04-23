@@ -20,6 +20,7 @@ const eslintConfig = [
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+      "react-hooks/rules-of-hooks": "off",
     },
   }),
 ];

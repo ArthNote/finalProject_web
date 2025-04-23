@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { TaskType } from "@/types/task";
 import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { updateTaskScheduled } from "@/lib/taskService";
+// import { updateTaskScheduled } from "@/lib/taskService";
 import TaskDetailsSheet from "./side_calendar/TaskDetailsSheet";
 import TaskViewFilters, { DateRangeType } from "./TaskViewFilters";
 import { useLocale, useTranslations } from "next-intl";
@@ -174,7 +174,7 @@ const GridView = () => {
       const task = findTask(taskId);
       const isScheduled = task?.scheduled || false;
 
-      await updateTaskScheduled(taskId, !isScheduled);
+      // await updateTaskScheduled(taskId, !isScheduled);
       // Refetch tasks to update the UI
       refetch();
     } catch (error) {

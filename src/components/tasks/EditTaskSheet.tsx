@@ -67,7 +67,7 @@ import {
 import { TaskType } from "@/types/task";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { sampleTasks } from "@/lib/taskService";
+
 import { useLocale, useTranslations } from "next-intl";
 import { enUS, fr } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
@@ -188,7 +188,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
     try {
       setIsLoadingTasks(true);
       // Filter out the current task to avoid setting itself as parent
-      const tasksData = sampleTasks.filter((t) => t.id !== task.id);
+      const tasksData: TaskType[] = [];
       setTasks(tasksData);
     } catch (error) {
       console.error("Error loading tasks:", error);

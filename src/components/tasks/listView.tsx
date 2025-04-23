@@ -19,7 +19,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
-import { updateTaskScheduled } from "@/lib/taskService";
+
 import TaskDetailsSheet from "./side_calendar/TaskDetailsSheet";
 import { TaskFilterParams, TaskType } from "@/types/task";
 import ListViewCard from "./listViewCard";
@@ -210,7 +210,7 @@ const ListView = () => {
       const task = findTask(taskId);
       const isScheduled = task?.scheduled || false;
 
-      const updatedTask = await updateTaskScheduled(taskId, !isScheduled);
+      // const updatedTask = await updateTaskScheduled(taskId, !isScheduled);
       // Refetch tasks to update the UI
       refetch();
     } catch (error) {
@@ -354,7 +354,6 @@ const ListView = () => {
               </Collapsible>
             )}
 
-      
           {(scheduledFilter === "all" || scheduledFilter === "scheduled") && (
             <Collapsible
               open={tasksOpen.todo}

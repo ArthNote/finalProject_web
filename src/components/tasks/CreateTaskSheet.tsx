@@ -68,7 +68,7 @@ import {
 import { TaskType } from "@/types/task";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { sampleTasks } from "@/lib/taskService";
+
 import { useLocale, useTranslations } from "next-intl";
 import { enUS, fr } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
@@ -168,7 +168,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const loadTasks = async () => {
     try {
       setIsLoadingTasks(true);
-      const tasksData = sampleTasks; // Replace with your API call to fetch tasks
+      const tasksData: TaskType[] = []; // Replace with your API call to fetch tasks
       setTasks(tasksData);
     } catch (error) {
       console.error("Error loading tasks:", error);

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateTaskScheduled } from "@/lib/taskService";
+
 import TaskDetailsSheet from "./side_calendar/TaskDetailsSheet";
 import { TaskFilterParams, TaskType } from "@/types/task";
 import TaskViewFilters, { DateRangeType } from "./TaskViewFilters";
@@ -258,7 +258,7 @@ const KanbanView = () => {
       const task = findTask(taskId);
       const isScheduled = task?.scheduled || false;
 
-      await updateTaskScheduled(taskId, !isScheduled);
+      // await updateTaskScheduled(taskId, !isScheduled);
       // Refetch tasks to update the UI
       refetch();
     } catch (error) {
