@@ -16,7 +16,7 @@ const publicRoutes = [
   "/forgot-password",
   "/reset-password",
   "/privacy",
-  "/terms",
+  "/terms", 
 ];
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -49,14 +49,9 @@ export default async function middleware(request: NextRequest) {
         : process.env.NEXT_PUBLIC_BACKEND_URL_PROD
     }/api/auth/get-session`,
     {
-      baseURL: request.nextUrl.origin,
       headers: { cookie: request.headers.get("cookie") || "" },
     }
   );
-
-  NextResponse.json(session, {
-    status: 200,
-  });
 
   const isLoggedIn = !!session;
 
