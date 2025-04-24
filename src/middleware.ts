@@ -1,9 +1,10 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { betterFetch } from "@better-fetch/fetch";
 
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
-import { Session } from "./lib/auth-client";
+import { authClient, Session } from "./lib/auth-client";
+import { cookies, headers } from "next/headers";
 
 const publicRoutes = [
   "/",
@@ -16,7 +17,7 @@ const publicRoutes = [
   "/forgot-password",
   "/reset-password",
   "/privacy",
-  "/terms", 
+  "/terms",
 ];
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -41,6 +42,9 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const header = await headers();
+  const cookie = await cookies();
+
   // Get session for all routes
   const { data: session } = await betterFetch<Session>(
     `${
@@ -49,9 +53,18 @@ export default async function middleware(request: NextRequest) {
         : process.env.NEXT_PUBLIC_BACKEND_URL_PROD
     }/api/auth/get-session`,
     {
-      headers: { cookie: request.headers.get("cookie") || "" },
+      headers: header,
+     
+      credentials: "include",
     }
   );
+
+  // const { data: session } = await authClient.getSession({
+  //   fetchOptions: {
+  //     headers: header,
+  //     cookie: cookie,
+  //   },
+  // });
 
   const isLoggedIn = !!session;
 
