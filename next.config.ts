@@ -82,7 +82,7 @@ const nextConfig: NextConfig = {
           {
             key: "Access-Control-Allow-Origin",
             // Replace with your domain
-            value: "https://taskflow-six-kohl.vercel.app",
+            value: "https://taskflow-note.netlify.app",
           },
           {
             key: "Access-Control-Allow-Methods",
