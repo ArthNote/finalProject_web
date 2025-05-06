@@ -203,6 +203,8 @@ const TaskViewFilters: React.FC<TaskViewFiltersProps> = ({
         return "bg-amber-500";
       case "low":
         return "bg-green-500";
+      case 'urgent': 
+        return "bg-red-700";
       default:
         return "bg-slate-500";
     }
@@ -363,6 +365,7 @@ const TaskViewFilters: React.FC<TaskViewFiltersProps> = ({
                       <SelectItem value="high">{t("high")}</SelectItem>
                       <SelectItem value="medium">{t("medium")}</SelectItem>
                       <SelectItem value="low">{t("low")}</SelectItem>
+                      <SelectItem value="urgent">{t("urgent")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

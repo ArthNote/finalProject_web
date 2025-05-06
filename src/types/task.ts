@@ -4,7 +4,7 @@ export interface TaskType {
   id: string;
   title: string;
   description: string;
-  priority: "high" | "medium" | "low";
+  priority: "high" | "medium" | "low" | "urgent";
   category: string;
   completed: boolean;
   scheduled: boolean;

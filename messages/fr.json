@@ -379,6 +379,80 @@
         "badge": "7 Jours d'Essai",
         "info": "7 jours d'essai gratuit, carte bancaire requise"
       }
+    },
+    "contact": {
+      "subtitle": "Contactez-nous",
+      "title": "Entrer en Contact",
+      "description": "Vous avez des questions ? Nous sommes là pour vous aider. Envoyez-nous un message et nous vous répondrons dès que possible.",
+      "toast": {
+        "success": {
+          "title": "Message envoyé",
+          "description": "Merci de nous avoir contactés ! Nous vous répondrons rapidement."
+        },
+        "error": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer."
+        }
+      },
+      "form": {
+        "name": {
+          "label": "Votre Nom",
+          "placeholder": "Entrez votre nom"
+        },
+        "email": {
+          "label": "Adresse Email",
+          "placeholder": "vous@exemple.com"
+        },
+        "message": {
+          "label": "Votre Message",
+          "placeholder": "Comment pouvons-nous vous aider ?"
+        },
+        "submit": "Envoyer le Message"
+      },
+      "info": {
+        "support": {
+          "title": "Support",
+          "description": "Besoin d'aide technique ?",
+          "email": "support@taskflow.com"
+        },
+        "sales": {
+          "title": "Commercial",
+          "description": "Intéressé par l'offre entreprise ?",
+          "email": "sales@taskflow.com"
+        },
+        "phone": {
+          "title": "Téléphone",
+          "description": "Lun-Ven 9h-18h",
+          "number": "+1 (555) 000-0000"
+        }
+      }
+    },
+    "reviews": {
+      "subtitle": "Avis Utilisateurs",
+      "title": "Ce que Disent Nos Utilisateurs",
+      "description": "Découvrez comment TaskFlow transforme la façon dont les gens travaillent et gèrent leurs tâches.",
+      "reviews": [
+        {
+          "name": "Sarah Johnson",
+          "title": "Chef de Produit",
+          "message": "TaskFlow a complètement transformé la façon dont notre équipe gère les projets. Les suggestions de l'IA sont pertinentes et nous font gagner des heures de planification chaque semaine."
+        },
+        {
+          "name": "Michael Chen",
+          "title": "Développeur Freelance",
+          "message": "En tant que freelance jonglant avec plusieurs projets, la planification intelligente de TaskFlow a changé la donne. C'est comme avoir un assistant personnel qui sait exactement comment je travaille."
+        },
+        {
+          "name": "Emily Rodriguez",
+          "title": "Directrice Marketing",
+          "message": "La synchronisation multi-plateformes est impeccable, et les analyses alimentées par l'IA ont aidé notre équipe à optimiser notre flux de travail d'une manière que nous n'aurions jamais imaginée."
+        },
+        {
+          "name": "David Kim",
+          "title": "Fondateur de Startup",
+          "message": "Les fonctionnalités entreprise de TaskFlow se sont parfaitement adaptées à notre équipe en croissance. Les options de personnalisation et les intégrations sont exactement ce dont nous avions besoin."
+        }
+      ]
     }
   },
   "footer": {
@@ -872,19 +946,33 @@
         "title": "Langue",
         "description": "Sélectionnez votre langue préférée",
         "english": "Anglais",
-        "french": "Français"
+        "french": "Français",
+        "selectLanguage": "Sélectionner la langue"
       },
       "font": {
         "title": "Police",
         "description": "Choisissez votre police préférée",
-        "preview": "Le vif renard brun saute par-dessus le chien paresseux. 1234567890"
+        "preview": "Le vif renard brun saute par-dessus le chien paresseux. 1234567890",
+        "selectFont": "Sélectionner la police"
       },
       "theme": {
         "title": "Thème",
         "description": "Choisissez votre thème de couleur préféré",
         "light": "Thème clair",
         "dark": "Thème sombre",
-        "system": "Thème système"
+        "system": "Thème système",
+        "themeStyle": "Style de thème",
+        "selectTheme": "Sélectionner un thème",
+        "style": {
+          "default": "Par défaut",
+          "bold-tech": "Tech Audacieux",
+          "amber-minimal": "Ambre Minimaliste",
+          "bubblegum": "Chewing-gum",
+          "cyberpunk": "Cyberpunk",
+          "twitter": "Twitter"
+        },
+        "appearanceMode": "Mode d'apparence",
+        "preview": "Aperçu"
       },
       "actions": {
         "save": "Enregistrer les modifications",
@@ -941,6 +1029,172 @@
           "8h": "8 heures",
           "24h": "24 heures"
         }
+      }
+    },
+    "preferences": {
+      "toast": {
+        "modeUpdatedSuccess": {
+          "title": "Mode mis à jour",
+          "description": "Votre mode a été mis à jour avec succès"
+        },
+        "modeUpdatedError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la mise à jour de votre mode"
+        },
+        "modeDeletedSuccess": {
+          "title": "Mode supprimé",
+          "description": "Votre mode a été supprimé avec succès"
+        },
+        "modeDeletedError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la suppression de votre mode"
+        },
+        "modeCreatedSuccess": {
+          "title": "Mode créé",
+          "description": "Votre mode a été créé avec succès"
+        },
+        "modeCreatedError": {
+          "title": "Erreur",
+          "description": "Une erreur s'est produite lors de la création de votre mode"
+        },
+        "nameRequired": {
+          "title": "Nom requis",
+          "description": "Veuillez entrer un nom pour votre mode de planification"
+        }
+      },
+      "errorState": {
+        "title": "Erreur de chargement des préférences",
+        "description": "Une erreur s'est produite lors du chargement de vos préférences. Veuillez réessayer plus tard.",
+        "action": "Réessayer"
+      },
+      "title": "Préférences de planification",
+      "description": "Gérez vos modes de planification et préférences pour l'organisation des tâches",
+      "availableModes": "Modes disponibles",
+      "viewDetails": "Voir les détails",
+      "editSchedulingMode": "Modifier le mode de planification",
+      "deleteDialog": {
+        "delete": "Supprimer",
+        "cancel": "Annuler",
+        "title": "Supprimer le mode de planification",
+        "description": "Êtes-vous sûr de vouloir supprimer ce mode de planification ? Cette action ne peut pas être annulée."
+      },
+      "cancel": "Annuler",
+      "makeCopy": "Faire une copie",
+      "saveChanges": "Enregistrer les modifications",
+      "close": "Fermer",
+      "edit": "Modifier",
+      "noSchedulingModes": {
+        "title": "Aucun mode de planification",
+        "description": "Vous n'avez aucun mode de planification disponible. Veuillez créer un nouveau mode."
+      },
+      "modes": {
+        "standard": {
+          "title": "Standard",
+          "description": "Planning équilibré avec pauses régulières"
+        },
+        "productivity_focus": {
+          "title": "Focus sur la productivité",
+          "description": "Optimisé pour le travail approfondi et la productivité maximale"
+        },
+        "wellbeing_focus": {
+          "title": "Focus sur le bien-être",
+          "description": "Journée de travail équilibrée avec beaucoup de pauses"
+        }
+      },
+      "card": {
+        "default": "Par défaut",
+        "builtIn": "Intégré",
+        "defaultDurationLabel": "Durée par défaut des tâches",
+        "defaultDurationValue": "{duration} minutes",
+        "dailyLimitLabel": "Limite quotidienne",
+        "dailyLimitValue": "{tasks} tâches, {hours} heures",
+        "breaksLabel": "Pauses",
+        "breaksValue": "{duration} min entre les tâches",
+        "disabled": "Désactivé",
+        "enabled": "Activé",
+        "focusOptimization": "Optimisation du focus"
+      },
+      "modeDetails": {
+        "taskScheduling": "Planification des tâches",
+        "defaultDurationLabel": "Durée par défaut",
+        "defaultDurationValue": "{duration} min",
+        "considerMoodLabel": "Considérer l'humeur",
+        "maxTasksPerDayLabel": "Tâches max par jour",
+        "maxHoursPerDayLabel": "Heures max par jour",
+        "breakBetweenTasksLabel": "Pause entre les tâches",
+        "breakBetweenTasksValue": "{duration} min",
+        "timeSlotIntervalLabel": "Intervalle des créneaux",
+        "timeSlotIntervalValue": "{duration} min",
+        "priorityLimits": "Limites de priorité",
+        "urgentTasks": "Tâches urgentes",
+        "highTasks": "Tâches prioritaires",
+        "lowTasks": "Tâches basses",
+        "mediumTasks": "Tâches moyennes",
+        "optimizationSettings": "Paramètres d'optimisation",
+        "respectFixedAppointments": "Respecter les rendez-vous fixes",
+        "yes": "Oui",
+        "no": "Non",
+        "addBreaks": "Ajouter des pauses",
+        "lunchBreakLabel": "Pause déjeuner",
+        "lunchBreakValue": "{start}, {duration} min",
+        "shortBreakLabel": "Pause courte",
+        "shortBreakValue": "Toutes les {frequency} min, {duration} min",
+        "optimizeFocusTime": "Optimiser le temps de concentration",
+        "energyLevelHours": "Heures selon le niveau d'énergie",
+        "highEnergyHours": "Heures de haute énergie",
+        "lowEnergyHours": "Heures de basse énergie",
+        "mediumEnergyHours": "Heures d'énergie moyenne",
+        "notSet": "Non défini"
+      },
+      "editMode": {
+        "name": "Nom",
+        "description": "Description",
+        "taskScheduling": "Planification des tâches",
+        "defaultTaskDuration": "Durée par défaut des tâches (minutes)",
+        "considerMood": "Considérer l'humeur",
+        "maxTasksPerDay": "Tâches maximum par jour",
+        "maxHoursPerDay": "Heures maximum par jour",
+        "breakBetweenTasks": "Pause entre les tâches (minutes)",
+        "timeSlotInterval": "Intervalle des créneaux (minutes)",
+        "selectInterval": "Sélectionner l'intervalle",
+        "minutes": "minutes",
+        "optimizationSettings": "Paramètres d'optimisation",
+        "respectFixedAppointments": "Respecter les rendez-vous fixes",
+        "addBreaks": "Ajouter des pauses",
+        "lunchBreak": "Pause déjeuner",
+        "startTime": "Heure de début",
+        "duration": "Durée (min)",
+        "shortBreaks": "Pauses courtes",
+        "every": "Toutes les (min)",
+        "optimzeForFocusTime": "Optimiser pour le temps de concentration",
+        "priorityLimits": "Limites de priorité",
+        "priorityLimitsDescription": "Nombre maximum de tâches par niveau de priorité par jour",
+        "urgentTasks": "Tâches urgentes",
+        "highTasks": "Tâches prioritaires",
+        "mediumTasks": "Tâches moyennes",
+        "lowTasks": "Tâches basses",
+        "energyLevels": "Heures selon le niveau d'énergie",
+        "highEnergyHours": "Heures de haute énergie",
+        "lowEnergyHours": "Heures de basse énergie",
+        "mediumEnergyHours": "Heures d'énergie moyenne",
+        "hoursSelected": "Heures sélectionnées",
+        "selectHours": "Sélectionner les heures",
+        "searchHours": "Rechercher des heures...",
+        "noHoursFound": "Aucune heure trouvée"
+      },
+      "createMode": {
+        "title": "Créer un nouveau mode de planification",
+        "description": "Définissez un mode de planification personnalisé avec vos paramètres préférés",
+        "trigger": "Créer un nouveau mode",
+        "nameLabel": "Nom",
+        "namePlaceholder": "Mon mode de planification",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Décrivez comment ce mode fonctionne...",
+        "chooseTemplate": "Choisir un modèle :",
+        "chooseTemplateDescription": "Vous pourrez personnaliser tous les paramètres après la création de ce mode.",
+        "cancel": "Annuler",
+        "createMode": "Créer le mode",
+        "creating": "Création en cours..."
       }
     }
   },
@@ -1192,9 +1446,13 @@
             "descriptionPlaceholder": "Entrez la description de la tâche",
             "priorityLabel": "Priorité",
             "priorityPlaceholder": "Sélectionnez la priorité",
+            "durationLabel": "Durée (minutes)",
+            "durationPlaceholder": "Entrez la durée en minutes",
+            "durationDescription": "La durée minimale est de 5 minutes",
             "priorityOptions": {
               "low": "Faible",
               "medium": "Moyenne",
+              "urgent": "Urgent",
               "high": "Élevée"
             },
             "categoryLabel": "Catégorie",
@@ -1210,10 +1468,15 @@
             "endTimeLabel": "Heure de fin",
             "durationLabel": "Durée (minutes)",
             "durationPlaceholder": "Entrez la durée en minutes",
-            "durationDescription": "La durée minimale est de 5 minutes"
+            "durationDescription": "La durée minimale est de 5 minutes",
+            "endTimeAutoDescription": "L'heure de fin sera automatiquement calculée en fonction de la durée"
           },
           "details": {
+            "teamMembers": "Membres de l'équipe",
+            "friends": "Amis",
+            "friend": "Amis",
             "title": "Détails",
+            "noPeopleFound": "Aucune personne trouvée",
             "tagsLabel": "Tags",
             "tagsPlaceholder": "Ajouter des tags",
             "parentTaskLabel": "Tâche parente",
@@ -1280,7 +1543,77 @@
         "changeView": "Changer de vue",
         "listView": "Vue liste",
         "gridView": "Vue grille",
-        "kanbanView": "Vue Kanban"
+        "kanbanView": "Vue kanban",
+        "cancel": "Annuler",
+        "back": "Retour",
+        "toast": {
+          "success": {
+            "title": "Emploi du temps optimisé",
+            "description": "Votre emploi du temps a été optimisé avec succès"
+          },
+          "error": {
+            "title": "Erreur",
+            "description": "Une erreur s'est produite lors de l'optimisation de votre emploi du temps"
+          }
+        },
+        "title": "Optimiser Votre Emploi du Temps",
+        "description": "Utilisez notre algorithme pour optimiser votre emploi du temps et améliorer la productivité",
+        "processing": "Traitement en cours...",
+        "continue": "Continuer",
+        "scope": {
+          "title": "Que souhaitez-vous optimiser ?",
+          "description": "Choisissez quelles tâches vous voulez que l'IA organise dans votre emploi du temps",
+          "unscheduled": {
+            "title": "Tâches non planifiées",
+            "description": "Trouver des créneaux optimaux pour les tâches sans horaire"
+          },
+          "scheduled": {
+            "title": "Tâches planifiées",
+            "description": "Réorganiser vos tâches planifiées existantes pour une meilleure efficacité"
+          },
+          "all": {
+            "title": "Toutes les tâches",
+            "description": "Réorganisation complète de votre emploi du temps"
+          }
+        },
+        "period": {
+          "today": "Aujourd'hui",
+          "tomorrow": "Demain",
+          "thisWeek": {
+            "title": "Cette semaine",
+            "description": "D'aujourd'hui aux 7 prochains jours"
+          },
+          "custom": "Période personnalisée",
+          "selectSpecificRange": "Sélectionner une période spécifique",
+          "title": "Sélectionner la période",
+          "description": "Choisissez les jours que vous voulez optimiser dans votre emploi du temps",
+          "backToOptions": "Retour aux options",
+          "selectRangeOfDays": "Sélectionnez une période de jours à optimiser"
+        },
+        "modes": {
+          "title": "Sélectionner le mode de planification",
+          "description": "Choisissez un mode de planification pour optimiser vos tâches",
+          "modes": {
+            "standard": {
+              "title": "Standard",
+              "description": "Planning équilibré avec pauses régulières"
+            },
+            "productivity_focus": {
+              "title": "Focus sur la productivité",
+              "description": "Optimisé pour le travail approfondi et la productivité maximale"
+            },
+            "wellbeing_focus": {
+              "title": "Focus sur le bien-être",
+              "description": "Journée de travail équilibrée avec beaucoup de pauses"
+            }
+          },
+          "focusTimeEnabled": "Temps de concentration activé",
+          "focusTimeDisabled": "Temps de concentration désactivé",
+          "breaksEnabled": "Pauses activées",
+          "breaksDisabled": "Pauses désactivées",
+          "maxTasks": "{count} tâches par jour",
+          "modeIncludes": "Ce mode inclut"
+        }
       },
       "calendar": "Calendrier"
     },
@@ -1305,6 +1638,10 @@
         "unscheduledTask": {
           "title": "Tâche non planifiée",
           "description": "Planifiez la tâche pour changer son statut."
+        },
+        "collisionError": {
+          "title": "Conflit de tâche",
+          "description": "La tâche que vous essayez de planifier est en conflit avec une autre tâche. Veuillez choisir un horaire différent."
         }
       },
       "error": {
@@ -1353,6 +1690,7 @@
       "priorityLevel": "Niveau de priorité",
       "allPriorities": "Toutes les priorités",
       "high": "Élevée",
+      "urgent": "Urgent",
       "medium": "Moyenne",
       "low": "Faible",
       "status": "Statut",
@@ -1395,13 +1733,23 @@
         "notScheduled": "Non planifiée",
         "schedule": "Planifier",
         "unscheduled": "Non planifiée",
+        "scheduling": "Planification...",
         "inprogress": "En cours",
         "todo": "À faire",
         "setStatus": "Définir le statut",
         "low": "Faible",
         "medium": "Moyenne",
         "high": "Élevée",
+        "urgent": "Urgent",
         "toast": {
+          "scheduleError": {
+            "title": "Erreur de planification",
+            "description": "Une erreur s'est produite lors de la planification de votre tâche"
+          },
+          "scheduleSuccess": {
+            "title": "Tâche planifiée",
+            "description": "Votre tâche a été planifiée avec succès"
+          },
           "updateSuccess": {
             "title": "Tâche mise à jour",
             "description": "Votre tâche a été mise à jour avec succès"
@@ -1439,6 +1787,7 @@
       "duration": "Durée",
       "priority": "Priorité",
       "high": "Élevée",
+      "urgent": "Urgent",
       "medium": "Moyenne",
       "low": "Faible",
       "status": "Statut",
@@ -1496,6 +1845,7 @@
         "noDescriptionProvided": "Aucune description fournie",
         "noDateScheduled": "Aucune date planifiée",
         "notScheduled": "Non planifiée",
+        "scheduling": "Planification...",
         "editTask": "Modifier la tâche",
         "setPriority": "Définir la priorité",
         "scheduleTask": "Planifier la tâche",
@@ -1503,6 +1853,7 @@
         "low": "Faible",
         "medium": "Moyenne",
         "high": "Élevée",
+        "urgent": "Urgent",
         "unscheduled": "Non planifiée",
         "inprogress": "En cours",
         "todo": "À faire",
@@ -1571,6 +1922,7 @@
         "low": "Faible",
         "medium": "Moyenne",
         "high": "Élevée",
+        "urgent": "Urgent",
         "unscheduled": "Non planifiée",
         "inprogress": "En cours",
         "todo": "À faire",
@@ -1627,6 +1979,7 @@
       "high": "Élevée",
       "medium": "Moyenne",
       "low": "Faible",
+      "urgent": "Urgent",
       "category": "Catégorie",
       "scheduled": "Planifiée",
       "save": "Enregistrer",
@@ -1815,6 +2168,7 @@
           "all": "Toutes les priorités",
           "low": "Faible",
           "medium": "Moyenne",
+          "urgent": "Urgent",
           "high": "Élevée"
         }
       },
@@ -1883,6 +2237,7 @@
           "options": {
             "low": "Faible",
             "medium": "Moyenne",
+            "urgent": "Urgent",
             "high": "Élevée"
           }
         }
@@ -1952,6 +2307,7 @@
       "priority": {
         "low": "Faible",
         "medium": "Moyenne",
+        "urgent": "Urgent",
         "high": "Élevée"
       },
       "status": {
@@ -1980,6 +2336,7 @@
       "all": "Toutes les priorités",
       "low": "Faible",
       "medium": "Moyenne",
+      "urgent": "Urgent",
       "high": "Élevée"
     },
     "editProject": {
@@ -2019,6 +2376,7 @@
         "title": "Définir la priorité",
         "low": "Faible",
         "medium": "Moyenne",
+        "urgent": "Urgent",
         "high": "Élevée"
       },
       "setStatus": {
@@ -2181,6 +2539,7 @@
         "priority": {
           "label": "Priorité",
           "high": "Élevée",
+          "urgent": "Urgent",
           "medium": "Moyenne",
           "low": "Faible"
         },
@@ -2204,6 +2563,7 @@
         "setPriority": {
           "label": "Définir la priorité",
           "high": "Priorité élevée",
+          "urgent": "Priorité urgent",
           "medium": "Priorité moyenne",
           "low": "Priorité faible"
         },
@@ -2305,6 +2665,479 @@
           "title": "Erreur d'affichage du fichier",
           "description": "Une erreur s'est produite lors de l'affichage du fichier. Veuillez réessayer."
         }
+      }
+    }
+  },
+  "goals": {
+    "rewards": {
+      "themes": {
+        "bold_tech": {
+          "title": "Bold Tech",
+          "description": "Débloquez le thème Bold pour un look moderne"
+        },
+        "amber_minimal": {
+          "title": "Amber Minimal",
+          "description": "Débloquez le thème Amber pour un look épuré"
+        },
+        "bubblegum": {
+          "title": "Bubblegum",
+          "description": "Débloquez le thème Bubblegum pour un look ludique"
+        },
+        "cyberpunk": {
+          "title": "Cyberpunk",
+          "description": "Débloquez le thème Cyberpunk pour un look futuriste"
+        },
+        "twitter": {
+          "title": "Twitter",
+          "description": "Débloquez le thème Twitter pour un look de réseau social"
+        }
+      }
+    },
+    "errorState": {
+      "title": "Erreur de chargement des objectifs",
+      "description": "Une erreur s'est produite lors du chargement de vos objectifs. Veuillez réessayer.",
+      "action": "Réessayer"
+    },
+    "header": {
+      "level": "Niveau {level}",
+      "levelDescription": "Continuez à atteindre vos objectifs pour monter de niveau et débloquer des récompenses !",
+      "progressToLevel": "Progression vers le Niveau {level}",
+      "xpNeededToLevel": "{xp} XP nécessaires pour atteindre le Niveau {level}",
+      "rewardsAtLevel": "Récompenses au Niveau {level}"
+    },
+    "streakCard": {
+      "title": "Série Quotidienne",
+      "current": "Actuelle",
+      "longest": "Plus longue"
+    },
+    "tabs": {
+      "goals&milestones": "Objectifs & Étapes",
+      "rewards&unlockables": "Récompenses & Débloquables",
+      "goals": "Objectifs",
+      "rewards": "Récompenses"
+    },
+    "goals": {
+      "title": "Objectifs & Défis",
+      "description": "Complétez ces objectifs pour gagner de l'XP et monter de niveau",
+      "generate": "Générer des Objectifs",
+      "tabs": {
+        "daily": "Quotidiens",
+        "weekly": "Hebdomadaires",
+        "monthly": "Mensuels"
+      },
+      "completed": "Complété le : {date}",
+      "progress": "Progression",
+      "daily": {
+        "noGoals": "Aucun objectif quotidien disponible. Cliquez sur 'Générer des Objectifs' pour en créer !",
+        "goals": {
+          "complete_5_tasks": {
+            "title": "Compléter 5 Tâches",
+            "description": "Complétez 5 tâches aujourd'hui"
+          },
+          "use_pomodoro_timer": {
+            "title": "Utiliser le Minuteur Pomodoro",
+            "description": "Complétez 3 sessions Pomodoro"
+          },
+          "plan_tasks": {
+            "title": "Planifier des Tâches",
+            "description": "Planifiez au moins 3 tâches pour une meilleure gestion du temps"
+          }
+        }
+      },
+      "weekly": {
+        "noGoals": "Aucun objectif hebdomadaire disponible. Cliquez sur 'Générer des Objectifs' pour en créer !",
+        "goals": {
+          "complete_20_tasks": {
+            "title": "Compléter 20 Tâches",
+            "description": "Complétez 20 tâches cette semaine"
+          },
+          "maintain_5-day_streak": {
+            "title": "Maintenir une Série de 5 Jours",
+            "description": "Connectez-vous et complétez des tâches pendant 5 jours consécutifs"
+          }
+        }
+      },
+      "monthly": {
+        "noGoals": "Aucun objectif mensuel disponible. Cliquez sur 'Générer des Objectifs' pour en créer !",
+        "goals": {
+          "power_user": {
+            "title": "Utilisateur Avancé",
+            "description": "Complétez 100 tâches ce mois-ci"
+          },
+          "consistency_king": {
+            "title": "Roi de la Constance",
+            "description": "Maintenez une série de 20 jours"
+          }
+        }
+      }
+    },
+    "rewardsTab": {
+      "allRewards": "Toutes les Récompenses",
+      "unlocked": "Débloquées",
+      "locked": "Verrouillées",
+      "noRewards": "Aucune récompense disponible pour le moment. Revenez plus tard !",
+      "noUnlockedRewards": "Aucune récompense débloquée pour le moment. Continuez à monter de niveau pour débloquer des récompenses !",
+      "noLockedRewards": "Félicitations ! Vous avez débloqué toutes les récompenses disponibles !",
+      "level": "Niveau {level}",
+      "unlockReward": "Débloquer la Récompense"
+    }
+  },
+  "dashboard": {
+    "greetings": {
+      "morning": "Bonjour",
+      "afternoon": "Bon Après-midi",
+      "evening": "Bonsoir"
+    },
+    "viewCalendar": "Voir Calendrier",
+    "stats": {
+      "tasksCompleted": "Tâches Terminées",
+      "focusTime": "Temps Focalisé",
+      "efficiency": "Efficacité",
+      "minutesUnit": "min"
+    },
+    "pomodoro": {
+      "title": "Minuteur Pomodoro",
+      "work": "Travail",
+      "shortBreak": "Courte Pause",
+      "longBreak": "Longue Pause",
+      "start": "Démarrer",
+      "pause": "Pause",
+      "reset": "Réinitialiser",
+      "settings": "Paramètres",
+      "workDuration": "Durée de travail (min)",
+      "shortBreakDuration": "Pause courte (min)",
+      "longBreakDuration": "Pause longue (min)",
+      "sessionsBeforeLongBreak": "Sessions avant pause longue",
+      "completedSessions": "{count} sessions terminées"
+    },
+    "tasks": {
+      "title": "Tâches d'aujourd'hui",
+      "viewAll": "Voir Tout",
+      "noTasks": {
+        "title": "Pas de tâches pour aujourd'hui",
+        "description": "Votre emploi du temps est libre. Ajoutez des tâches pour commencer.",
+        "button": "Ajouter une tâche"
+      },
+      "urgent": "Urgent"
+    },
+    "mood": {
+      "noMoodEntries": "Aucune entrée d'humeur encore",
+      "moodHistory": "Historique de l'humeur",
+      "title": "Suivi d'Humeur",
+      "loading": "Chargement de l'historique d'humeur...",
+      "howAreYouFeeling": "Comment vous sentez-vous aujourd'hui?",
+      "moods": {
+        "great": "Excellent",
+        "good": "Bien",
+        "neutral": "Neutre",
+        "bad": "Mauvais",
+        "awful": "Terrible"
+      },
+      "energyLevel": "Niveau d'énergie",
+      "energy": "Énergie",
+      "saveSuccess": {
+        "title": "Humeur enregistrée",
+        "description": "Votre humeur a été enregistrée avec succès"
+      },
+      "saveError": {
+        "title": "Erreur d'enregistrement",
+        "description": "Une erreur s'est produite lors de l'enregistrement de votre humeur"
+      },
+      "low": "Faible",
+      "high": "Élevé",
+      "notes": "Notes",
+      "notesPlaceholder": "Ajoutez des notes sur votre journée...",
+      "save": "Enregistrer",
+      "history": "Voir l'historique"
+    },
+    "motivationalTip": {
+      "title": "Conseil du Jour",
+      "refreshTip": "Nouveau Conseil",
+      "source": "Source"
+    },
+    "quickActions": {
+      "title": "Actions Rapides",
+      "tasks": "Tâches",
+      "navigate": "Naviguer vers",
+      "tools": "Outils",
+      "addTask": "Ajouter une tâche",
+      "generateAi": "Génération IA",
+      "calendar": "Calendrier",
+      "goals": "Objectifs",
+      "pomodoro": "Pomodoro",
+      "analytics": "Analytique",
+      "settings": "Paramètres",
+      "aiDefaultPrompt": "Générer un plan de productivité pour aujourd'hui avec 5-7 tâches"
+    },
+    "goals": {
+      "title": "Objectifs & Étapes",
+      "level": "Niveau {level}",
+      "streakDays": "{days} jours",
+      "totalXP": "Total: {xp} XP",
+      "activeGoals": "Objectifs Actifs",
+      "viewAll": "Tout voir",
+      "noGoals": "Pas d'objectifs actifs",
+      "createGoal": "Créer un objectif",
+      "daily": "Quotidien",
+      "weekly": "Hebdomadaire",
+      "monthly": "Mensuel",
+      "xpReward": "{xp} XP",
+      "goals": {
+        "complete_5_tasks": {
+          "title": "Compléter 5 Tâches",
+          "description": "Complétez 5 tâches aujourd'hui"
+        },
+        "use_pomodoro_timer": {
+          "title": "Utiliser le Minuteur Pomodoro",
+          "description": "Complétez 3 sessions Pomodoro"
+        },
+        "plan_tasks": {
+          "title": "Planifier des Tâches",
+          "description": "Planifiez au moins 3 tâches pour une meilleure gestion du temps"
+        },
+        "complete_20_tasks": {
+          "title": "Compléter 20 Tâches",
+          "description": "Complétez 20 tâches cette semaine"
+        },
+        "maintain_5-day_streak": {
+          "title": "Maintenir une Série de 5 Jours",
+          "description": "Connectez-vous et complétez des tâches pendant 5 jours consécutifs"
+        },
+        "power_user": {
+          "title": "Utilisateur Avancé",
+          "description": "Complétez 100 tâches ce mois-ci"
+        },
+        "consistency_king": {
+          "title": "Roi de la Constance",
+          "description": "Maintenez une série de 20 jours"
+        }
+      }
+    },
+    "analytics": {
+      "title": "Aperçu Analytique",
+      "week": "Semaine",
+      "month": "Mois",
+      "year": "Année",
+      "completion": "Tâches Terminées",
+      "focusTime": "Temps Focalisé",
+      "viewDetailedAnalytics": "Voir l'analyse détaillée",
+      "minutesFocus": "Minutes de focus",
+      "tasksCompleted": "Tâches terminées",
+      "tasks": "Tâches",
+      "focus": "Focus",
+      "dayName": "{day}",
+      "tasksCreated": "Tâches créées",
+      "quarter": "Trimestre"
+    },
+    "activity": {
+      "title": "Activités Récentes",
+      "noActivities": "Pas d'activités récentes",
+      "startActivity": "Commencez à utiliser l'application pour suivre vos activités",
+      "taskCompleted": "{{userName}} a terminé la tâche \"{{taskName}}\"",
+      "taskCreated": "{{userName}} a créé \"{{taskName}}\"",
+      "commentAdded": "{{userName}} a commenté sur \"{{taskName}}\"",
+      "userJoined": "{{userName}} a rejoint l'équipe \"{{teamName}}\"",
+      "documentEdited": "{{userName}} a modifié \"{{documentName}}\"",
+      "goalProgress": "{{userName}} a progressé sur l'objectif \"{{goalName}}\" ({{progress}}%)",
+      "moodLogged": "{{userName}} a enregistré une humeur {{mood}} avec une énergie de {{energy}}/10",
+      "activityOccurred": "{{userName}} a effectué une action",
+      "minutesAgo": "il y a {{minutes}}m",
+      "hoursAgo": "il y a {{hours}}h",
+      "daysAgo": "il y a {{days}}j",
+      "viewComment": "Voir",
+      "completed": "Terminé",
+      "loadMore": "Charger plus"
+    },
+    "integrations": {
+      "title": "Intégrations",
+      "connected": "Connecté",
+      "disconnected": "Déconnecté",
+      "error": "Erreur",
+      "lastSync": "Synchronisé {{time}}",
+      "loading": "Chargement des intégrations...",
+      "loadError": "Échec du chargement des intégrations",
+      "retry": "Réessayer",
+      "syncNow": "Synchroniser",
+      "manageIntegrations": "Gérer"
+    }
+  },
+  "Terms": {
+    "title": "Conditions Générales d'Utilisation",
+    "lastUpdated": "Dernière mise à jour: {date}",
+    "sections": {
+      "introduction": {
+        "title": "1. Introduction",
+        "content": "Bienvenue sur notre plateforme. Les présentes Conditions Générales d'Utilisation régissent votre utilisation de notre site web, application web et tous les services associés. En accédant à nos services ou en les utilisant, vous acceptez d'être lié par ces Conditions. Si vous n'êtes pas d'accord avec une partie des conditions, vous ne pouvez pas accéder à nos services."
+      },
+      "definitions": {
+        "title": "2. Définitions",
+        "terms": {
+          "service": {
+            "term": "\"Service\"",
+            "definition": "désigne l'application fournie par notre entreprise."
+          },
+          "user": {
+            "term": "\"Utilisateur\"",
+            "definition": "désigne la personne qui s'est inscrite pour un compte sur notre Service."
+          },
+          "terms": {
+            "term": "\"Conditions\"",
+            "definition": "désigne ces Conditions Générales d'Utilisation."
+          },
+          "content": {
+            "term": "\"Contenu\"",
+            "definition": "désigne toute donnée ou information créée, téléchargée ou partagée via notre Service."
+          }
+        }
+      },
+      "userAccounts": {
+        "title": "3. Comptes Utilisateurs",
+        "content": {
+          "registration": "Pour utiliser certaines fonctionnalités de notre Service, vous devez créer un compte. Vous acceptez de fournir des informations exactes, actuelles et complètes lors du processus d'inscription et de mettre à jour ces informations pour les maintenir exactes, actuelles et complètes.",
+          "responsibility": "Vous êtes responsable de la confidentialité de votre compte et de votre mot de passe. Vous acceptez d'assumer la responsabilité de toutes les activités qui se déroulent sous votre compte.",
+          "termination": "Nous nous réservons le droit de suspendre ou de résilier votre compte à notre seule discrétion, sans préavis, pour une conduite que nous estimons contraire à ces Conditions ou préjudiciable aux autres utilisateurs du Service, à nous-mêmes ou à des tiers, ou pour toute autre raison."
+        }
+      },
+      "intellectualProperty": {
+        "title": "4. Droits de Propriété Intellectuelle",
+        "content": "Le Service et son contenu original, ses fonctionnalités et ses fonctions sont et resteront la propriété exclusive de notre entreprise et de ses concédants. Le Service est protégé par le droit d'auteur, les marques de commerce et d'autres lois des États-Unis et des pays étrangers. Nos marques de commerce et notre présentation commerciale ne peuvent pas être utilisées en relation avec un produit ou un service sans le consentement écrit préalable de notre entreprise."
+      },
+      "userContent": {
+        "title": "5. Contenu de l'Utilisateur",
+        "content": {
+          "ownership": "Vous conservez tous les droits sur votre Contenu que vous téléchargez, publiez ou partagez sur ou via le Service.",
+          "license": "En téléchargeant, publiant ou partageant du Contenu, vous nous accordez une licence mondiale, non exclusive et libre de redevance pour utiliser, reproduire, modifier, adapter, publier, traduire, distribuer et afficher ce Contenu dans le cadre de la fourniture du Service.",
+          "prohibited": "Vous ne pouvez pas télécharger, publier ou partager du Contenu qui enfreint les droits de propriété intellectuelle d'autrui ou qui viole ces Conditions."
+        }
+      },
+      "prohibitedActivities": {
+        "title": "6. Activités Interdites",
+        "items": {
+          "illegal": "Utiliser le Service à des fins illégales ou interdites par ces Conditions.",
+          "impersonation": "Usurper l'identité d'une personne ou d'une entité, ou déclarer faussement ou déformer votre affiliation avec une personne ou une entité.",
+          "harmful": "Adopter une conduite qui restreint ou empêche l'utilisation ou la jouissance du Service par quiconque, ou qui peut nous nuire ou nuire aux utilisateurs du Service.",
+          "spam": "Utiliser le Service pour envoyer du contenu promotionnel ou commercial non sollicité ou toute autre forme de spam.",
+          "security": "Tenter d'interférer avec, de compromettre l'intégrité ou la sécurité du système, ou de déchiffrer les transmissions vers ou depuis les serveurs exécutant le Service."
+        }
+      },
+      "privacy": {
+        "title": "7. Politique de Confidentialité",
+        "content": "Votre utilisation du Service est également régie par notre Politique de Confidentialité, qui est incorporée à ces Conditions par référence. Veuillez consulter notre Politique de Confidentialité pour comprendre nos pratiques."
+      },
+      "termination": {
+        "title": "8. Résiliation",
+        "content": "Nous pouvons résilier ou suspendre votre compte et interdire l'accès au Service immédiatement, sans préavis ni responsabilité, à notre seule discrétion, pour quelque raison que ce soit, y compris, mais sans s'y limiter, une violation des Conditions."
+      },
+      "limitation": {
+        "title": "9. Limitation de Responsabilité",
+        "content": "En aucun cas notre entreprise, ni ses directeurs, employés, partenaires, agents, fournisseurs ou affiliés, ne seront responsables des dommages indirects, accessoires, spéciaux, consécutifs ou punitifs, y compris, sans limitation, la perte de profits, de données, d'utilisation, de clientèle ou d'autres pertes immatérielles, résultant de votre accès ou utilisation ou impossibilité d'accéder ou d'utiliser le Service."
+      },
+      "changes": {
+        "title": "10. Modifications des Conditions",
+        "content": "Nous nous réservons le droit de modifier ou de remplacer ces Conditions à tout moment. Il est de votre responsabilité de consulter périodiquement ces Conditions pour en connaître les changements. Votre utilisation continue du Service après la publication de toute modification de ces Conditions constitue une acceptation de ces changements."
+      },
+      "contact": {
+        "title": "11. Contactez-nous",
+        "content": "Si vous avez des questions concernant ces Conditions, veuillez nous contacter via les informations de contact fournies."
+      }
+    }
+  },
+  "Privacy": {
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière mise à jour: {date}",
+    "sections": {
+      "introduction": {
+        "title": "1. Introduction",
+        "content": "Chez notre entreprise, nous prenons votre vie privée au sérieux. Cette Politique de Confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous utilisez notre application. Veuillez lire attentivement cette politique de confidentialité. Si vous n'êtes pas d'accord avec les termes de cette politique de confidentialité, veuillez ne pas accéder à l'application."
+      },
+      "information": {
+        "title": "2. Informations que nous collectons",
+        "intro": "Nous collectons plusieurs types d'informations à diverses fins pour fournir et améliorer notre service:",
+        "items": {
+          "personal": "Données personnelles: En utilisant notre Service, nous pouvons vous demander de nous fournir certaines informations personnellement identifiables qui peuvent être utilisées pour vous contacter ou vous identifier (\"Données personnelles\"). Cela peut inclure, sans s'y limiter: adresse e-mail, nom et prénom, numéro de téléphone, adresse et cookies.",
+          "usage": "Données d'utilisation: Nous pouvons également collecter des informations sur la façon dont le Service est accédé et utilisé (\"Données d'utilisation\"). Ces données peuvent inclure des informations telles que l'adresse de protocole Internet de votre ordinateur (adresse IP), le type de navigateur, la version du navigateur, les pages de notre Service que vous visitez, l'heure et la date de votre visite, le temps passé sur ces pages, les identifiants uniques de l'appareil et d'autres données de diagnostic.",
+          "device": "Données de l'appareil: Nous collectons des informations sur l'appareil que vous utilisez pour accéder à notre Service, y compris le modèle matériel, le système d'exploitation et sa version, les identifiants uniques de l'appareil et les informations sur le réseau mobile.",
+          "cookies": "Cookies et données de suivi: Nous utilisons des cookies et des technologies de suivi similaires pour suivre l'activité sur notre Service et conserver certaines informations."
+        }
+      },
+      "dataUsage": {
+        "title": "3. Comment nous utilisons vos données",
+        "intro": "Nous utilisons les données collectées à diverses fins:",
+        "purposes": {
+          "serviceProvision": "Pour fournir et maintenir notre Service",
+          "improvement": "Pour améliorer notre Service et l'expérience utilisateur",
+          "communication": "Pour communiquer avec vous concernant les mises à jour, le support et les offres promotionnelles (avec options de désabonnement)",
+          "security": "Pour détecter, prévenir et résoudre les problèmes techniques et les risques de sécurité"
+        }
+      },
+      "dataSharing": {
+        "title": "4. Divulgation des données",
+        "intro": "Nous pouvons divulguer vos informations personnelles dans les situations suivantes:",
+        "parties": {
+          "serviceProviders": "Prestataires de services: Nous pouvons employer des sociétés tierces et des individus pour faciliter notre Service (\"Prestataires de services\"), pour fournir le Service en notre nom, pour exécuter des services liés au Service ou pour nous aider à analyser comment notre Service est utilisé. Ces tiers n'ont accès à vos Données personnelles que pour effectuer ces tâches en notre nom et sont tenus de ne pas les divulguer ni les utiliser à d'autres fins.",
+          "legal": "Exigences légales: Nous pouvons divulguer vos Données personnelles si la loi l'exige ou en réponse à des demandes valides des autorités publiques (par exemple, un tribunal ou une agence gouvernementale).",
+          "business": "Transferts commerciaux: Dans le cadre d'une fusion, d'une vente d'actifs de l'entreprise, d'un financement ou d'une acquisition de tout ou partie de notre activité par une autre société.",
+          "consent": "Avec votre consentement: Nous pouvons divulguer vos informations personnelles à toute autre fin avec votre consentement."
+        }
+      },
+      "cookies": {
+        "title": "5. Cookies et technologies de suivi",
+        "intro": "Nous utilisons des cookies et des technologies de suivi similaires pour suivre l'activité sur notre Service et conserver certaines informations. Les cookies sont des fichiers contenant une petite quantité de données qui peuvent inclure un identifiant unique anonyme.",
+        "types": {
+          "essential": {
+            "name": "Cookies essentiels",
+            "description": "Nécessaires au fonctionnement de notre site web. Ils permettent des fonctions de base comme la navigation dans les pages et l'accès aux zones sécurisées du site web."
+          },
+          "analytics": {
+            "name": "Cookies d'analyse",
+            "description": "Nous aident à comprendre comment les visiteurs interagissent avec notre site web en collectant et en rapportant des informations de manière anonyme."
+          },
+          "functional": {
+            "name": "Cookies fonctionnels",
+            "description": "Permettent des fonctionnalités et une personnalisation améliorées, comme la mémorisation de vos préférences et paramètres."
+          },
+          "advertising": {
+            "name": "Cookies publicitaires",
+            "description": "Utilisés pour suivre les visiteurs sur les sites web afin d'afficher des publicités pertinentes basées sur les visites précédentes."
+          }
+        },
+        "management": "Vous pouvez demander à votre navigateur de refuser tous les cookies ou d'indiquer quand un cookie est envoyé. Cependant, si vous n'acceptez pas les cookies, vous ne pourrez peut-être pas utiliser certaines parties de notre Service."
+      },
+      "security": {
+        "title": "6. Sécurité des données",
+        "content": "La sécurité de vos données est importante pour nous, mais n'oubliez pas qu'aucune méthode de transmission sur Internet ou méthode de stockage électronique n'est sécurisée à 100%. Bien que nous nous efforcions d'utiliser des moyens commercialement acceptables pour protéger vos Données personnelles, nous ne pouvons garantir leur sécurité absolue."
+      },
+      "thirdParty": {
+        "title": "7. Liens vers d'autres sites",
+        "content": "Notre Service peut contenir des liens vers d'autres sites qui ne sont pas exploités par nous. Si vous cliquez sur un lien tiers, vous serez dirigé vers le site de ce tiers. Nous vous conseillons vivement de consulter la Politique de confidentialité de chaque site que vous visitez. Nous n'avons aucun contrôle et n'assumons aucune responsabilité quant au contenu, aux politiques de confidentialité ou aux pratiques des sites ou services tiers."
+      },
+      "childrens": {
+        "title": "8. Confidentialité des enfants",
+        "content": "Notre Service ne s'adresse pas aux personnes de moins de 13 ans. Nous ne collectons pas sciemment d'informations personnellement identifiables de personnes de moins de 13 ans. Si vous êtes un parent ou un tuteur et que vous savez que votre enfant nous a fourni des Données personnelles, veuillez nous contacter. Si nous apprenons que nous avons collecté des Données personnelles d'enfants sans vérification du consentement parental, nous prenons des mesures pour supprimer ces informations de nos serveurs."
+      },
+      "dataRetention": {
+        "title": "9. Conservation des données",
+        "content": "Nous ne conserverons vos Données personnelles que le temps nécessaire aux fins énoncées dans cette Politique de confidentialité. Nous conserverons et utiliserons vos Données personnelles dans la mesure nécessaire pour respecter nos obligations légales (par exemple, si nous sommes tenus de conserver vos données pour nous conformer aux lois applicables), résoudre les litiges et faire respecter nos accords et politiques juridiques."
+      },
+      "userRights": {
+        "title": "10. Vos droits en matière de protection des données",
+        "intro": "Selon votre emplacement et les lois applicables, vous pouvez avoir certains droits concernant vos données personnelles:",
+        "rights": {
+          "access": "Le droit d'accès – Vous avez le droit de demander des copies de vos données personnelles.",
+          "rectification": "Le droit de rectification – Vous avez le droit de demander que nous corrigions toute information que vous jugez inexacte. Vous avez également le droit de demander que nous complétions les informations que vous jugez incomplètes.",
+          "erasure": "Le droit à l'effacement – Vous avez le droit de demander que nous effacions vos données personnelles, sous certaines conditions.",
+          "restriction": "Le droit de restreindre le traitement – Vous avez le droit de demander que nous restreignions le traitement de vos données personnelles, sous certaines conditions.",
+          "portability": "Le droit à la portabilité des données – Vous avez le droit de demander que nous transférions les données que nous avons collectées à une autre organisation, ou directement à vous, sous certaines conditions.",
+          "objection": "Le droit de s'opposer au traitement – Vous avez le droit de vous opposer au traitement de vos données personnelles, sous certaines conditions."
+        }
+      },
+      "changes": {
+        "title": "11. Modifications de cette politique de confidentialité",
+        "content": "Nous pouvons mettre à jour notre Politique de confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle Politique de confidentialité sur cette page et en mettant à jour la date de \"dernière mise à jour\". Nous vous conseillons de consulter périodiquement cette Politique de confidentialité pour tout changement. Les modifications apportées à cette Politique de confidentialité sont effectives lorsqu'elles sont publiées sur cette page."
+      },
+      "contact": {
+        "title": "12. Contactez-nous",
+        "content": "Si vous avez des questions concernant cette Politique de confidentialité, veuillez nous contacter via les informations de contact fournies sur notre site web."
       }
     }
   }

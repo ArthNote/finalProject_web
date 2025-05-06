@@ -11,6 +11,10 @@ import GridViewCard from "./gridViewCard";
 import GridViewLoading from "./gridViewLoading";
 import GridViewCardLoading from "./gridViewCardLoading";
 import { useTasks, hasMoreTasks, getNextPage } from "@/lib/services/tasks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateTaskCompleteStatus } from "@/lib/api/tasks";
+import { toast } from "@/hooks/use-toast";
+import { scheduleTasks } from "@/lib/api/schedule";
 
 const GridView = () => {
   const t = useTranslations("tasks.gridView");
@@ -19,6 +23,7 @@ const GridView = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [scheduledFilter, setScheduledFilter] = useState("all"); // "all", "scheduled", "unscheduled"
   const [priorityFilter, setPriorityFilter] = useState("all"); // "all",
+  const [schedulingTaskId, setSchedulingTaskId] = useState<string | null>(null);
 
   // Pagination state
   const [pagination, setPagination] = useState({
@@ -139,48 +144,113 @@ const GridView = () => {
   // Get unique categories from tasks
   const categories = ["all"]; // We'll need to fetch categories from the server or add them dynamically
 
-  // Task action handlers
+  const queryClient = useQueryClient();
+
+  const { mutate: updateCompleteStatus } = useMutation({
+    mutationFn: updateTaskCompleteStatus,
+    onSuccess: () => {
+      Promise.all([
+        queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+      ]);
+      toast({
+        title:
+          locale === "en"
+            ? "Task status updated"
+            : "Statut de la tâche mis à jour",
+        description:
+          locale === "en"
+            ? "The task status has been updated successfully."
+            : "Le statut de la tâche a été mis à jour avec succès.",
+      });
+    },
+    onError: () => {
+      toast({
+        title:
+          locale === "en"
+            ? "Error updating task status"
+            : "Erreur de mise à jour du statut de la tâche",
+        description:
+          locale === "en"
+            ? "There was an error updating the task status."
+            : "Il y a eu une erreur lors de la mise à jour du statut de la tâche.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleToggleComplete = async (taskId: string) => {
     try {
-      const findTask = (id: string) => {
-        return (
-          todoTasks.find((t) => t.id === id) ||
-          completedTasks.find((t) => t.id === id) ||
-          unscheduledTasks.find((t) => t.id === id) ||
-          inprogressTasks.find((t) => t.id === id) ||
-          null
-        );
-      };
-
-      // Logic for toggling completion status
-      refetch();
+      updateCompleteStatus(taskId);
     } catch (error) {
       console.error("Error updating task completion status:", error);
     }
   };
 
   const handleToggleScheduled = async (taskId: string) => {
-    try {
-      const findTask = (id: string) => {
-        return (
-          todoTasks.find((t) => t.id === id) ||
-          completedTasks.find((t) => t.id === id) ||
-          unscheduledTasks.find((t) => t.id === id) ||
-          inprogressTasks.find((t) => t.id === id) ||
-          null
-        );
-      };
-
-      const task = findTask(taskId);
-      const isScheduled = task?.scheduled || false;
-
-      // await updateTaskScheduled(taskId, !isScheduled);
-      // Refetch tasks to update the UI
-      refetch();
-    } catch (error) {
-      console.error("Error updating task scheduling status:", error);
-    }
-  };
+      try {
+        setSchedulingTaskId(taskId); // Set loading state
+        const findTask = (id: string) => {
+          return (
+            todoTasks.find((t) => t.id === id) ||
+            completedTasks.find((t) => t.id === id) ||
+            unscheduledTasks.find((t) => t.id === id) ||
+            inprogressTasks.find((t) => t.id === id) ||
+            null
+          );
+        };
+  
+        const task = findTask(taskId);
+        if (!task) {
+          toast({
+            title: locale === "en" ? "Task not found" : "Tâche introuvable",
+            description: locale === "en" ? "An error occurred while scheduling your task" : "Une erreur s'est produite lors de la planification de votre tâche",
+            variant: "destructive",
+          });
+          return;
+        }
+  
+        // If already scheduled, don't do anything -
+        // you'd need another API call to unschedule a specific task
+        if (task.scheduled) {
+          return;
+        }
+  
+        // Create a scheduling request for just this one task
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+  
+        const thirtyDaysFromToday = new Date(today);
+        thirtyDaysFromToday.setDate(today.getDate() + 30);
+  
+        await scheduleTasks({
+          taskSelectionMode: "full", // Only schedule unscheduled tasks
+          timePeriodType: "custom",
+          customRangeStart: today,
+          customRangeEnd: thirtyDaysFromToday,
+          respectFixedAppointments: true,
+          addBreaksEnabled: true,
+          optimizeFocusTimeEnabled: true,
+          includePastTasks: false,
+        });
+  
+        toast({
+          title: locale === "en" ? "Task scheduled" : "Tâche planifiée",
+          description: locale === "en" ? "Your task has been successfully scheduled" : "Votre tâche a été planifiée avec succès",
+        });
+  
+        // Refetch tasks to update the UI
+        refetch();
+        setSchedulingTaskId(null);
+      } catch (error) {
+        console.error("Error updating task scheduling status:", error);
+        setSchedulingTaskId(null);
+        toast({
+          title: locale === "en" ? "Error scheduling task" : "Erreur de planification de la tâche",
+          description: locale === "en" ? "An error occurred while scheduling your task" : "Une erreur s'est produite lors de la planification de votre tâche",
+          variant: "destructive",
+        });
+      }
+    };
 
   // Helper function for empty state UI
   const EmptyStateUI = ({ message }: { message: string }) => (
@@ -269,6 +339,7 @@ const GridView = () => {
                         setSelectedTask={setSelectedTask}
                         handleToggleComplete={handleToggleComplete}
                         handleToggleScheduled={handleToggleScheduled}
+                        isScheduling={schedulingTaskId === task.id}
                       />
                     ))}
                     {loadingStates.unscheduled && <GridViewCardLoading />}
@@ -296,7 +367,6 @@ const GridView = () => {
             </div>
           )}
 
-       
           {(scheduledFilter === "all" || scheduledFilter === "scheduled") && (
             <div className="space-y-4">
               <h3 className="font-medium text-base border-b pb-2">

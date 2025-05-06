@@ -17,6 +17,8 @@ const getPriorityColor = (priority: string) => {
       return "bg-amber-500";
     case "low":
       return "bg-green-500";
+    case "urgent":
+      return "bg-red-700";
     default:
       return "bg-blue-500";
   }
@@ -37,7 +39,7 @@ export const EventItem: React.FC<EventItemProps> = ({
   onSelect,
   onUpdate,
 }) => {
-  const locale = useLocale() as "fr" | "en" ;
+  const locale = useLocale() as "fr" | "en";
   const eventRef = React.useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = React.useState(false);
   const [resizing, setResizing] = React.useState(false);

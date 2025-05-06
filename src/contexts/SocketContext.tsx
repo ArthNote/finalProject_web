@@ -34,6 +34,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     if (!session?.user.id) return;
 
     // Create socket connection if it doesn't exist yet
+
     if (!socketRef.current) {
       const socket = io("http://localhost:8080", {
         query: {

@@ -31,6 +31,8 @@ const TaskCard = ({
                 ? "bg-red-500"
                 : task.priority === "medium"
                 ? "bg-amber-500"
+                : task.priority === "urgent"
+                ? "bg-red-700"
                 : "bg-green-500"
             }`}
           />

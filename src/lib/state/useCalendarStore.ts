@@ -77,7 +77,7 @@ export const useCalendarStore = create<CalendarState>((set) => ({
     medium: true,
     low: true,
   },
-  viewMode: "kanban",
+  viewMode: "list",
   isSettingsOpen: false,
   optimizationRange: {
     from: undefined,

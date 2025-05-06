@@ -25,7 +25,7 @@ import {
   Lock,
 } from "lucide-react";
 import GamedGoalsView from "./GamedGoalsView";
-import RewardsView from "./RewardsView";
+import { RewardsView } from "./RewardsView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -36,6 +36,14 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getUserProgress,
+  updateGoalProgress,
+  getRewards,
+  unlockReward,
+  generateGoals,
+} from "@/lib/api/goals";
 
 import {
   ProgressStat,
@@ -48,300 +56,128 @@ import { Badge } from "@/components/ui/badge";
 import { AnimatePresence, motion } from "motion/react";
 import { StreakCard } from "./StreakCard";
 import { GoalCard } from "./GoalCard";
+import { useTranslations } from "next-intl";
+import { ErrorState } from "../error_state";
+import GoalsSkeleton from "./GoalsSkeleton";
 
 const GoalsPage = () => {
+  const t = useTranslations("goals");
   const [activeTab, setActiveTab] = useState<"daily" | "weekly" | "monthly">(
     "daily"
   );
-
   const [activeSection, setActiveSection] = useState<"goals" | "rewards">(
     "goals"
   );
-
-  // Mock data
-  const userProgress: UserProgress = {
-    level: 7,
-    currentXP: 350,
-    nextLevelXP: 500,
-    streakDays: 8,
-    longestStreak: 14,
-    completedMilestones: 3,
-    totalMilestones: 10,
-  };
-
-  const progressStats: ProgressStat[] = [
-    {
-      label: "Daily Goals",
-      value: 85,
-      prevValue: 73,
-      change: 12,
-      color: "blue",
-    },
-    {
-      label: "Weekly Goals",
-      value: 62,
-      prevValue: 55,
-      change: 7,
-      color: "purple",
-    },
-    {
-      label: "Monthly Goals",
-      value: 45,
-      prevValue: 40,
-      change: 5,
-      color: "amber",
-    },
-  ];
-
-  const milestones: GameMilestone[] = [
-    {
-      id: "1",
-      name: "First Task Completed",
-      description: "Complete your first task",
-      unlocked: true,
-      unlockedDate: "2025-03-15",
-      icon: "🚀",
-      xpReward: 50,
-    },
-    {
-      id: "2",
-      name: "3-Day Streak",
-      description: "Complete goals for 3 days in a row",
-      unlocked: true,
-      unlockedDate: "2025-03-20",
-      icon: "🔥",
-      xpReward: 75,
-    },
-    {
-      id: "3",
-      name: "Level 5 Reached",
-      description: "Reach experience level 5",
-      unlocked: true,
-      unlockedDate: "2025-03-28",
-      icon: "⭐",
-      xpReward: 100,
-    },
-    {
-      id: "4",
-      name: "50 Tasks Done",
-      description: "Complete 50 tasks in total",
-      unlocked: false,
-      icon: "📋",
-      xpReward: 150,
-    },
-    {
-      id: "5",
-      name: "10-Day Streak",
-      description: "Complete goals for 10 days in a row",
-      unlocked: false,
-      icon: "🔥",
-      xpReward: 200,
-    },
-  ];
-
-  // Mock function to open add goal modal
-  const openAddGoalModal = () => {
-    toast.info("Add goal functionality would open here");
-  };
-
-  // Calculate XP percentage
-  const xpPercentage =
-    (userProgress.currentXP / userProgress.nextLevelXP) * 100;
-
-  // Motivational quotes
-  const quotes = [
-    "Consistency is the key to extraordinary results.",
-    "Every task completed is a step toward mastery.",
-    "Small daily improvements lead to stunning results.",
-    "Your future self is watching you right now through memories.",
-    "Progress is progress, no matter how small.",
-  ];
-
-  const userLevel = {
-    current: 7,
-    xp: 2350,
-    nextLevelXp: 3000,
-    totalXpEarned: 12350,
-  };
-
   const [showXpAnimation, setShowXpAnimation] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
+  const queryClient = useQueryClient();
+
+  // Fetch user progress
+  const {
+    data: progress,
+    isLoading: isLoadingProgress,
+    refetch: refetchProgress,
+  } = useQuery({
+    queryKey: ["user-progress"],
+    queryFn: getUserProgress,
+  });
+
+  // Fetch rewards
+  const { data: rewards, isLoading: isLoadingRewards } = useQuery({
+    queryKey: ["rewards"],
+    queryFn: getRewards,
+  });
+
+  // Update goal progress mutation
+  const updateGoalMutation = useMutation({
+    mutationFn: ({ goalId, progress }: { goalId: string; progress: number }) =>
+      updateGoalProgress(goalId, progress),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-progress"] });
       setShowXpAnimation(true);
       setTimeout(() => setShowXpAnimation(false), 2000);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+    },
+  });
 
-  const nextLevelRewards: Reward[] = [
-    {
-      id: "reward-1",
-      title: "Dark Theme",
-      description: "Unlock the dark theme for the app",
-      level: 8,
-      icon: <Lightbulb className="h-5 w-5" />,
-      unlocked: false,
+  // Unlock reward mutation
+  const unlockRewardMutation = useMutation({
+    mutationFn: (rewardId: string) => unlockReward(rewardId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rewards"] });
+      queryClient.invalidateQueries({ queryKey: ["user-progress"] });
     },
-    {
-      id: "reward-2",
-      title: "Custom Dashboard",
-      description: "Create your own custom dashboard layout",
-      level: 8,
-      icon: <Rocket className="h-5 w-5" />,
-      unlocked: false,
-    },
-    {
-      id: "reward-3",
-      title: "Advanced Analytics",
-      description: "Access detailed productivity analytics",
-      level: 8,
-      icon: <TrendingUp className="h-5 w-5" />,
-      unlocked: false,
-    },
-  ];
+  });
 
-  const dailyGoals: Goal[] = [
-    {
-      id: "daily-1",
-      title: "Complete 5 high-priority tasks",
-      description: "Finish 5 tasks marked as high priority",
-      type: "daily",
-      xp: 50,
-      progress: 80,
-      status: "in-progress",
-      icon: <Zap className="h-5 w-5 text-yellow-500" />,
+  const generateGoalsMutation = useMutation({
+    mutationFn: generateGoals,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-progress"] });
     },
-    {
-      id: "daily-2",
-      title: "Update task statuses",
-      description: "Keep your task board up to date by updating statuses",
-      type: "daily",
-      xp: 30,
-      progress: 100,
-      status: "completed",
-      completedAt: "Today, 2:30 PM",
-      icon: <CheckCircle2 className="h-5 w-5 text-green-500" />,
-    },
-    {
-      id: "daily-3",
-      title: "Use the Pomodoro timer",
-      description: "Complete at least 3 Pomodoro sessions",
-      type: "daily",
-      xp: 40,
-      progress: 67,
-      status: "in-progress",
-      icon: <Clock className="h-5 w-5 text-blue-500" />,
-    },
-  ];
+  });
 
-  const weeklyGoals: Goal[] = [
-    {
-      id: "weekly-1",
-      title: "Complete 20 tasks",
-      description: "Finish 20 tasks of any priority",
-      type: "weekly",
-      xp: 150,
-      progress: 65,
-      status: "in-progress",
-      icon: <Target className="h-5 w-5 text-purple-500" />,
-    },
-    {
-      id: "weekly-2",
-      title: "Maintain a 5-day streak",
-      description:
-        "Log in and complete at least one task for 5 consecutive days",
-      type: "weekly",
-      xp: 200,
-      progress: 80,
-      status: "in-progress",
-      icon: <Flame className="h-5 w-5 text-orange-500" />,
-    },
-    {
-      id: "weekly-3",
-      title: "Create a weekly plan",
-      description: "Use the planning feature to organize your week",
-      type: "weekly",
-      xp: 100,
-      progress: 100,
-      status: "completed",
-      completedAt: "2 days ago",
-      icon: <Calendar className="h-5 w-5 text-indigo-500" />,
-    },
-  ];
+  const handleGenerateGoals = () => {
+    generateGoalsMutation.mutate();
+  };
 
-  const monthlyGoals: Goal[] = [
-    {
-      id: "monthly-1",
-      title: "Complete a major project",
-      description: "Mark a project as completed",
-      type: "monthly",
-      xp: 500,
-      progress: 90,
-      status: "in-progress",
-      icon: <Trophy className="h-5 w-5 text-amber-500" />,
-    },
-    {
-      id: "monthly-2",
-      title: "Achieve 80% task completion rate",
-      description: "Complete at least 80% of all tasks created this month",
-      type: "monthly",
-      xp: 400,
-      progress: 75,
-      status: "in-progress",
-      icon: <TrendingUp className="h-5 w-5 text-emerald-500" />,
-    },
-    {
-      id: "monthly-3",
-      title: "Maintain a 20-day streak",
-      description:
-        "Log in and complete at least one task for 20 days this month",
-      type: "monthly",
-      xp: 600,
-      progress: 50,
-      status: "in-progress",
-      icon: <Flame className="h-5 w-5 text-red-500" />,
-    },
-  ];
+  const handleGoalProgress = (goalId: string, newProgress: number) => {
+    updateGoalMutation.mutate({ goalId, progress: newProgress });
+  };
 
-  const milestoneGoals: Goal[] = [
-    {
-      id: "milestone-1",
-      title: "Productivity Master",
-      description: "Complete 1000 tasks in total",
-      type: "milestone",
-      xp: 1000,
-      progress: 72,
-      status: "in-progress",
-      icon: <Crown className="h-5 w-5 text-yellow-500" />,
-    },
-    {
-      id: "milestone-2",
-      title: "Consistency Champion",
-      description: "Maintain a 30-day streak",
-      type: "milestone",
-      xp: 1500,
-      progress: 60,
-      status: "in-progress",
-      icon: <Shield className="h-5 w-5 text-blue-500" />,
-    },
-    {
-      id: "milestone-3",
-      title: "Project Virtuoso",
-      description: "Successfully complete 10 projects",
-      type: "milestone",
-      xp: 2000,
-      progress: 40,
-      status: "in-progress",
-      icon: <Star className="h-5 w-5 text-purple-500" />,
-    },
-  ];
+  const handleUnlockReward = (rewardId: string) => {
+    unlockRewardMutation.mutate(rewardId);
+  };
 
-  const xpNeeded = userLevel.nextLevelXp - userLevel.xp;
-  const xpProgress = (userLevel.xp / userLevel.nextLevelXp) * 100;
+  if (isLoadingProgress || isLoadingRewards) {
+    return <GoalsSkeleton />;
+  }
+
+  if (!progress) {
+    return (
+      <ErrorState
+        action={t("errorState.action")}
+        description={t("errorState.description")}
+        title={t("errorState.title")}
+        retryAction={refetchProgress}
+      />
+    );
+  }
+
+  const XP_PER_LEVEL = 1000;
+
+  // Ensure progress values are numbers with defaults
+  const userLevel = {
+    current: progress.data.level || 1,
+    xp: progress.data.currentXP || 0,
+    nextLevelXp: XP_PER_LEVEL,
+    totalXpEarned: progress.data.totalXP || 0,
+  };
+
+  const xpNeeded = Math.max(0, userLevel.nextLevelXp - userLevel.xp);
+  const xpProgress = Math.min(
+    100,
+    (userLevel.xp / userLevel.nextLevelXp) * 100
+  );
+
+  // Filter goals by type with null checks
+  const dailyGoals =
+    progress.data.goals?.filter((goal) => goal.type === "DAILY") || [];
+  const weeklyGoals =
+    progress.data.goals?.filter((goal) => goal.type === "WEEKLY") || [];
+  const monthlyGoals =
+    progress.data.goals?.filter((goal) => goal.type === "MONTHLY") || [];
+  const milestoneGoals =
+    progress.data.goals?.filter((goal) => goal.type === "MILESTONE") || [];
+
+  // Filter rewards for next level with null checks
+  const nextLevelRewards =
+    rewards && Array.isArray(rewards)
+      ? rewards.filter(
+          (reward) => reward.unlockLevel === progress.data.level + 1
+        )
+      : [];
 
   return (
-    <div className="w-full space-y-8 ">
+    <div className="w-full space-y-8">
       {/* Hero Section with Level and Quote */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8 p-4 sm:p-0">
         <Card className="col-span-1 lg:col-span-3 relative overflow-hidden border-2 border-primary/20">
@@ -353,18 +189,20 @@ const GoalsPage = () => {
               <div>
                 <CardTitle className="text-2xl flex items-center">
                   <Trophy className="mr-2 h-6 w-6 text-yellow-500" />
-                  Level {userLevel.current}
+                  {t("header.level", {
+                    level: progress.data.level,
+                  })}
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Keep completing goals to level up and unlock rewards!
+                  {t("header.levelDescription")}
                 </CardDescription>
               </div>
               <Badge
                 variant="outline"
                 className="text-lg px-3 py-1 bg-primary/10 border-primary/20"
               >
-                <Zap className="mr-2 h-5 w-5 text-yellow-500" /> {userLevel.xp}{" "}
-                XP
+                <Zap className="mr-2 h-5 w-5 text-yellow-500" />{" "}
+                {progress.data.currentXP} XP
               </Badge>
             </div>
           </CardHeader>
@@ -373,9 +211,13 @@ const GoalsPage = () => {
             {/* Level Progress Bar */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Progress to Level {userLevel.current + 1}</span>
                 <span>
-                  {userLevel.xp} / {userLevel.nextLevelXp} XP
+                  {t("header.progressToLevel", {
+                    level: progress.data.level + 1,
+                  })}
+                </span>
+                <span>
+                  {progress.data.currentXP} / {XP_PER_LEVEL} XP
                 </span>
               </div>
               <div className="relative">
@@ -399,7 +241,10 @@ const GoalsPage = () => {
                 </AnimatePresence>
               </div>
               <p className="text-sm text-muted-foreground">
-                {xpNeeded} XP needed to reach Level {userLevel.current + 1}
+                {t("header.xpNeededToLevel", {
+                  xp: XP_PER_LEVEL - progress.data.currentXP,
+                  level: progress.data.level + 1,
+                })}
               </p>
             </div>
 
@@ -407,7 +252,9 @@ const GoalsPage = () => {
             <div className="space-y-3">
               <h3 className="text-sm font-medium flex items-center">
                 <Gift className="mr-2 h-4 w-4 text-primary" />
-                Rewards at Level {userLevel.current + 1}
+                {t("header.rewardsAtLevel", {
+                  level: progress.data.level + 1,
+                })}
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -418,12 +265,14 @@ const GoalsPage = () => {
                   >
                     <CardContent className="p-4 flex items-start space-x-3">
                       <div className="bg-primary/10 p-2 rounded-full">
-                        {reward.icon}
+                        <Star className="h-5 w-5" />
                       </div>
                       <div className="space-y-1">
-                        <h4 className="font-medium">{reward.title}</h4>
+                        <h4 className="font-medium">
+                          {t(`rewards.themes.${reward.title}.title`)}
+                        </h4>
                         <p className="text-xs text-muted-foreground">
-                          {reward.description}
+                          {t(`rewards.themes.${reward.title}.description`)}
                         </p>
                       </div>
                     </CardContent>
@@ -434,8 +283,8 @@ const GoalsPage = () => {
           </CardContent>
         </Card>
         <StreakCard
-          streak={userProgress.streakDays}
-          longestStreak={userProgress.longestStreak}
+          streak={progress.data.streakDays}
+          longestStreak={progress.data.longestStreak}
         />
       </div>
 
@@ -447,14 +296,14 @@ const GoalsPage = () => {
             className="gap-2 shadow-sm"
             onClick={() => setActiveSection("goals")}
           >
-            <Target className="h-4 w-4" /> Goals & Milestones
+            <Target className="h-4 w-4" /> {t("tabs.goals&milestones")}
           </Button>
           <Button
             variant={activeSection === "rewards" ? "default" : "outline"}
             className="gap-2 shadow-sm"
             onClick={() => setActiveSection("rewards")}
           >
-            <Gift className="h-4 w-4" /> Rewards & Unlockables
+            <Gift className="h-4 w-4" /> {t("tabs.rewards&unlockables")}
           </Button>
         </div>
         <div className="sm:hidden flex items-center space-x-4">
@@ -463,14 +312,14 @@ const GoalsPage = () => {
             className="gap-2 shadow-sm w-full"
             onClick={() => setActiveSection("goals")}
           >
-            <Target className="h-4 w-4" /> Goals
+            <Target className="h-4 w-4" /> {t("tabs.goals")}
           </Button>
           <Button
             variant={activeSection === "rewards" ? "default" : "outline"}
             className="gap-2 shadow-sm w-full"
             onClick={() => setActiveSection("rewards")}
           >
-            <Gift className="h-4 w-4" /> Rewards
+            <Gift className="h-4 w-4" /> {t("tabs.rewards")}
           </Button>
         </div>
       </div>
@@ -479,11 +328,15 @@ const GoalsPage = () => {
       <div className="lg:col-span-3 space-y-6">
         {activeSection === "goals" ? (
           <Card>
-            <CardHeader>
-              <CardTitle>Goals & Challenges</CardTitle>
-              <CardDescription>
-                Complete these goals to earn XP and level up
-              </CardDescription>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between">
+              <div>
+                <CardTitle>{t("goals.title")}</CardTitle>
+                <CardDescription>{t("goals.description")}</CardDescription>
+              </div>
+              <Button onClick={handleGenerateGoals} variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                {t("goals.generate")}
+              </Button>
             </CardHeader>
             <CardContent>
               <Tabs
@@ -492,54 +345,115 @@ const GoalsPage = () => {
                   setActiveTab(value as "daily" | "weekly" | "monthly")
                 }
               >
-                <TabsList className="grid grid-cols-4 mb-4">
-                  <TabsTrigger value="daily">Daily</TabsTrigger>
-                  <TabsTrigger value="weekly">Weekly</TabsTrigger>
-                  <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                  <TabsTrigger value="milestones">Milestones</TabsTrigger>
+                <TabsList className="grid grid-cols-3 mb-4">
+                  <TabsTrigger value="daily">
+                    {t("goals.tabs.daily")}
+                  </TabsTrigger>
+                  <TabsTrigger value="weekly">
+                    {t("goals.tabs.weekly")}
+                  </TabsTrigger>
+                  <TabsTrigger value="monthly">
+                    {t("goals.tabs.monthly")}
+                  </TabsTrigger>
+                  {/* <TabsTrigger value="milestones">Milestones</TabsTrigger> */}
                 </TabsList>
 
                 <TabsContent value="daily" className="space-y-4">
-                  {dailyGoals.map((goal) => (
-                    <GoalCard key={goal.id} goal={goal} />
-                  ))}
+                  {dailyGoals.length > 0 ? (
+                    dailyGoals.map((goal) => (
+                      <GoalCard
+                        key={goal.id}
+                        goal={goal}
+                        onProgressUpdate={(progress) =>
+                          handleGoalProgress(goal.id, progress)
+                        }
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      {t("goals.daily.noGoals")}
+                    </div>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="weekly" className="space-y-4">
-                  {weeklyGoals.map((goal) => (
-                    <GoalCard key={goal.id} goal={goal} />
-                  ))}
+                  {weeklyGoals.length > 0 ? (
+                    weeklyGoals.map((goal) => (
+                      <GoalCard
+                        key={goal.id}
+                        goal={goal}
+                        onProgressUpdate={(progress) =>
+                          handleGoalProgress(goal.id, progress)
+                        }
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      {t("goals.weekly.noGoals")}
+                    </div>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="monthly" className="space-y-4">
-                  {monthlyGoals.map((goal) => (
-                    <GoalCard key={goal.id} goal={goal} />
-                  ))}
+                  {monthlyGoals.length > 0 ? (
+                    monthlyGoals.map((goal) => (
+                      <GoalCard
+                        key={goal.id}
+                        goal={goal}
+                        onProgressUpdate={(progress) =>
+                          handleGoalProgress(goal.id, progress)
+                        }
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No monthly goals available. Click 'Generate Goals' to
+                      create some!
+                    </div>
+                  )}
                 </TabsContent>
 
-                <TabsContent value="milestones" className="space-y-4">
-                  {milestoneGoals.map((goal) => (
-                    <GoalCard key={goal.id} goal={goal} />
-                  ))}
-                </TabsContent>
+                {/* <TabsContent value="milestones" className="space-y-4">
+                  {milestoneGoals.length > 0 ? (
+                    milestoneGoals.map((goal) => (
+                      <GoalCard
+                        key={goal.id}
+                        goal={goal}
+                        onProgressUpdate={(progress) =>
+                          handleGoalProgress(goal.id, progress)
+                        }
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No milestone goals available yet. Keep completing goals to
+                      unlock milestones!
+                    </div>
+                  )}
+                </TabsContent> */}
               </Tabs>
             </CardContent>
           </Card>
         ) : (
-          <RewardsView userProgress={userProgress} />
+          <RewardsView
+            rewards={rewards || []}
+            userProgress={{
+              id: progress.data.id,
+              level: progress.data.level || 1,
+              currentXP: progress.data.currentXP || 0,
+              totalXP: progress.data.totalXP || 0,
+              streakDays: progress.data.streakDays || 0,
+              longestStreak: progress.data.longestStreak || 0,
+              lastStreakDate:
+                progress.data.lastStreakDate || new Date().toISOString(),
+              rewards: progress.data.rewards || [],
+            }}
+            onUnlock={handleUnlockReward}
+          />
         )}
       </div>
-
-      {/* {activeSection === "goals" && (
-        <div className="mt-10 ">
-          <ProgressAnalytics stats={progressStats} />
-        </div>
-      )} */}
     </div>
   );
 };
 
-
-
 export default GoalsPage;
-

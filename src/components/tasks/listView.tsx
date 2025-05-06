@@ -32,6 +32,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import ListViewLoading from "./listViewLoading";
 import ListViewCardLoading from "./listViewCardLoading";
+import { scheduleTasks } from "@/lib/api/schedule";
 
 const ListView = () => {
   const t = useTranslations("tasks.listView");
@@ -101,7 +102,7 @@ const ListView = () => {
     isError,
     refetch,
   } = useTasks(filterParams, pagination, setPagination);
-
+  const [schedulingTaskId, setSchedulingTaskId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
 
   // Helper to check if we should show the "Load More" button
@@ -197,6 +198,7 @@ const ListView = () => {
 
   const handleToggleScheduled = async (taskId: string) => {
     try {
+      setSchedulingTaskId(taskId); // Set loading state
       const findTask = (id: string) => {
         return (
           todoTasks.find((t) => t.id === id) ||
@@ -208,13 +210,55 @@ const ListView = () => {
       };
 
       const task = findTask(taskId);
-      const isScheduled = task?.scheduled || false;
+      if (!task) {
+        toast({
+          title: t("card.toast.scheduleError.title"),
+          description: t("card.toast.scheduleError.description"),
+          variant: "destructive",
+        });
+        return;
+      }
 
-      // const updatedTask = await updateTaskScheduled(taskId, !isScheduled);
+      // If already scheduled, don't do anything -
+      // you'd need another API call to unschedule a specific task
+      if (task.scheduled) {
+        return;
+      }
+
+      // Create a scheduling request for just this one task
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const thirtyDaysFromToday = new Date(today);
+      thirtyDaysFromToday.setDate(today.getDate() + 30);
+
+      await scheduleTasks({
+        taskSelectionMode: "full", // Only schedule unscheduled tasks
+        timePeriodType: "custom",
+        customRangeStart: today,
+        customRangeEnd: thirtyDaysFromToday,
+        respectFixedAppointments: true,
+        addBreaksEnabled: true,
+        optimizeFocusTimeEnabled: true,
+        includePastTasks: false,
+      });
+
+      toast({
+        title: t("card.toast.scheduleSuccess.title"),
+        description: t("card.toast.scheduleSuccess.description"),
+      });
+
       // Refetch tasks to update the UI
       refetch();
+      setSchedulingTaskId(null);
     } catch (error) {
       console.error("Error updating task scheduling status:", error);
+      setSchedulingTaskId(null);
+      toast({
+        title: t("card.toast.scheduleError.title"),
+        description: t("card.toast.scheduleError.description"),
+        variant: "destructive",
+      });
     }
   };
 
@@ -322,6 +366,7 @@ const ListView = () => {
                             handleToggleComplete={handleToggleComplete}
                             handleToggleScheduled={handleToggleScheduled}
                             handleViewTaskDetails={handleViewTaskDetails}
+                            isScheduling={schedulingTaskId === task.id}
                           />
                         ))}
                         {hasMoreUnscheduled && (

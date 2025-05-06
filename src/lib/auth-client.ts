@@ -23,6 +23,9 @@ export const authClient = createAuthClient({
         lang: {
           type: "string",
         },
+        activeOrganizationId: {
+          type: "string",
+        },
       },
     }),
     organizationClient({

@@ -67,12 +67,16 @@ import {
 } from "@/components/ui/command";
 import { TaskType } from "@/types/task";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useLocale, useTranslations } from "next-intl";
-import { enUS, fr } from "date-fns/locale";
+import { enUS, fr, id } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import { useProjects } from "@/hooks/useProjects";
+import { getFriends } from "@/lib/api/friends";
+import { useTeam } from "../team/team-context";
+import { Friend } from "@/types/friend";
+import { authClient } from "@/lib/auth-client";
 interface CreateTaskSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -86,6 +90,7 @@ type TeamMember = {
   name: string;
   email: string;
   avatar?: string;
+  source: "team" | "friend";
 };
 
 type Project = {
@@ -122,6 +127,8 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const [openAssignCombobox, setOpenAssignCombobox] = useState(false);
   const [searchProjectValue, setSearchProjectValue] = useState("");
   const [openProjectCombobox, setOpenProjectCombobox] = useState(false);
+  const [searchPeopleValue, setSearchPeopleValue] = useState("");
+  const { data } = authClient.useSession();
 
   const queryClient = useQueryClient();
 
@@ -165,35 +172,72 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
   const assignedTo = form.watch("assignedTo") || [];
   const parentId = form.watch("parentId");
   const selectedProjectId = form.watch("projectId");
-  const loadTasks = async () => {
-    try {
-      setIsLoadingTasks(true);
-      const tasksData: TaskType[] = []; // Replace with your API call to fetch tasks
-      setTasks(tasksData);
-    } catch (error) {
-      console.error("Error loading tasks:", error);
-    } finally {
-      setIsLoadingTasks(false);
-    }
+
+  const { team, hasTeamSub } = useTeam();
+
+  const { data: friendsData, isLoading: loadingFriends } = useQuery({
+    queryKey: ["friends"],
+    queryFn: getFriends,
+  });
+
+  const getOtherUser = (friend: Friend) => {
+    // Return the other user's data (not the current user)
+    const myUserId = data?.user.id;
+    return friend.sender.id === myUserId ? friend.receiver : friend.sender;
   };
-  // Fetch tasks and team members when the sheet opens
-  useEffect(() => {
-    if (open) {
-      loadTasks();
-      loadTeamMembers();
-    }
-  }, [open]);
+
   const loadTeamMembers = async () => {
     try {
       setIsLoadingTeamMembers(true);
-      const members = [] as TeamMember[]; // Replace with your API call to fetch team members
-      setTeamMembers(members);
+
+      // Format team members with source
+      let formattedTeamMembers = [] as TeamMember[];
+
+      if (hasTeamSub) {
+        formattedTeamMembers = team.members.map((member) => ({
+          id: member.userId,
+          email: member.email,
+          name: member.name,
+          avatar: member.avatar,
+          source: "team" as const,
+        }));
+      }
+
+      const friends = friendsData?.data as Friend[];
+
+      const formattedFriends = friends.map((friend) => {
+        const otherUser = getOtherUser(friend);
+        return {
+          id: otherUser.id,
+          name: otherUser.username,
+          email: otherUser.email,
+          avatar: otherUser.image,
+          source: "friend" as const,
+        };
+      }) as TeamMember[];
+
+      // Combine both lists
+      setTeamMembers([...formattedTeamMembers, ...formattedFriends]);
     } catch (error) {
-      console.error("Error loading team members:", error);
+      console.error("Error loading people:", error);
     } finally {
       setIsLoadingTeamMembers(false);
     }
   };
+
+  useEffect(() => {
+    if (team || friendsData) {
+      loadTeamMembers();
+    }
+  }, [team, friendsData]);
+
+  const filteredPeople = searchPeopleValue
+    ? teamMembers.filter(
+        (person) =>
+          person.name.toLowerCase().includes(searchPeopleValue.toLowerCase()) ||
+          person.email.toLowerCase().includes(searchPeopleValue.toLowerCase())
+      )
+    : teamMembers;
 
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -478,6 +522,53 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                     <FormField
                       control={form.control}
                       disabled={isPending}
+                      name="duration"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("basicInfo.durationLabel")}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder={t("basicInfo.durationPlaceholder")}
+                              min={5}
+                              value={field.value ?? ""}
+                              onChange={(e) => {
+                                const newDuration =
+                                  e.target.value === ""
+                                    ? undefined
+                                    : Number(e.target.value);
+
+                                field.onChange(newDuration);
+
+                                // If we have start time and duration, calculate end time
+                                const startTime = form.getValues("startTime");
+                                if (startTime && newDuration) {
+                                  const endDate = new Date(startTime);
+                                  // Add duration in minutes
+                                  endDate.setMinutes(
+                                    endDate.getMinutes() + newDuration
+                                  );
+                                  form.setValue("endTime", endDate);
+                                }
+                              }}
+                              onBlur={field.onBlur}
+                              name={field.name}
+                              ref={field.ref}
+                              disabled={field.disabled}
+                              required
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {t("basicInfo.durationDescription")}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      disabled={isPending}
                       name="description"
                       render={({ field }) => (
                         <FormItem>
@@ -519,6 +610,9 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
+                              <SelectItem value="urgent">
+                                {t("basicInfo.priorityOptions.urgent")}
+                              </SelectItem>
                               <SelectItem value="high">
                                 {t("basicInfo.priorityOptions.high")}
                               </SelectItem>
@@ -646,12 +740,34 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                     <Input
                                       type="time"
                                       onChange={(e) => {
-                                        const date = field.value || new Date();
+                                        // Create a new date object from either the existing date or current date
+                                        const baseDate =
+                                          form.getValues("date") || new Date();
                                         const [hours, minutes] = e.target.value
                                           .split(":")
                                           .map(Number);
-                                        date.setHours(hours, minutes);
-                                        field.onChange(date);
+
+                                        // Create a new date with the selected time
+                                        const startDate = new Date(baseDate);
+                                        startDate.setHours(hours, minutes);
+
+                                        // Update the start time
+                                        field.onChange(startDate);
+
+                                        // Also update the date field to match
+                                        form.setValue("date", startDate);
+
+                                        // If we have a duration value, calculate and set the end time
+                                        const duration =
+                                          form.getValues("duration");
+                                        if (duration) {
+                                          const endDate = new Date(startDate);
+                                          // Add duration in minutes
+                                          endDate.setMinutes(
+                                            endDate.getMinutes() + duration
+                                          );
+                                          form.setValue("endTime", endDate);
+                                        }
                                       }}
                                       value={
                                         field.value
@@ -683,14 +799,6 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                   <FormControl>
                                     <Input
                                       type="time"
-                                      onChange={(e) => {
-                                        const date = field.value || new Date();
-                                        const [hours, minutes] = e.target.value
-                                          .split(":")
-                                          .map(Number);
-                                        date.setHours(hours, minutes);
-                                        field.onChange(date);
-                                      }}
                                       value={
                                         field.value
                                           ? `${String(
@@ -700,16 +808,22 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                             ).padStart(2, "0")}`
                                           : ""
                                       }
+                                      readOnly
+                                      className="bg-muted cursor-not-allowed"
                                     />
                                   </FormControl>
                                 </div>
+                                <FormDescription>
+                                  {t("schedule.endTimeAutoDescription") ||
+                                    "Automatically calculated from start time and duration"}
+                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
                         </div>
 
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           disabled={isPending}
                           name="duration"
@@ -745,7 +859,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </>
                     )}
                   </TabsContent>
@@ -796,7 +910,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                     </div>
 
                     {/* Parent Task Field - Now enabled */}
-                    <FormField
+                    {/* <FormField
                       control={form.control}
                       disabled={isPending}
                       name="parentId"
@@ -902,7 +1016,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                           <FormMessage />
                         </FormItem>
                       )}
-                    />
+                    /> */}
 
                     {/* Assigned To - Now enabled */}
                     <FormField
@@ -967,64 +1081,145 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
+
                             <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]">
                               <Command>
                                 <CommandInput
                                   placeholder={t("details.assignToPlaceholder")}
+                                  value={searchPeopleValue}
+                                  onValueChange={setSearchPeopleValue}
                                   className="h-9"
                                 />
                                 <CommandList>
                                   <CommandEmpty>
-                                    {t("details.noTeamMembers")}
+                                    {t("details.noPeopleFound")}
                                   </CommandEmpty>
-                                  <CommandGroup>
-                                    {teamMembers.map((member) => (
-                                      <CommandItem
-                                        key={member.id}
-                                        onSelect={() =>
-                                          handleToggleAssignee(member.id)
-                                        }
-                                        className="flex items-center gap-2"
-                                      >
-                                        <Avatar className="h-6 w-6">
-                                          {member.avatar && (
-                                            <AvatarImage
-                                              src={member.avatar}
-                                              alt={member.name}
-                                            />
-                                          )}
-                                          <AvatarFallback>
-                                            {getInitials(member.name)}
-                                          </AvatarFallback>
-                                        </Avatar>
-                                        <span>{member.name}</span>
-                                        <div className="ml-auto">
-                                          <Checkbox
-                                            checked={field.value?.includes(
-                                              member.id
+
+                                  {/* Team Members Group */}
+                                  <CommandGroup
+                                    heading={t("details.teamMembers")}
+                                  >
+                                    {filteredPeople
+                                      .filter(
+                                        (person) => person.source === "team"
+                                      )
+                                      .map((member) => (
+                                        <CommandItem
+                                          key={member.id}
+                                          onSelect={() =>
+                                            handleToggleAssignee(member.id)
+                                          }
+                                          className="flex items-center gap-2"
+                                        >
+                                          <Avatar className="h-6 w-6">
+                                            {member.avatar && (
+                                              <AvatarImage
+                                                src={member.avatar}
+                                                alt={member.name}
+                                              />
                                             )}
-                                            onCheckedChange={() =>
-                                              handleToggleAssignee(member.id)
-                                            }
-                                            aria-label={`Select ${member.name}`}
-                                          />
-                                        </div>
-                                      </CommandItem>
-                                    ))}
+                                            <AvatarFallback>
+                                              {getInitials(member.name)}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <span>{member.name}</span>
+                                          <div className="ml-auto">
+                                            <Checkbox
+                                              checked={assignedTo.includes(
+                                                member.id
+                                              )}
+                                              onCheckedChange={() =>
+                                                handleToggleAssignee(member.id)
+                                              }
+                                              aria-label={`Select ${member.name}`}
+                                            />
+                                          </div>
+                                        </CommandItem>
+                                      ))}
+                                  </CommandGroup>
+
+                                  {/* Friends Group */}
+                                  <CommandGroup heading={t("details.friends")}>
+                                    {filteredPeople
+                                      .filter(
+                                        (person) => person.source === "friend"
+                                      )
+                                      .map((friend) => (
+                                        <CommandItem
+                                          key={friend.id}
+                                          onSelect={() =>
+                                            handleToggleAssignee(friend.id)
+                                          }
+                                          className="flex items-center gap-2"
+                                        >
+                                          <Avatar className="h-6 w-6">
+                                            {friend.avatar && (
+                                              <AvatarImage
+                                                src={friend.avatar}
+                                                alt={friend.name}
+                                              />
+                                            )}
+                                            <AvatarFallback>
+                                              {getInitials(friend.name)}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <span>{friend.name}</span>
+                                          <div className="ml-auto">
+                                            <Checkbox
+                                              checked={assignedTo.includes(
+                                                friend.id
+                                              )}
+                                              onCheckedChange={() =>
+                                                handleToggleAssignee(friend.id)
+                                              }
+                                              aria-label={`Select ${friend.name}`}
+                                            />
+                                          </div>
+                                        </CommandItem>
+                                      ))}
                                   </CommandGroup>
                                 </CommandList>
+
                                 {assignedTo.length > 0 && (
-                                  <div className="border-t p-2">
-                                    <Button
-                                      variant="ghost"
-                                      className="w-full justify-start text-sm"
-                                      onClick={() =>
-                                        form.setValue("assignedTo", [])
-                                      }
-                                    >
-                                      <X className="mr-2 h-4 w-4" />
-                                      {t("details.clearAll")}
-                                    </Button>
+                                  <div className="border-t p-2 flex flex-wrap gap-1">
+                                    {assignedTo.map((userId) => {
+                                      const member = teamMembers.find(
+                                        (m) => m.id === userId
+                                      );
+                                      return member ? (
+                                        <Badge key={userId} variant="secondary">
+                                          {member.name}
+                                          {member.source === "friend" && (
+                                            <span className="text-xs text-muted-foreground ml-1">
+                                              • {t("details.friend")}
+                                            </span>
+                                          )}
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleToggleAssignee(userId);
+                                            }}
+                                            className="ml-1 text-muted-foreground hover:text-foreground"
+                                          >
+                                            <X className="h-3 w-3" />
+                                          </button>
+                                        </Badge>
+                                      ) : null;
+                                    })}
+                                    {assignedTo.length > 0 && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-xs h-7 px-2"
+                                        onClick={() =>
+                                          form.setValue("assignedTo", [])
+                                        }
+                                      >
+                                        <X className="mr-1 h-3 w-3" />
+                                        {t("details.clearAll")}
+                                      </Button>
+                                    )}
                                   </div>
                                 )}
                               </Command>

@@ -38,6 +38,8 @@ interface KanbanColumnProps {
   onToggleComplete: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
   handleTaskMove: (taskId: string, columnId: string) => void;
+  handleToggleSchedule: (taskId: string) => void;
+  schedulingTaskId?: string;
 }
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
@@ -55,6 +57,8 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   onToggleComplete,
   onDeleteTask,
   handleTaskMove,
+  handleToggleSchedule,
+  schedulingTaskId
 }) => {
   const t = useTranslations("tasks.kanbanView");
   const locale = useLocale() as "en" | "fr";
@@ -120,6 +124,8 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                     onToggleComplete={onToggleComplete}
                     onDeleteTask={onDeleteTask}
                     handleTaskMove={handleTaskMove}
+                    handleToggleSchedule={handleToggleSchedule}
+                    isScheduling={schedulingTaskId === task.id}
                   />
                 ))}
               </>

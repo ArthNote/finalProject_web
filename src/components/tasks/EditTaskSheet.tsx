@@ -66,12 +66,16 @@ import {
 } from "@/components/ui/command";
 import { TaskType } from "@/types/task";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useLocale, useTranslations } from "next-intl";
 import { enUS, fr } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import { useProjects } from "@/hooks/useProjects";
+import { useTeam } from "../team/team-context";
+import { getFriends } from "@/lib/api/friends";
+import { Friend } from "@/types/friend";
+import { authClient } from "@/lib/auth-client";
 
 interface EditTaskSheetProps {
   open: boolean;
@@ -84,6 +88,7 @@ type TeamMember = {
   name: string;
   email: string;
   avatar?: string;
+  source: "team" | "friend";
 };
 
 const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
@@ -117,6 +122,8 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
   const [openTaskCombobox, setOpenTaskCombobox] = useState(false);
   const [openAssignCombobox, setOpenAssignCombobox] = useState(false);
   const [searchProjectValue, setSearchProjectValue] = useState("");
+  const [searchPeopleValue, setSearchPeopleValue] = useState("");
+  const { data } = authClient.useSession();
 
   const tValidation = useTranslations();
   const { taskSchema } = createTaskValidators(tValidation);
@@ -172,6 +179,72 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
   const parentId = form.watch("parentId");
   const projectId = form.watch("projectId");
 
+  const { team, hasTeamSub } = useTeam();
+
+  const { data: friendsData, isLoading: loadingFriends } = useQuery({
+    queryKey: ["friends"],
+    queryFn: getFriends,
+  });
+
+  const getOtherUser = (friend: Friend) => {
+    // Return the other user's data (not the current user)
+    const myUserId = data?.user.id;
+    return friend.sender.id === myUserId ? friend.receiver : friend.sender;
+  };
+
+  const loadTeamMembers = async () => {
+    try {
+      setIsLoadingTeamMembers(true);
+
+      // Format team members with source
+      let formattedTeamMembers = [] as TeamMember[];
+
+      if (hasTeamSub) {
+        formattedTeamMembers = team.members.map((member) => ({
+          id: member.userId,
+          email: member.email,
+          name: member.name,
+          avatar: member.avatar,
+          source: "team" as const,
+        }));
+      }
+
+      const friends = friendsData?.data as Friend[];
+
+      const formattedFriends = friends.map((friend) => {
+        const otherUser = getOtherUser(friend);
+        return {
+          id: otherUser.id,
+          name: otherUser.username,
+          email: otherUser.email,
+          avatar: otherUser.image,
+          source: "friend" as const,
+        };
+      }) as TeamMember[];
+
+      // Combine both lists
+      setTeamMembers([...formattedTeamMembers, ...formattedFriends]);
+    } catch (error) {
+      console.error("Error loading people:", error);
+    } finally {
+      setIsLoadingTeamMembers(false);
+    }
+  };
+
+  useEffect(() => {
+    if (team || friendsData) {
+      loadTeamMembers();
+    }
+  }, [team, friendsData]);
+
+  const filteredPeople = searchPeopleValue
+    ? teamMembers.filter(
+        (person) =>
+          person.name.toLowerCase().includes(searchPeopleValue.toLowerCase()) ||
+          person.email.toLowerCase().includes(searchPeopleValue.toLowerCase())
+      )
+    : teamMembers;
+
   const { data: projects, isLoading } = useProjects({
     search: searchProjectValue || "",
   });
@@ -194,29 +267,6 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
       console.error("Error loading tasks:", error);
     } finally {
       setIsLoadingTasks(false);
-    }
-  };
-
-  const loadTeamMembers = async () => {
-    try {
-      setIsLoadingTeamMembers(true);
-      // In a real application, this would be an API call to fetch team members
-      // For now, we'll derive from the assigned users if any
-      const members = task.assignedTo
-        ? task.assignedTo.map((user) => ({
-            id: user.id,
-            name: user.name,
-            email: `${user.name
-              .toLowerCase()
-              .replace(/\s+/g, ".")}@example.com`,
-            avatar: user.profilePic,
-          }))
-        : [];
-      setTeamMembers(members);
-    } catch (error) {
-      console.error("Error loading team members:", error);
-    } finally {
-      setIsLoadingTeamMembers(false);
     }
   };
 
@@ -438,7 +488,6 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
               <ScrollArea className="h-[calc(100vh-250px)] pr-3">
                 <div className="p-1">
                   <TabsContent value="basic" className="space-y-6 mt-0">
-                    {/* Basic fields */}
                     <FormField
                       control={form.control}
                       disabled={isPending}
@@ -533,6 +582,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
                       disabled={isPending}
@@ -546,6 +596,53 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                               {...field}
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      disabled={isPending}
+                      name="duration"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("basicInfo.durationLabel")}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder={t("basicInfo.durationPlaceholder")}
+                              min={5}
+                              value={field.value ?? ""}
+                              onChange={(e) => {
+                                const newDuration =
+                                  e.target.value === ""
+                                    ? undefined
+                                    : Number(e.target.value);
+
+                                field.onChange(newDuration);
+
+                                // If we have start time and duration, calculate end time
+                                const startTime = form.getValues("startTime");
+                                if (startTime && newDuration) {
+                                  const endDate = new Date(startTime);
+                                  // Add duration in minutes
+                                  endDate.setMinutes(
+                                    endDate.getMinutes() + newDuration
+                                  );
+                                  form.setValue("endTime", endDate);
+                                }
+                              }}
+                              onBlur={field.onBlur}
+                              name={field.name}
+                              ref={field.ref}
+                              disabled={field.disabled}
+                              required
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {t("basicInfo.durationDescription")}
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -584,7 +681,6 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
-                            value={field.value}
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -596,6 +692,9 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
+                              <SelectItem value="urgent">
+                                {t("basicInfo.priorityOptions.urgent")}
+                              </SelectItem>
                               <SelectItem value="high">
                                 {t("basicInfo.priorityOptions.high")}
                               </SelectItem>
@@ -632,7 +731,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                   </TabsContent>
 
                   <TabsContent value="schedule" className="space-y-6 mt-0">
-                    {/* Schedule fields */}
+                    {/* Schedule fields - unchanged */}
                     <FormField
                       control={form.control}
                       disabled={isPending}
@@ -723,12 +822,34 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                                     <Input
                                       type="time"
                                       onChange={(e) => {
-                                        const date = field.value || new Date();
+                                        // Create a new date object from either the existing date or current date
+                                        const baseDate =
+                                          form.getValues("date") || new Date();
                                         const [hours, minutes] = e.target.value
                                           .split(":")
                                           .map(Number);
-                                        date.setHours(hours, minutes);
-                                        field.onChange(date);
+
+                                        // Create a new date with the selected time
+                                        const startDate = new Date(baseDate);
+                                        startDate.setHours(hours, minutes);
+
+                                        // Update the start time
+                                        field.onChange(startDate);
+
+                                        // Also update the date field to match
+                                        form.setValue("date", startDate);
+
+                                        // If we have a duration value, calculate and set the end time
+                                        const duration =
+                                          form.getValues("duration");
+                                        if (duration) {
+                                          const endDate = new Date(startDate);
+                                          // Add duration in minutes
+                                          endDate.setMinutes(
+                                            endDate.getMinutes() + duration
+                                          );
+                                          form.setValue("endTime", endDate);
+                                        }
                                       }}
                                       value={
                                         field.value
@@ -760,14 +881,6 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                                   <FormControl>
                                     <Input
                                       type="time"
-                                      onChange={(e) => {
-                                        const date = field.value || new Date();
-                                        const [hours, minutes] = e.target.value
-                                          .split(":")
-                                          .map(Number);
-                                        date.setHours(hours, minutes);
-                                        field.onChange(date);
-                                      }}
                                       value={
                                         field.value
                                           ? `${String(
@@ -777,51 +890,58 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                                             ).padStart(2, "0")}`
                                           : ""
                                       }
+                                      readOnly
+                                      className="bg-muted cursor-not-allowed"
                                     />
                                   </FormControl>
                                 </div>
+                                <FormDescription>
+                                  {t("schedule.endTimeAutoDescription") ||
+                                    "Automatically calculated from start time and duration"}
+                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
                         </div>
 
-                        <FormField
-                          control={form.control}
-                          disabled={isPending}
-                          name="duration"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>
-                                {t("schedule.durationLabel")}
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder={t(
-                                    "schedule.durationPlaceholder"
-                                  )}
-                                  min={5}
-                                  {...field}
-                                  value={
-                                    field.value === null ? "" : field.value
-                                  }
-                                  onChange={(e) => {
-                                    const value =
-                                      e.target.value === ""
-                                        ? null
-                                        : Number(e.target.value);
-                                    field.onChange(value);
-                                  }}
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                {t("schedule.durationDescription")}
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        {/* <FormField
+                                 control={form.control}
+                                 disabled={isPending}
+                                 name="duration"
+                                 render={({ field }) => (
+                                   <FormItem>
+                                     <FormLabel>
+                                       {t("schedule.durationLabel")}
+                                     </FormLabel>
+                                     <FormControl>
+                                       <Input
+                                         type="number"
+                                         placeholder={t(
+                                           "schedule.durationPlaceholder"
+                                         )}
+                                         min={5}
+                                         value={field.value ?? ""}
+                                         onChange={(e) =>
+                                           field.onChange(
+                                             e.target.value === ""
+                                               ? undefined
+                                               : Number(e.target.value)
+                                           )
+                                         }
+                                         onBlur={field.onBlur}
+                                         name={field.name}
+                                         ref={field.ref}
+                                         disabled={field.disabled}
+                                       />
+                                     </FormControl>
+                                     <FormDescription>
+                                       {t("schedule.durationDescription")}
+                                     </FormDescription>
+                                     <FormMessage />
+                                   </FormItem>
+                                 )}
+                               /> */}
                       </>
                     )}
                   </TabsContent>
@@ -871,116 +991,116 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                       </div>
                     </div>
 
-                    {/* Parent Task Field */}
-                    <FormField
-                      control={form.control}
-                      disabled={isPending}
-                      name="parentId"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>{t("details.parentTaskLabel")}</FormLabel>
-                          <Popover
-                            open={openTaskCombobox}
-                            onOpenChange={setOpenTaskCombobox}
-                          >
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  role="combobox"
-                                  className={cn(
-                                    "w-full justify-between",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                  onClick={() =>
-                                    setOpenTaskCombobox(!openTaskCombobox)
-                                  }
-                                >
-                                  {isLoadingTasks ? (
-                                    <div className="flex items-center gap-2">
-                                      <Loader2 className="h-4 w-4 animate-spin" />
-                                      <span>{t("details.loadingTasks")}</span>
-                                    </div>
-                                  ) : field.value && selectedTask ? (
-                                    <div className="flex items-center gap-2 truncate">
-                                      <span className="truncate">
-                                        {selectedTask.title}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    t("details.selectParentTask")
-                                  )}
-                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]">
-                              <Command>
-                                <CommandInput
-                                  placeholder={t(
-                                    "details.parentTaskPlaceholder"
-                                  )}
-                                  value={searchTaskValue}
-                                  onValueChange={setSearchTaskValue}
-                                  className="h-9"
-                                />
-                                <CommandList>
-                                  <CommandEmpty>
-                                    {t("details.noTasksFound")}
-                                  </CommandEmpty>
-                                  <CommandGroup>
-                                    <CommandItem
-                                      onSelect={() => {
-                                        form.setValue("parentId", undefined);
-                                        setOpenTaskCombobox(false);
-                                        setSearchTaskValue("");
-                                      }}
-                                      className="text-muted-foreground"
-                                    >
-                                      {t("details.noTasks")}
-                                    </CommandItem>
-                                    {filteredTasks.map((task) => (
-                                      <CommandItem
-                                        key={task.id}
-                                        onSelect={() => {
-                                          form.setValue("parentId", task.id);
-                                          setOpenTaskCombobox(false);
-                                          setSearchTaskValue("");
-                                        }}
-                                        className="flex items-center gap-2"
-                                      >
-                                        <div
-                                          className={cn(
-                                            "w-2 h-2 rounded-full",
-                                            task.priority === "high"
-                                              ? "bg-destructive"
-                                              : task.priority === "medium"
-                                              ? "bg-amber-500"
-                                              : "bg-emerald-500"
-                                          )}
-                                        />
-                                        <span className="truncate">
-                                          {task.title}
-                                        </span>
-                                        {field.value === task.id && (
-                                          <Check className="ml-auto h-4 w-4" />
-                                        )}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                          <FormDescription>
-                            {t("details.parentTaskDescription")}
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {/* Parent Task Field - Now enabled */}
+                    {/* <FormField
+                             control={form.control}
+                             disabled={isPending}
+                             name="parentId"
+                             render={({ field }) => (
+                               <FormItem className="flex flex-col">
+                                 <FormLabel>{t("details.parentTaskLabel")}</FormLabel>
+                                 <Popover
+                                   open={openTaskCombobox}
+                                   onOpenChange={setOpenTaskCombobox}
+                                 >
+                                   <PopoverTrigger asChild>
+                                     <FormControl>
+                                       <Button
+                                         variant="outline"
+                                         role="combobox"
+                                         className={cn(
+                                           "w-full justify-between",
+                                           !field.value && "text-muted-foreground"
+                                         )}
+                                         onClick={() =>
+                                           setOpenTaskCombobox(!openTaskCombobox)
+                                         }
+                                       >
+                                         {isLoadingTasks ? (
+                                           <div className="flex items-center gap-2">
+                                             <Loader2 className="h-4 w-4 animate-spin" />
+                                             <span>{t("details.loadingTasks")}</span>
+                                           </div>
+                                         ) : field.value && selectedTask ? (
+                                           <div className="flex items-center gap-2 truncate">
+                                             <span className="truncate">
+                                               {selectedTask.title}
+                                             </span>
+                                           </div>
+                                         ) : (
+                                           t("details.selectParentTask")
+                                         )}
+                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                       </Button>
+                                     </FormControl>
+                                   </PopoverTrigger>
+                                   <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]">
+                                     <Command>
+                                       <CommandInput
+                                         placeholder={t(
+                                           "details.parentTaskPlaceholder"
+                                         )}
+                                         value={searchTaskValue}
+                                         onValueChange={setSearchTaskValue}
+                                         className="h-9"
+                                       />
+                                       <CommandList>
+                                         <CommandEmpty>
+                                           {t("details.noTasksFound")}
+                                         </CommandEmpty>
+                                         <CommandGroup>
+                                           <CommandItem
+                                             onSelect={() => {
+                                               form.setValue("parentId", undefined);
+                                               setOpenTaskCombobox(false);
+                                               setSearchTaskValue("");
+                                             }}
+                                             className="text-muted-foreground"
+                                           >
+                                             {t("details.noTasks")}
+                                           </CommandItem>
+                                           {filteredTasks.map((task) => (
+                                             <CommandItem
+                                               key={task.id}
+                                               onSelect={() => {
+                                                 form.setValue("parentId", task.id);
+                                                 setOpenTaskCombobox(false);
+                                                 setSearchTaskValue("");
+                                               }}
+                                               className="flex items-center gap-2"
+                                             >
+                                               <div
+                                                 className={cn(
+                                                   "w-2 h-2 rounded-full",
+                                                   task.priority === "high"
+                                                     ? "bg-destructive"
+                                                     : task.priority === "medium"
+                                                     ? "bg-amber-500"
+                                                     : "bg-emerald-500"
+                                                 )}
+                                               />
+                                               <span className="truncate">
+                                                 {task.title}
+                                               </span>
+                                               {field.value === task.id && (
+                                                 <Check className="ml-auto h-4 w-4" />
+                                               )}
+                                             </CommandItem>
+                                           ))}
+                                         </CommandGroup>
+                                       </CommandList>
+                                     </Command>
+                                   </PopoverContent>
+                                 </Popover>
+                                 <FormDescription>
+                                   {t("details.parentTaskDescription")}
+                                 </FormDescription>
+                                 <FormMessage />
+                               </FormItem>
+                             )}
+                           /> */}
 
-                    {/* Assigned To */}
+                    {/* Assigned To - Now enabled */}
                     <FormField
                       control={form.control}
                       disabled={isPending}
@@ -1015,7 +1135,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                                     <div className="flex flex-wrap gap-1 mr-2">
                                       {field.value.length > 2 ? (
                                         <span>
-                                          {t("details.peopleAssigned", {
+                                          {t("peopleAssigned", {
                                             count: field.value.length,
                                           })}
                                         </span>
@@ -1043,64 +1163,145 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
+
                             <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]">
                               <Command>
                                 <CommandInput
                                   placeholder={t("details.assignToPlaceholder")}
+                                  value={searchPeopleValue}
+                                  onValueChange={setSearchPeopleValue}
                                   className="h-9"
                                 />
                                 <CommandList>
                                   <CommandEmpty>
-                                    {t("details.noTeamMembers")}
+                                    {t("details.noPeopleFound")}
                                   </CommandEmpty>
-                                  <CommandGroup>
-                                    {teamMembers.map((member) => (
-                                      <CommandItem
-                                        key={member.id}
-                                        onSelect={() =>
-                                          handleToggleAssignee(member.id)
-                                        }
-                                        className="flex items-center gap-2"
-                                      >
-                                        <Avatar className="h-6 w-6">
-                                          {member.avatar && (
-                                            <AvatarImage
-                                              src={member.avatar}
-                                              alt={member.name}
-                                            />
-                                          )}
-                                          <AvatarFallback>
-                                            {getInitials(member.name)}
-                                          </AvatarFallback>
-                                        </Avatar>
-                                        <span>{member.name}</span>
-                                        <div className="ml-auto">
-                                          <Checkbox
-                                            checked={field.value?.includes(
-                                              member.id
+
+                                  {/* Team Members Group */}
+                                  <CommandGroup
+                                    heading={t("details.teamMembers")}
+                                  >
+                                    {filteredPeople
+                                      .filter(
+                                        (person) => person.source === "team"
+                                      )
+                                      .map((member) => (
+                                        <CommandItem
+                                          key={member.id}
+                                          onSelect={() =>
+                                            handleToggleAssignee(member.id)
+                                          }
+                                          className="flex items-center gap-2"
+                                        >
+                                          <Avatar className="h-6 w-6">
+                                            {member.avatar && (
+                                              <AvatarImage
+                                                src={member.avatar}
+                                                alt={member.name}
+                                              />
                                             )}
-                                            onCheckedChange={() =>
-                                              handleToggleAssignee(member.id)
-                                            }
-                                            aria-label={`Select ${member.name}`}
-                                          />
-                                        </div>
-                                      </CommandItem>
-                                    ))}
+                                            <AvatarFallback>
+                                              {getInitials(member.name)}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <span>{member.name}</span>
+                                          <div className="ml-auto">
+                                            <Checkbox
+                                              checked={assignedTo.includes(
+                                                member.id
+                                              )}
+                                              onCheckedChange={() =>
+                                                handleToggleAssignee(member.id)
+                                              }
+                                              aria-label={`Select ${member.name}`}
+                                            />
+                                          </div>
+                                        </CommandItem>
+                                      ))}
+                                  </CommandGroup>
+
+                                  {/* Friends Group */}
+                                  <CommandGroup heading={t("details.friends")}>
+                                    {filteredPeople
+                                      .filter(
+                                        (person) => person.source === "friend"
+                                      )
+                                      .map((friend) => (
+                                        <CommandItem
+                                          key={friend.id}
+                                          onSelect={() =>
+                                            handleToggleAssignee(friend.id)
+                                          }
+                                          className="flex items-center gap-2"
+                                        >
+                                          <Avatar className="h-6 w-6">
+                                            {friend.avatar && (
+                                              <AvatarImage
+                                                src={friend.avatar}
+                                                alt={friend.name}
+                                              />
+                                            )}
+                                            <AvatarFallback>
+                                              {getInitials(friend.name)}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <span>{friend.name}</span>
+                                          <div className="ml-auto">
+                                            <Checkbox
+                                              checked={assignedTo.includes(
+                                                friend.id
+                                              )}
+                                              onCheckedChange={() =>
+                                                handleToggleAssignee(friend.id)
+                                              }
+                                              aria-label={`Select ${friend.name}`}
+                                            />
+                                          </div>
+                                        </CommandItem>
+                                      ))}
                                   </CommandGroup>
                                 </CommandList>
+
                                 {assignedTo.length > 0 && (
-                                  <div className="border-t p-2">
-                                    <Button
-                                      variant="ghost"
-                                      className="w-full justify-start text-sm"
-                                      onClick={() =>
-                                        form.setValue("assignedTo", [])
-                                      }
-                                    >
-                                      <X className="mr-2 h-4 w-4" />
-                                      {t("details.clearAll")}
-                                    </Button>
+                                  <div className="border-t p-2 flex flex-wrap gap-1">
+                                    {assignedTo.map((userId) => {
+                                      const member = teamMembers.find(
+                                        (m) => m.id === userId
+                                      );
+                                      return member ? (
+                                        <Badge key={userId} variant="secondary">
+                                          {member.name}
+                                          {member.source === "friend" && (
+                                            <span className="text-xs text-muted-foreground ml-1">
+                                              • {t("details.friend")}
+                                            </span>
+                                          )}
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleToggleAssignee(userId);
+                                            }}
+                                            className="ml-1 text-muted-foreground hover:text-foreground"
+                                          >
+                                            <X className="h-3 w-3" />
+                                          </button>
+                                        </Badge>
+                                      ) : null;
+                                    })}
+                                    {assignedTo.length > 0 && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-xs h-7 px-2"
+                                        onClick={() =>
+                                          form.setValue("assignedTo", [])
+                                        }
+                                      >
+                                        <X className="mr-1 h-3 w-3" />
+                                        {t("details.clearAll")}
+                                      </Button>
+                                    )}
                                   </div>
                                 )}
                               </Command>
@@ -1141,7 +1342,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                       )}
                     />
 
-                    {/* Resources section - Enhanced for editing existing resources */}
+                    {/* Resources section */}
                     <div className="space-y-3">
                       <FormLabel>{t("details.resourcesLabel")}</FormLabel>
                       <div className="space-y-2">
@@ -1152,99 +1353,29 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                                 key={resource.id}
                                 className="flex items-center justify-between p-2 border rounded-md"
                               >
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-medium truncate">
-                                    {resource.name}
-                                  </p>
+                                <div>
+                                  <p className="font-medium">{resource.name}</p>
                                   <p className="text-xs text-muted-foreground">
-                                    {resource.category} •{" "}
-                                    {resource.type || "General"}
-                                    {resource.url && (
-                                      <span className="ml-1">
-                                        •{" "}
-                                        <a
-                                          href={resource.url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-primary hover:underline"
-                                          onClick={(e) => e.stopPropagation()}
-                                        >
-                                          {resource.url.length > 30
-                                            ? `${resource.url.substring(
-                                                0,
-                                                30
-                                              )}...`
-                                            : resource.url}
-                                        </a>
-                                      </span>
-                                    )}
+                                    {resource.category} • {resource.type}
+                                    {resource.url && ` • ${resource.url}`}
                                   </p>
                                 </div>
-                                <div className="flex space-x-1">
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleEditResource(resource)}
-                                    aria-label={`Edit resource ${resource.name}`}
-                                    disabled={editingResourceId !== null}
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="16"
-                                      height="16"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      className="lucide lucide-pencil"
-                                    >
-                                      <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                                      <path d="m15 5 4 4" />
-                                    </svg>
-                                  </Button>
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleRemoveResource(resource.id!)
-                                    }
-                                    aria-label={`Remove resource ${resource.name}`}
-                                    disabled={editingResourceId === resource.id}
-                                  >
-                                    <Trash2 className="h-4 w-4 text-muted-foreground" />
-                                  </Button>
-                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleRemoveResource(resource.id!)
+                                  }
+                                >
+                                  <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                </Button>
                               </div>
                             ))}
                           </div>
                         )}
 
                         <div className="space-y-2 border rounded-md p-3">
-                          <div className="flex justify-between items-center mb-2">
-                            <h4 className="text-sm font-medium">
-                              {editingResourceId
-                                ? t("details.editResource")
-                                : resources.length
-                                ? t("details.addNewResource")
-                                : t("details.addResource")}
-                            </h4>
-                            {editingResourceId && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleCancelEditResource}
-                              >
-                                <X className="h-4 w-4 mr-1" />
-                                {t("details.cancelEdit")}
-                              </Button>
-                            )}
-                          </div>
-
                           <FormItem>
                             <FormLabel>
                               {t("details.resourcesNameLabel")}
@@ -1256,11 +1387,6 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                               value={resourceName}
                               onChange={(e) => setResourceName(e.target.value)}
                             />
-                            {!resourceName.trim() && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {t("details.resourcesNameRequired")}
-                              </p>
-                            )}
                           </FormItem>
 
                           <div className="grid grid-cols-2 gap-2">
@@ -1287,13 +1413,7 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                                 value={resourceCategory}
                                 onValueChange={(
                                   value: "file" | "link" | "note"
-                                ) => {
-                                  setResourceCategory(value);
-                                  // Clear URL if changing from link to something else
-                                  if (value !== "link") {
-                                    setResourceUrl("");
-                                  }
-                                }}
+                                ) => setResourceCategory(value)}
                               >
                                 <SelectTrigger>
                                   <SelectValue
@@ -1326,11 +1446,10 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                               placeholder={t("details.resourcesUrlPlaceholder")}
                               value={resourceUrl}
                               onChange={(e) => setResourceUrl(e.target.value)}
-                              disabled={resourceCategory !== "link"}
                             />
                             {resourceCategory === "link" && !resourceUrl && (
                               <div className="text-xs text-red-500 mt-1">
-                                {t("details.resourcesUrlRequired")}
+                                {t("details.resourcesUrlDescription")}
                               </div>
                             )}
                           </FormItem>
@@ -1347,41 +1466,13 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                                 !resourceUrl.trim())
                             }
                           >
-                            {editingResourceId ? (
-                              <>
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="lucide lucide-check mr-2"
-                                >
-                                  <polyline points="20 6 9 17 4 12" />
-                                </svg>
-                                {t("details.updateResource")}
-                              </>
-                            ) : (
-                              <>
-                                <Plus className="h-4 w-4 mr-2" />
-                                {resources.length
-                                  ? t("details.addNewResource")
-                                  : t("details.addResource")}
-                              </>
-                            )}
+                            <Plus className="h-4 w-4 mr-2" />
+                            {t("details.addResource")}
                           </Button>
                         </div>
                       </div>
                     </div>
-
-                    {/* ...existing code... */}
                   </TabsContent>
-
-                  {/* ...existing code... */}
                 </div>
               </ScrollArea>
             </Tabs>
@@ -1396,12 +1487,12 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {t("updating")}
+                    {t("creating")}
                   </>
                 ) : (
                   <>
                     <Check className="h-4 w-4" />
-                    {t("update")}
+                    {t("create")}
                   </>
                 )}
               </Button>

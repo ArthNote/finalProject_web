@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -20,7 +20,7 @@ import {
 import {
   BarChart2,
   BrainCircuit,
-  Calendar as CalendarIcon, 
+  Calendar as CalendarIcon,
   CalendarDays,
   CalendarRange,
   Check,
@@ -42,6 +42,9 @@ import {
   Sun,
   X,
   Zap,
+  AlertCircle,
+  Loader2,
+  CheckIcon,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -67,8 +70,12 @@ import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
 import CreateTaskSheet from "@/components/tasks/CreateTaskSheet";
 import AiTasksSheet from "@/components/tasks/AiTasksSheet";
-import { useMutation } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast, useToast } from "@/hooks/use-toast";
+import { scheduleTasks } from "@/lib/api/schedule";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getSchedulerModes } from "@/lib/api/schedulerPrefs";
+import { getIconForMode } from "@/lib/modes";
 
 // Define interfaces for props to fix TypeScript errors
 interface ScopeOptionProps {
@@ -91,9 +98,9 @@ interface TimeOptionProps {
 
 interface OptimizeScheduleProps {
   onClose: () => void;
-  optimizationMode: "balanced" | "productivity" | "wellbeing" | "custom";
+  optimizationMode: string;
   setOptimizationMode: (
-    mode: "balanced" | "productivity" | "wellbeing" | "custom"
+    mode: string
   ) => void;
   optimizationPeriod: "custom" | "today" | "tomorrow" | "week";
   setOptimizationPeriod: (
@@ -128,10 +135,8 @@ interface TimePeriodStepProps {
 }
 
 interface OptimizationStyleStepProps {
-  optimizationMode: "balanced" | "productivity" | "wellbeing" | "custom";
-  setOptimizationMode: (
-    mode: "balanced" | "productivity" | "wellbeing" | "custom"
-  ) => void;
+  optimizationMode: string;
+  setOptimizationMode: (mode: string) => void;
 }
 
 interface OptionsStepProps {
@@ -160,8 +165,6 @@ const FloatingToolbar = () => {
     isRecording,
     toggleRecording,
     processAiTask,
-    optimizationMode,
-    setOptimizationMode,
     optimizationPeriod,
     setOptimizationPeriod,
     showPriorityLevels,
@@ -219,6 +222,12 @@ const FloatingToolbar = () => {
 
   // Determine if we're on mobile
   const [isMobile, setIsMobile] = React.useState(false);
+
+
+  // Initialize optimization mode with preferred mode id
+  const [optimizationMode, setOptimizationMode] = React.useState<string>(
+    'standard'
+  );
 
   // Update isMobile state based on window width
   React.useEffect(() => {
@@ -405,7 +414,6 @@ const FloatingToolbar = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -639,24 +647,94 @@ function OptimizeSchedule({
 }: OptimizeScheduleProps) {
   const [step, setStep] = React.useState(1);
   const [isProcessing, setIsProcessing] = React.useState(false);
-  const [config, setConfig] = React.useState({
-    respectFixedAppointments: true,
-    addBreaks: true,
-    optimizeForFocus: false,
+  const queryClient = useQueryClient();
+  const t = useTranslations("tasks.toolbar.optimize");
+
+  // Fetch the selected scheduling mode data
+  const { data: modesData } = useQuery({
+    queryKey: ["schedulerModes"],
+    queryFn: getSchedulerModes,
   });
 
-  const totalSteps = 4;
+  // Find the selected mode configuration
+  const selectedMode = React.useMemo(() => {
+    if (!modesData?.modes) return null;
+    return modesData.modes.find((mode) => mode.id === optimizationMode);
+  }, [modesData?.modes, optimizationMode]);
 
-  const handleNext = () => {
+  const { isPending, data, mutateAsync } = useMutation({
+    mutationFn: scheduleTasks,
+    onError: (error) => {
+      console.error("Error scheduling tasks:", error);
+      throw error;
+    },
+    onSuccess: (data) => {
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["tasks"], type: "all" }),
+        queryClient.invalidateQueries({ queryKey: ["project"], type: "all" }),
+        queryClient.invalidateQueries({ queryKey: ["tasks-by-date"] }),
+        queryClient.invalidateQueries({ queryKey: ["calendar-tasks"] }),
+        queryClient.invalidateQueries({ queryKey: ["team"], type: "all" }),
+      ]);
+    },
+  });
+
+  // Now 3 steps instead of 4 (removed OptionsStep)
+  const totalSteps = 3;
+
+  const handleNext = async () => {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      // Process optimization
-      setIsProcessing(true);
-      setTimeout(() => {
-        setIsProcessing(false);
+      try {
+        // Use the selected mode configuration if available
+        if (!selectedMode) {
+          throw new Error("No scheduling mode selected");
+        }
+
+        const scheduleParams = {
+          taskSelectionMode: optimizationTaskScope as
+            | "unscheduled"
+            | "reschedule"
+            | "full",
+          timePeriodType: optimizationPeriod as
+            | "today"
+            | "tomorrow"
+            | "this_week"
+            | "custom",
+          ...(optimizationPeriod === "custom" && {
+            customRangeStart: optimizationRange.from,
+            customRangeEnd: optimizationRange.to,
+          }),
+          // Use configuration from selected mode
+          respectFixedAppointments:
+            selectedMode.config.optimization.respectFixedAppointments,
+          addBreaksEnabled: selectedMode.config.optimization.addBreaks.enabled,
+          optimizeFocusTimeEnabled:
+            selectedMode.config.optimization.optimizeFocusTime,
+          includePastTasks: false,
+          // Additional parameters from mode config
+          schedulerModeId: selectedMode.id,
+          isBuiltIn: selectedMode.isBuiltIn,
+        };
+
+        // Call the mutation
+        await mutateAsync(scheduleParams);
+
+        toast({
+          title: t("toast.success.title"),
+          description: t("toast.success.description"),
+          variant: "default",
+        });
+
         onClose();
-      }, 2000);
+      } catch (error) {
+        toast({
+          title: t("toast.error.title"),
+          description: t("toast.error.description"),
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -692,8 +770,6 @@ function OptimizeSchedule({
             setOptimizationMode={setOptimizationMode}
           />
         );
-      case 4:
-        return <OptionsStep config={config} setConfig={setConfig} />;
       default:
         return null;
     }
@@ -705,9 +781,9 @@ function OptimizeSchedule({
       <div className="px-6 pt-6 pb-4 border-b">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-semibold">Optimize Your Schedule</h2>
+            <h2 className="text-lg font-semibold">{t("title")}</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Let AI find the perfect time slots for your tasks
+              {t("description")}
             </p>
           </div>
         </div>
@@ -715,28 +791,13 @@ function OptimizeSchedule({
         {/* Progress indicator */}
         <div className="mt-4 flex items-center justify-between">
           {Array.from({ length: totalSteps }).map((_, i) => (
-            <React.Fragment key={i}>
-              <div
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium",
-                  i + 1 === step
-                    ? "bg-primary text-primary-foreground"
-                    : i + 1 < step
-                    ? "bg-primary/20 text-primary"
-                    : "bg-muted text-muted-foreground"
-                )}
-              >
-                {i + 1 < step ? <Check className="h-3 w-3" /> : i + 1}
-              </div>
-              {i < totalSteps - 1 && (
-                <div
-                  className={cn(
-                    "h-0.5 flex-1",
-                    i + 1 < step ? "bg-primary" : "bg-muted"
-                  )}
-                ></div>
+            <div
+              key={i}
+              className={cn(
+                "h-2 rounded-full flex-1 mx-0.5",
+                i + 1 <= step ? "bg-primary" : "bg-muted"
               )}
-            </React.Fragment>
+            />
           ))}
         </div>
       </div>
@@ -750,18 +811,15 @@ function OptimizeSchedule({
       <div className="border-t p-6">
         <div className="flex justify-between">
           <Button variant="outline" onClick={step > 1 ? handleBack : onClose}>
-            {step > 1 ? "Back" : "Cancel"}
+            {step > 1 ? t("back") : t("cancel")}
           </Button>
-          <Button onClick={handleNext} disabled={isProcessing}>
-            {isProcessing ? (
-              <>
-                <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-b-transparent border-current"></div>
-                Processing...
-              </>
+          <Button onClick={handleNext} disabled={isPending}>
+            {isPending ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : step < totalSteps ? (
-              "Continue"
+              t("continue")
             ) : (
-              "Optimize Schedule"
+              t("optimizeSchedule")
             )}
           </Button>
         </div>
@@ -774,24 +832,24 @@ function TaskScopeStep({
   optimizationTaskScope,
   setOptimizationTaskScope,
 }: TaskScopeStepProps) {
+  const t = useTranslations("tasks.toolbar.optimize.scope");
   const options = [
     {
       id: "unscheduled",
-      title: "Unscheduled Tasks",
-      description: "Find optimal time slots for tasks without a schedule",
+      title: t("unscheduled.title"),
+      description: t("unscheduled.description"),
       icon: <Plus className="h-5 w-5 text-amber-500" />,
     },
     {
       id: "scheduled",
-      title: "Scheduled Tasks",
-      description:
-        "Reorganize your existing scheduled tasks for better efficiency",
+      title: t("scheduled.title"),
+      description: t("scheduled.description"),
       icon: <Clock4 className="h-5 w-5 text-green-500" />,
     },
     {
       id: "all",
-      title: "All Tasks",
-      description: "Complete reorganization of your entire schedule",
+      title: t("all.title"),
+      description: t("all.description"),
       icon: <CalendarRange className="h-5 w-5 text-blue-500" />,
     },
   ];
@@ -799,11 +857,9 @@ function TaskScopeStep({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">
-          What would you like to optimize?
-        </h3>
+        <h3 className="text-lg font-medium">{t("title")}</h3>
         <p className="text-sm text-muted-foreground mt-1.5">
-          Choose which tasks you want the AI to organize in your schedule
+          {t("description")}
         </p>
       </div>
 
@@ -856,37 +912,43 @@ function TimePeriodStep({
   setOptimizationRange,
   locale,
 }: TimePeriodStepProps) {
+  const t = useTranslations("tasks.toolbar.optimize.period");
   const [showCalendar, setShowCalendar] = React.useState(false);
 
   const options = [
     {
       id: "today",
-      title: "Today",
-      description: `${format(new Date(), "EEEE, MMMM d")}`,
+      title: t("today"),
+      description: `${format(new Date(), "EEEE, MMMM d", {
+        locale: locale === "en" ? enUS : fr,
+      })}`,
       icon: <CalendarDays className="h-5 w-5 text-purple-500" />,
     },
     {
       id: "tomorrow",
-      title: "Tomorrow",
-      description: `${format(addDays(new Date(), 1), "EEEE, MMMM d")}`,
+      title: t("tomorrow"),
+      description: `${format(addDays(new Date(), 1), "EEEE, MMMM d", {
+        locale: locale === "en" ? enUS : fr,
+      })}`,
       icon: <CalendarDays className="h-5 w-5 text-indigo-500" />,
     },
     {
       id: "week",
-      title: "This Week",
-      description: "From today to the next 7 days",
+      title: t("thisWeek.title"),
+      description: t("thisWeek.description"),
       icon: <CalendarRange className="h-5 w-5 text-teal-500" />,
     },
     {
       id: "custom",
-      title: "Custom Range",
+      title: t("custom"),
       description:
         optimizationRange.from && optimizationRange.to
-          ? `${format(optimizationRange.from, "MMM d")} - ${format(
-              optimizationRange.to,
-              "MMM d"
-            )}`
-          : "Select specific dates",
+          ? `${format(optimizationRange.from, "MMM d", {
+              locale: locale === "en" ? enUS : fr,
+            })} - ${format(optimizationRange.to, "MMM d", {
+              locale: locale === "en" ? enUS : fr,
+            })}`
+          : t("selectSpecificRange"),
       icon: <CalendarIcon className="h-5 w-5 text-blue-500" />,
     },
   ];
@@ -894,9 +956,9 @@ function TimePeriodStep({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">Select Time Period</h3>
+        <h3 className="text-lg font-medium">{t("title")}</h3>
         <p className="text-sm text-muted-foreground mt-1.5">
-          Choose the days you want to optimize in your schedule
+          {t("description")}
         </p>
       </div>
 
@@ -909,7 +971,7 @@ function TimePeriodStep({
             className="mb-2"
           >
             <ChevronLeft className="mr-1 h-4 w-4" />
-            Back to options
+            {t("backToOptions")}
           </Button>
 
           <Calendar
@@ -933,7 +995,7 @@ function TimePeriodStep({
           />
 
           <div className="text-center text-sm text-muted-foreground">
-            Select a range of dates to optimize
+            {t("selectRangeOfDays")}
           </div>
         </div>
       ) : (
@@ -992,115 +1054,141 @@ function OptimizationStyleStep({
   optimizationMode,
   setOptimizationMode,
 }: OptimizationStyleStepProps) {
-  const options = [
-    {
-      id: "balanced",
-      title: "Balanced",
-      description: "Distribute tasks evenly with regular breaks",
-      icon: <Zap className="h-5 w-5 text-blue-500" />,
+  const t = useTranslations("tasks.toolbar.optimize.modes");
+  const [selectedModeId, setSelectedModeId] = useState(optimizationMode);
+
+  // Fetch scheduler modes from the database
+  const {
+    data: modesData,
+    isLoading: isLoadingModes,
+    error,
+  } = useQuery({
+    queryKey: ["schedulerModes"],
+    queryFn: getSchedulerModes,
+  });
+
+  // Extract built-in and custom modes
+  const modes = React.useMemo(() => {
+    if (!modesData?.modes) return [];
+    return modesData.modes.map((mode) => ({
+      id: mode.id,
+      title:  mode.name,
+      description: mode.description,
+      icon: getIconForMode(mode),
+      isDefault: mode.isDefault,
+      isPreferred: mode.isPreferred,
+      isBuiltIn: mode.isBuiltIn,
       details: [
-        "Equal distribution of tasks",
-        "Regular breaks between activities",
-        "Balance of different task types",
+        mode.config.optimization.optimizeFocusTime
+          ? t("focusTimeEnabled")
+          : t("focusTimeDisabled"),
+        t("maxTasks", { count: mode.config.maxTasksPerDay }),
+        mode.config.optimization.addBreaks.enabled
+          ? t("breaksEnabled")
+          : t("breaksDisabled"),
       ],
-    },
-    {
-      id: "productivity",
-      title: "Productivity Focus",
-      description: "Group similar tasks to minimize context switching",
-      icon: <BarChart2 className="h-5 w-5 text-purple-500" />,
-      details: [
-        "Deep work time blocks",
-        "Minimal context switching",
-        "Grouped similar tasks",
-      ],
-    },
-    {
-      id: "wellbeing",
-      title: "Wellbeing Focus",
-      description: "Prioritize breaks and prevent overloading",
-      icon: <Sun className="h-5 w-5 text-amber-500" />,
-      details: [
-        "Regular breaks throughout the day",
-        "Prevent meeting overload",
-        "Buffer time between activities",
-      ],
-    },
-    {
-      id: "custom",
-      title: "Custom Rules",
-      description: "Apply your personalized scheduling preferences",
-      icon: <Settings className="h-5 w-5 text-gray-500" />,
-      details: [
-        "Your saved preferences",
-        "Personalized scheduling rules",
-        "Custom time blocks",
-      ],
-    },
-  ];
+      config: mode.config,
+    }));
+  }, [modesData?.modes, t]);
+
+  // Handle mode selection
+  useEffect(() => {
+    if (selectedModeId !== optimizationMode) {
+      setOptimizationMode(selectedModeId);
+    }
+  }, [selectedModeId, optimizationMode, setOptimizationMode]);
+
+  if (isLoadingModes) {
+    return (
+      <div className="space-y-4">
+        <div className="h-8 w-full">
+          <Skeleton className="h-full w-3/4" />
+        </div>
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-32 w-full" />
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8">
+        <AlertCircle className="h-10 w-10 text-destructive mb-4" />
+        <h3 className="font-medium text-lg">{t("errorLoadingModes")}</h3>
+        <p className="text-sm text-muted-foreground mt-2">
+          {error instanceof Error ? error.message : t("errorGeneric")}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">Select Optimization Style</h3>
+        <h3 className="text-lg font-medium">{t("title")}</h3>
         <p className="text-sm text-muted-foreground mt-1.5">
-          Choose how the AI should prioritize your tasks and time
+          {t("description")}
         </p>
       </div>
 
       <div className="space-y-4 mt-6">
-        {options.map((option) => (
+        {modes.map((mode) => (
           <div
-            key={option.id}
+            key={mode.id}
             className={cn(
               "p-4 border rounded-lg transition-all cursor-pointer",
-              optimizationMode === option.id
+              selectedModeId === mode.id
                 ? "border-primary bg-primary/5"
                 : "hover:border-primary/30 hover:bg-muted/50"
             )}
-            onClick={() =>
-              setOptimizationMode(
-                option.id as
-                  | "balanced"
-                  | "productivity"
-                  | "wellbeing"
-                  | "custom"
-              )
-            }
+            onClick={() => setSelectedModeId(mode.id)}
           >
             <div className="flex mb-3">
               <div className="mr-3">
                 <div
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center",
-                    optimizationMode === option.id
-                      ? "bg-primary/10"
-                      : "bg-muted"
+                    selectedModeId === mode.id ? "bg-primary/10" : "bg-muted"
                   )}
                 >
-                  {option.icon}
+                  {mode.icon || <Settings className="h-5 w-5 text-gray-500" />}
                 </div>
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium">{option.title}</h4>
-                  {optimizationMode === option.id && (
+                  <h4 className="font-medium">
+                    {mode.isBuiltIn
+                      ? t(
+                          `modes.${mode.title
+                            .toLowerCase()
+                            .replace(/\s+/g, "_")}.title`
+                        )
+                      : mode.title}
+                  </h4>
+                  {selectedModeId === mode.id && (
                     <Check className="h-4 w-4 text-primary" />
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {option.description}
+                  {mode.isBuiltIn
+                    ? t(
+                        `modes.${mode.title
+                          .toLowerCase()
+                          .replace(/\s+/g, "_")}.description`
+                      )
+                    : mode.description}
                 </p>
               </div>
             </div>
 
-            {optimizationMode === option.id && (
+            {selectedModeId === mode.id && (
               <div className="bg-muted/50 p-3 rounded-md mt-2">
-                <p className="text-xs font-medium mb-2">This style includes:</p>
+                <p className="text-xs font-medium mb-2">{t("modeIncludes")}:</p>
                 <ul className="text-xs text-muted-foreground space-y-1">
-                  {option.details.map((detail, i) => (
+                  {mode.details.map((detail, i) => (
                     <li key={i} className="flex items-center">
-                      <Check className="h-3 w-3 mr-1.5 text-primary" />
+                      <CheckIcon className="h-3 w-3 mr-2 text-primary" />
                       {detail}
                     </li>
                   ))}
@@ -1113,7 +1201,6 @@ function OptimizationStyleStep({
     </div>
   );
 }
-
 function OptionsStep({ config, setConfig }: OptionsStepProps) {
   const toggleOption = (key: keyof typeof config) => {
     setConfig((prev) => ({

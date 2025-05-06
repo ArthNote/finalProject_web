@@ -26,9 +26,14 @@ import { Column } from "./kanban/types";
 // Import useTasks and related functions from tasks service
 import { useTasks, hasMoreTasks, getNextPage } from "@/lib/services/tasks";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
-import { updateTaskKanban, updateTaskStatus } from "@/lib/api/tasks";
+import {
+  updateTaskCompleteStatus,
+  updateTaskKanban,
+  updateTaskStatus,
+} from "@/lib/api/tasks";
 import { toast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { scheduleTasks } from "@/lib/api/schedule";
 
 const KanbanView = () => {
   const t = useTranslations("tasks.kanbanView");
@@ -40,6 +45,7 @@ const KanbanView = () => {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [scheduledFilter, setScheduledFilter] = useState("all");
   const [columnFilter, setColumnFilter] = useState("all");
+  const [schedulingTaskId, setSchedulingTaskId] = useState<string | null>(null);
 
   // Replace pagination state variables with a single object to match ListView structure
   const [pagination, setPagination] = useState({
@@ -224,20 +230,41 @@ const KanbanView = () => {
     refetch();
   };
 
+  const { mutate: updateCompleteStatus } = useMutation({
+    mutationFn: updateTaskCompleteStatus,
+    onSuccess: () => {
+      Promise.all([
+        queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+      ]);
+      toast({
+        title:
+          locale === "en"
+            ? "Task status updated"
+            : "Statut de la tâche mis à jour",
+        description:
+          locale === "en"
+            ? "The task status has been updated successfully."
+            : "Le statut de la tâche a été mis à jour avec succès.",
+      });
+    },
+    onError: () => {
+      toast({
+        title:
+          locale === "en"
+            ? "Error updating task status"
+            : "Erreur de mise à jour du statut de la tâche",
+        description:
+          locale === "en"
+            ? "There was an error updating the task status."
+            : "Il y a eu une erreur lors de la mise à jour du statut de la tâche.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleToggleComplete = async (taskId: string) => {
     try {
-      const findTask = (id: string) => {
-        return (
-          todoTasks.find((t) => t.id === id) ||
-          completedTasks.find((t) => t.id === id) ||
-          unscheduledTasks.find((t) => t.id === id) ||
-          inprogressTasks.find((t) => t.id === id) ||
-          null
-        );
-      };
-
-      // Logic for toggling completion status
-      refetch();
+      updateCompleteStatus(taskId);
     } catch (error) {
       console.error("Error updating task completion status:", error);
     }
@@ -263,6 +290,85 @@ const KanbanView = () => {
       refetch();
     } catch (error) {
       console.error("Error updating task scheduling status:", error);
+    }
+  };
+
+  const handleToggleSchedule = async (taskId: string) => {
+    try {
+      setSchedulingTaskId(taskId); // Set loading state
+      const findTask = (id: string) => {
+        return (
+          todoTasks.find((t) => t.id === id) ||
+          completedTasks.find((t) => t.id === id) ||
+          unscheduledTasks.find((t) => t.id === id) ||
+          inprogressTasks.find((t) => t.id === id) ||
+          null
+        );
+      };
+
+      const task = findTask(taskId);
+      if (!task) {
+        toast({
+          title: locale === "en" ? "Task not found" : "Tâche introuvable",
+          description:
+            locale === "en"
+              ? "The task was not found."
+              : "La tâche n'a pas été trouvée.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // If already scheduled, don't do anything -
+      // you'd need another API call to unschedule a specific task
+      if (task.scheduled) {
+        return;
+      }
+
+      // Create a scheduling request for just this one task
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const thirtyDaysFromToday = new Date(today);
+      thirtyDaysFromToday.setDate(today.getDate() + 30);
+
+      await scheduleTasks({
+        taskSelectionMode: "full", // Only schedule unscheduled tasks
+        timePeriodType: "custom",
+        customRangeStart: today,
+        customRangeEnd: thirtyDaysFromToday,
+        respectFixedAppointments: true,
+        addBreaksEnabled: true,
+        optimizeFocusTimeEnabled: true,
+        includePastTasks: false,
+      });
+
+      toast({
+        title:
+          locale === "en" ? "Schedule Success" : "Succès de la planification",
+        description:
+          locale === "en"
+            ? "The task has been scheduled successfully."
+            : "La tâche a été planifiée avec succès.",
+      });
+
+      // Refetch tasks to update the UI
+      refetch();
+      setSchedulingTaskId(null);
+    } catch (error) {
+      console.error("Error updating task scheduling status:", error);
+      setSchedulingTaskId(null);
+      toast({
+        title:
+          locale === "en"
+            ? "Error updating task scheduling status"
+            : "Erreur de mise à jour du statut de la planification de la tâche",
+        description:
+          locale === "en"
+            ? "There was an error updating the task scheduling status."
+            : "Il y a eu une erreur lors de la mise à jour du statut de la planification de la tâche.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -519,6 +625,8 @@ const KanbanView = () => {
                   onToggleComplete={handleToggleComplete}
                   onDeleteTask={handleDeleteTask}
                   handleTaskMove={handleTaskMove}
+                  handleToggleSchedule={handleToggleSchedule}
+                  schedulingTaskId={schedulingTaskId as string | undefined}
                 />
               );
             })}

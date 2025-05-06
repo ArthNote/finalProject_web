@@ -364,6 +364,7 @@ function getBadgeVariant(
       return "secondary";
     case "low":
       return "default";
+
     default:
       return "default";
   }

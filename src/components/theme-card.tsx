@@ -6,11 +6,11 @@ export function ThemeCard({
   selectedTheme,
   onSelect,
 }: {
-  theme: "light" | "dark" | "system";
+  theme: string;
   selectedTheme: string;
-  onSelect: (theme: "light" | "dark" | "system") => void;
+  onSelect: (theme:  string) => void;
 }) {
-  const getThemeStyles = (theme: "light" | "dark" | "system") => {
+  const getThemeStyles = (theme: string) => {
     if (theme === "system") {
       return {
         card: "relative overflow-hidden bg-white", // Base style for system theme
@@ -21,11 +21,24 @@ export function ThemeCard({
         darkContent: "absolute top-0 right-0 w-1/2 h-full z-20",
       };
     }
+    // For built-in light/dark themes
+    if (theme === "light" || theme === "dark") {
+      return {
+        card: theme === "dark" ? "bg-zinc-950" : "bg-white",
+        border: theme === "dark" ? "border-zinc-800" : "border-zinc-200",
+        dots: theme === "dark" ? "bg-zinc-600" : "bg-zinc-300",
+        mockContent: theme === "dark" ? "bg-zinc-800" : "bg-zinc-300",
+        darkOverlay: "",
+        darkContent: "",
+      };
+    }
+
+    // For custom themes (reward themes)
     return {
-      card: theme === "dark" ? "bg-zinc-950" : "bg-white", // Simple dark background
-      border: theme === "dark" ? "border-zinc-800" : "border-zinc-200",
-      dots: theme === "dark" ? "bg-zinc-600" : "bg-zinc-300",
-      mockContent: theme === "dark" ? "bg-zinc-800" : "bg-zinc-300",
+      card: theme,
+      border: "border-primary/20",
+      dots: "bg-primary",
+      mockContent: "bg-primary/20",
       darkOverlay: "",
       darkContent: "",
     };

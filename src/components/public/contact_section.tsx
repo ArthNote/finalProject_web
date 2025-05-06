@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import { sendEmail } from "@/lib/api/contact";
+import { useMutation } from "@tanstack/react-query";
 
 interface ContactFormData {
   name: string;
@@ -28,13 +30,26 @@ const ContactSection = () => {
     },
   });
 
+  const { mutate: sendContact, isPending } = useMutation({
+    mutationFn: sendEmail,
+    onSuccess: () => {
+      toast({
+        title: t("toast.success.title"),
+        description: t("toast.success.description"),
+      });
+      form.reset();
+    },
+    onError: (error) => {
+      toast({
+        title: t("toast.error.title"),
+        variant: "destructive",
+        description: t("toast.error.description") + " " + error.message,
+      });
+    },
+  });
+
   const onSubmit = (data: ContactFormData) => {
-    // Here you would typically send the data to your backend
-    console.log(data);
-    toast({
-      description: "Message sent successfully!",
-    });
-    form.reset();
+    sendContact(data);
   };
 
   const contactInfo = [
@@ -100,6 +115,7 @@ const ContactSection = () => {
                     <Input
                       id="name"
                       placeholder={t("form.name.placeholder")}
+                      disabled={isPending}
                       {...form.register("name")}
                     />
                   </div>
@@ -110,6 +126,7 @@ const ContactSection = () => {
                     <Input
                       id="email"
                       type="email"
+                      disabled={isPending}
                       placeholder={t("form.email.placeholder")}
                       {...form.register("email")}
                     />
@@ -122,11 +139,27 @@ const ContactSection = () => {
                       id="message"
                       placeholder={t("form.message.placeholder")}
                       className="min-h-[150px]"
+                      disabled={isPending}
                       {...form.register("message")}
                     />
                   </div>
                 </div>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" disabled={isPending}>
+                  {isPending && (
+                    <svg
+                      className="animate-spin h-5 w-5 mr-3 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M4 12a8 8 0 1 1 16 0A8 8 0 0 1 4 12z" />
+                    </svg>
+                  )}
                   {t("form.submit")}
                 </Button>
               </form>

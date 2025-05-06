@@ -57,8 +57,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getCalendarTasks } from "@/lib/api/tasks";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getCalendarTasks, updateTaskCompleteStatus } from "@/lib/api/tasks";
 import { TaskType } from "@/types/task";
 import TaskDetailsSheet from "../tasks/side_calendar/TaskDetailsSheet";
 import TaskCard from "./taskCard";
@@ -69,6 +69,8 @@ import { WeekViewSkeleton } from "./loading/WeekViewSkeleton";
 import { DayViewSkeleton } from "./loading/DayViewSkeleton";
 import { TaskSheetSkeleton } from "./loading/TaskSheetSkeleton";
 import { Skeleton } from "../ui/skeleton";
+import EditTaskSheet from "../tasks/EditTaskSheet";
+import { toast } from "@/hooks/use-toast";
 
 type ViewMode = "month" | "week" | "day";
 
@@ -78,6 +80,7 @@ const CalendarView = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+  const [editSheetOpen, setEditSheetOpen] = useState(false);
 
   const locale = useLocale() as "fr" | "en";
   const t = useTranslations("calendar");
@@ -182,6 +185,8 @@ const CalendarView = () => {
         return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
       case "low":
         return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+      case "urgent":
+        return "bg-red-700 text-white dark:bg-red-700/30 dark:text-red-300";
       default:
         return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
     }
@@ -215,6 +220,49 @@ const CalendarView = () => {
   const handleTaskClick = (e: React.MouseEvent, task: TaskType) => {
     e.stopPropagation(); // Prevent day click handler from firing
     setSelectedTask(task);
+  };
+
+  const { mutate: updateCompleteStatus } = useMutation({
+    mutationFn: updateTaskCompleteStatus,
+    onSuccess: () => {
+      Promise.all([
+        queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.invalidateQueries({
+          queryKey: ["calendar-tasks", start.toISOString(), end.toISOString()],
+        }),
+      ]);
+      toast({
+        title:
+          locale === "en"
+            ? "Task status updated"
+            : "Statut de la tâche mis à jour",
+        description:
+          locale === "en"
+            ? "The task status has been updated successfully."
+            : "Le statut de la tâche a été mis à jour avec succès.",
+      });
+    },
+    onError: () => {
+      toast({
+        title:
+          locale === "en"
+            ? "Error updating task status"
+            : "Erreur de mise à jour du statut de la tâche",
+        description:
+          locale === "en"
+            ? "There was an error updating the task status."
+            : "Il y a eu une erreur lors de la mise à jour du statut de la tâche.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleToggleComplete = async (taskId: string) => {
+    try {
+      updateCompleteStatus(taskId);
+    } catch (error) {
+      console.error("Error updating task completion status:", error);
+    }
   };
 
   const getTotalTasksInCurrentView = () => {
@@ -399,6 +447,8 @@ const CalendarView = () => {
                                                 ? "bg-red-500"
                                                 : task.priority === "medium"
                                                 ? "bg-amber-500"
+                                                : task.priority === "urgent"
+                                                ? "bg-red-700"
                                                 : "bg-green-500"
                                             }`}
                                           ></div>
@@ -573,97 +623,98 @@ const CalendarView = () => {
                         </div>
                       ) : (
                         <div className="space-y-px">
-                          {tasksByPriority(selectedDateTasks).map(
-                            ({ priority, tasks }) => (
-                              <div key={priority}>
-                                {tasks.map((task) => (
-                                  <div
-                                    key={task.id}
-                                    className={`group relative p-4 border-l-2 transition-all cursor-pointer
-                                  ${
-                                    priority === "high"
-                                      ? "border-l-red-600 hover:border-l-red-500 bg-gradient-to-r from-red-500/5 to-transparent hover:from-red-500/10"
-                                      : priority === "medium"
-                                      ? "border-l-amber-600 hover:border-l-amber-500 bg-gradient-to-r from-amber-500/5 to-transparent hover:from-amber-500/10"
-                                      : "border-l-emerald-600 hover:border-l-emerald-500 bg-gradient-to-r from-emerald-500/5 to-transparent hover:from-emerald-500/10"
-                                  }
-                                  hover:bg-accent/5`}
-                                    onClick={(e) => handleTaskClick(e, task)}
-                                  >
-                                    {/* Time & Priority Indicator */}
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                                      <div className="flex items-center gap-1.5">
-                                        <Clock className="h-3.5 w-3.5" />
-                                        <span>
-                                          {format(
-                                            new Date(
-                                              task.startTime || task.date!
-                                            ),
-                                            "h:mm a",
-                                            {
-                                              locale:
-                                                locale === "fr" ? fr : enUS,
-                                            }
-                                          )}
-                                        </span>
-                                      </div>
-                                      {priority === "high" && (
-                                        <Badge
-                                          variant="destructive"
-                                          className="h-5 px-1.5"
-                                        >
-                                          {t("urgent")}
-                                        </Badge>
+                          {selectedDateTasks
+                            .sort((a, b) => {
+                              const timeA = new Date(
+                                a.startTime || a.date!
+                              ).getTime();
+                              const timeB = new Date(
+                                b.startTime || b.date!
+                              ).getTime();
+                              return timeA - timeB;
+                            })
+                            .map((task) => (
+                              <div
+                                key={task.id}
+                                className={`group relative p-4 border-l-2 transition-all cursor-pointer
+                ${
+                  task.priority === "high"
+                    ? "border-l-red-600 hover:border-l-red-500 bg-gradient-to-r from-red-500/5 to-transparent hover:from-red-500/10"
+                    : task.priority === "medium"
+                    ? "border-l-amber-600 hover:border-l-amber-500 bg-gradient-to-r from-amber-500/5 to-transparent hover:from-amber-500/10"
+                    : task.priority === "urgent"
+                    ? "border-l-red-700 hover:border-l-red-600 bg-gradient-to-r from-red-700/5 to-transparent hover:from-red-700/10"
+                    : "border-l-emerald-600 hover:border-l-emerald-500 bg-gradient-to-r from-emerald-500/5 to-transparent hover:from-emerald-500/10"
+                }
+                hover:bg-accent/5`}
+                                onClick={(e) => handleTaskClick(e, task)}
+                              >
+                                {/* Time & Priority Indicator */}
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                  <div className="flex items-center gap-1.5">
+                                    <Clock className="h-3.5 w-3.5" />
+                                    <span>
+                                      {format(
+                                        new Date(task.startTime || task.date!),
+                                        "h:mm a",
+                                        {
+                                          locale: locale === "fr" ? fr : enUS,
+                                        }
                                       )}
-                                    </div>
-
-                                    {/* Title & Description */}
-                                    <div className="space-y-1">
-                                      <h4 className="font-medium text-sm">
-                                        {task.title}
-                                      </h4>
-                                      {task.description && (
-                                        <p className="text-sm text-muted-foreground leading-normal line-clamp-2 group-hover:line-clamp-none">
-                                          {task.description}
-                                        </p>
-                                      )}
-                                    </div>
-
-                                    {/* Footer */}
-                                    {task.assignedTo &&
-                                      task.assignedTo.length > 0 && (
-                                        <div className="flex items-center gap-2 mt-3">
-                                          <Avatar className="h-6 w-6">
-                                            <AvatarFallback className="text-xs bg-accent">
-                                              {task.assignedTo[0].name.charAt(
-                                                0
-                                              )}
-                                            </AvatarFallback>
-                                          </Avatar>
-                                          <span className="text-xs text-muted-foreground">
-                                            {task.assignedTo[0].name}
-                                          </span>
-                                        </div>
-                                      )}
-
-                                    {/* Hover Actions */}
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8 rounded-full"
-                                      >
-                                        <Info className="h-4 w-4 text-muted-foreground" />
-                                        <span className="sr-only">
-                                          {t("viewDetails")}
-                                        </span>
-                                      </Button>
-                                    </div>
+                                    </span>
                                   </div>
-                                ))}
+                                  {task.priority === "urgent" && (
+                                    <Badge
+                                      variant="destructive"
+                                      className="h-5 px-1.5"
+                                    >
+                                      {t("urgent")}
+                                    </Badge>
+                                  )}
+                                </div>
+
+                                {/* Title & Description */}
+                                <div className="space-y-1">
+                                  <h4 className="font-medium text-sm">
+                                    {task.title}
+                                  </h4>
+                                  {task.description && (
+                                    <p className="text-sm text-muted-foreground leading-normal line-clamp-2 group-hover:line-clamp-none">
+                                      {task.description}
+                                    </p>
+                                  )}
+                                </div>
+
+                                {/* Footer */}
+                                {task.assignedTo &&
+                                  task.assignedTo.length > 0 && (
+                                    <div className="flex items-center gap-2 mt-3">
+                                      <Avatar className="h-6 w-6">
+                                        <AvatarFallback className="text-xs bg-accent">
+                                          {task.assignedTo[0].name.charAt(0)}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <span className="text-xs text-muted-foreground">
+                                        {task.assignedTo[0].name}
+                                      </span>
+                                    </div>
+                                  )}
+
+                                {/* Hover Actions */}
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 rounded-full"
+                                  >
+                                    <Info className="h-4 w-4 text-muted-foreground" />
+                                    <span className="sr-only">
+                                      {t("viewDetails")}
+                                    </span>
+                                  </Button>
+                                </div>
                               </div>
-                            )
-                          )}
+                            ))}
                         </div>
                       )}
                     </div>
@@ -733,6 +784,10 @@ const CalendarView = () => {
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-red-700" />
+                        <span>{t("urgent")}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
                         <div className="w-2 h-2 rounded-full bg-red-500" />
                         <span>{t("high")}</span>
                       </div>
@@ -778,11 +833,7 @@ const CalendarView = () => {
       <TaskDetailsSheet
         task={selectedTask}
         onOpenChange={(open) => !open && setSelectedTask(null)}
-        onTaskComplete={(taskId) => {
-          queryClient.invalidateQueries({
-            queryKey: ["calendar-tasks"],
-          });
-        }}
+        onTaskComplete={handleToggleComplete}
         onTaskScheduled={(taskId) => {
           queryClient.invalidateQueries({
             queryKey: ["calendar-tasks"],
@@ -795,12 +846,20 @@ const CalendarView = () => {
 
 // Helper function to organize tasks by priority
 const tasksByPriority = (tasks: TaskType[]) => {
-  const priorities = ["high", "medium", "low"] as const;
+  // First sort all tasks by time
+  const sortedTasks = [...tasks].sort((a, b) => {
+    const timeA = new Date(a.startTime || a.date!).getTime();
+    const timeB = new Date(b.startTime || b.date!).getTime();
+    return timeA - timeB;
+  });
 
-  return priorities
+  // Then group by priority while maintaining time order within each group
+  const priorityOrder = ["urgent", "high", "medium", "low"] as const;
+
+  return priorityOrder
     .map((priority) => ({
       priority,
-      tasks: tasks.filter((task) => task.priority === priority),
+      tasks: sortedTasks.filter((task) => task.priority === priority),
     }))
     .filter((group) => group.tasks.length > 0);
 };

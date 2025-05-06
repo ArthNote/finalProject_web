@@ -63,6 +63,8 @@ const TimelineCalendar = () => {
 
   const [selectedTask, setSelectedTask] = React.useState<TaskType | null>(null);
 
+  const [forceReset, setForceReset] = React.useState(0);
+
   // Get state and actions from our Zustand store
   const {
     events,
@@ -252,11 +254,10 @@ const TimelineCalendar = () => {
 
   // Handle event update (when dragging/resizing in calendar)
   const handleEventUpdate = (updatedTask: TaskType) => {
-    // Only call the mutation to update task times when there's an actual change
+    // Only process if we have valid time data
     if (updatedTask.startTime && updatedTask.endTime && updatedTask.duration) {
       // Find the original task to compare with
       const originalTask = data?.find((task) => task.id === updatedTask.id);
-
       if (!originalTask) return;
 
       // Convert dates to timestamps for reliable comparison
@@ -265,20 +266,54 @@ const TimelineCalendar = () => {
       const updatedStart = new Date(updatedTask.startTime).getTime();
       const updatedEnd = new Date(updatedTask.endTime).getTime();
 
-      // Only update if something actually changed
-      if (
+      // Check if there's any actual change
+      const hasChanged =
         originalStart !== updatedStart ||
         originalEnd !== updatedEnd ||
-        originalTask.duration !== updatedTask.duration
-      ) {
-        console.log("Task actually changed, updating in database");
-        updateTimes({
-          id: updatedTask.id,
-          startTime: new Date(updatedTask.startTime),
-          endTime: new Date(updatedTask.endTime),
-          duration: updatedTask.duration,
-          date: new Date(updatedTask.date!),
+        originalTask.duration !== updatedTask.duration;
+
+      if (hasChanged) {
+        // Check for collisions with other tasks
+        const hasCollision = filteredTasks.some((task) => {
+          // Skip comparing with itself
+          if (task.id === updatedTask.id) return false;
+
+          // Skip tasks without proper time data
+          if (!task.startTime || !task.endTime) return false;
+
+          // Get the time bounds of the other task
+          const taskStart = new Date(task.startTime).getTime();
+          const taskEnd = new Date(task.endTime).getTime();
+
+          // Check for overlap:
+          // (updatedStart < taskEnd) && (updatedEnd > taskStart)
+          return updatedStart < taskEnd && updatedEnd > taskStart;
         });
+
+        if (hasCollision) {
+          // Show toast about collision and don't update
+          toast({
+            title: t("toast.collisionError.title") || "Task Collision",
+            description:
+              t("toast.collisionError.description") ||
+              "This task would overlap with another task. Please choose a different time.",
+            variant: "destructive",
+          });
+
+          // Force immediate reset
+          refetch();
+          setForceReset((prev) => prev + 1); // This will trigger a re-render
+        } else {
+          // No collision, proceed with the update
+          console.log("Task actually changed, updating in database");
+          updateTimes({
+            id: updatedTask.id,
+            startTime: new Date(updatedTask.startTime),
+            endTime: new Date(updatedTask.endTime),
+            duration: updatedTask.duration,
+            date: new Date(updatedTask.date!),
+          });
+        }
       } else {
         console.log("No actual changes detected, skipping update");
       }
@@ -429,7 +464,7 @@ const TimelineCalendar = () => {
               >
                 {filteredTasks.map((task: TaskType) => (
                   <EventItem
-                    key={task.id}
+                    key={`${task.id}-${forceReset}`} // Using forceReset in the key forces recreation
                     event={task}
                     selectedDate={selectedDate}
                     timelineRef={timelineRef}

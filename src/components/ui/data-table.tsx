@@ -129,6 +129,7 @@ export function DataTable<TData, TValue>({
               <SelectItem value="low">{t("setPriority.low")}</SelectItem>
               <SelectItem value="medium">{t("setPriority.medium")}</SelectItem>
               <SelectItem value="high">{t("setPriority.high")}</SelectItem>
+              <SelectItem value="urgent">{t("setPriority.urgent")}</SelectItem>
             </SelectContent>
           </Select>
         </div>

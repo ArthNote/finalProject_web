@@ -47,9 +47,13 @@ import { useTeam } from "../team-context";
 import AiTasksSheet from "@/components/tasks/AiTasksSheet";
 import CreateTaskSheet from "@/components/tasks/CreateTaskSheet";
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateTaskPriority, updateTaskStatus } from "@/lib/api/tasks";
+import {
+  updateTaskCompleteStatus,
+  updateTaskPriority,
+  updateTaskStatus,
+} from "@/lib/api/tasks";
 import { toast } from "@/hooks/use-toast";
 import EditTaskSheet from "@/components/tasks/EditTaskSheet";
 import TaskDetailsSheet from "@/components/tasks/side_calendar/TaskDetailsSheet";
@@ -90,6 +94,7 @@ const TeamTasks = ({ limit, compact = false }: TeamTasksProps) => {
   const [taskToEdit, setTaskToEdit] = React.useState<TaskType | null>(null);
   const [isEditTaskSheetOpen, setIsEditTaskSheetOpen] = React.useState(false);
   const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
+  const locale = useLocale() as "en" | "fr";
 
   const queryClient = useQueryClient();
 
@@ -113,6 +118,47 @@ const TeamTasks = ({ limit, compact = false }: TeamTasksProps) => {
       });
     },
   });
+
+  const { mutate: updateCompleteStatus } = useMutation({
+    mutationFn: updateTaskCompleteStatus,
+    onSuccess: () => {
+      Promise.all([
+        queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.refetchQueries({ queryKey: ["team"], type: "all" }),
+      ]);
+      toast({
+        title:
+          locale === "en"
+            ? "Task status updated"
+            : "Statut de la tâche mis à jour",
+        description:
+          locale === "en"
+            ? "The task status has been updated successfully."
+            : "Le statut de la tâche a été mis à jour avec succès.",
+      });
+    },
+    onError: () => {
+      toast({
+        title:
+          locale === "en"
+            ? "Error updating task status"
+            : "Erreur de mise à jour du statut de la tâche",
+        description:
+          locale === "en"
+            ? "There was an error updating the task status."
+            : "Il y a eu une erreur lors de la mise à jour du statut de la tâche.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleToggleComplete = async (taskId: string) => {
+    try {
+      updateCompleteStatus(taskId);
+    } catch (error) {
+      console.error("Error updating task completion status:", error);
+    }
+  };
 
   const { mutate: updateStatus } = useMutation({
     mutationFn: async (params: { id: string; status: string }) => {
@@ -513,7 +559,7 @@ const TeamTasks = ({ limit, compact = false }: TeamTasksProps) => {
       <TaskDetailsSheet
         task={detailsSheetOpen ? selectedTask : null}
         onOpenChange={setDetailsSheetOpen}
-        onTaskComplete={() => {}}
+        onTaskComplete={handleToggleComplete}
         onTaskScheduled={() => {}}
       />
     </>

@@ -61,6 +61,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTranslations } from "next-intl";
 import { count } from "console";
+import { authClient } from "@/lib/auth-client";
 
 interface AiTasksSheetProps {
   open: boolean;
@@ -242,6 +243,7 @@ const AiTasksSheet = ({
       {
         high: "bg-red-500",
         medium: "bg-amber-500",
+        urgent: "bg-red-700",
         low: "bg-green-500",
       }[task.priority] || "bg-slate-500";
 

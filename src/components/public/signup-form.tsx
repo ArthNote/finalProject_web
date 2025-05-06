@@ -91,6 +91,7 @@ export function SignupForm({
           name: name,
           lang: locale,
           image: "https://github.com/shadcn.png",
+          activeOrganizationId: "org-1",
         },
         {
           onRequest: () => {

@@ -18,7 +18,7 @@ import {
 } from "../ui/tooltip";
 import { ThemeCard } from "../theme-card";
 import { Button } from "../ui/button";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useFont } from "../wrappers/font-provider";
 import { useLocale, useTranslations } from "next-intl";
@@ -26,9 +26,10 @@ import { redirect } from "@/i18n/navigation";
 import { toast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { updateLanguage } from "@/lib/api/users";
+import { useUnlockedThemes } from "@/hooks/use-unlocked-themes";
 
 const AppearanceTab = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const { font, setFont } = useFont();
   const t = useTranslations("settings.appearance");
   const [tempTheme, setTempTheme] = useState(theme || "system");
@@ -36,11 +37,56 @@ const AppearanceTab = () => {
   const [tempLocale, setTempLocale] = useState(locale);
   const [tempFont, setTempFont] = useState<FontSetting>(font);
   const [isSaving, setIsSaving] = useState(false);
+  const unlockedThemes = useUnlockedThemes();
+  // Extract theme type and color mode
+  const [selectedThemeType, setSelectedThemeType] = useState<string>("default");
+  const [selectedColorMode, setSelectedColorMode] = useState<
+    "light" | "dark" | "system"
+  >("system");
+
   useEffect(() => {
-    setTempTheme(theme || "system");
+    if (theme) {
+      if (theme === "light" || theme === "dark" || theme === "system") {
+        setSelectedThemeType("default");
+        setSelectedColorMode(theme as "light" | "dark" | "system");
+      } else {
+        const themeName = theme.replace("theme-", "");
+        setSelectedThemeType(themeName);
+        setSelectedColorMode(resolvedTheme === "dark" ? "dark" : "light");
+      }
+      setTempTheme(theme);
+    }
+
     setTempLocale(locale);
     setTempFont(font);
-  }, [theme, locale, font]);
+  }, [theme, locale, font, resolvedTheme]);
+
+  // Update theme preview without applying
+  useEffect(() => {
+    let newTheme: string;
+    if (selectedThemeType === "default") {
+      newTheme = selectedColorMode;
+    } else {
+      // For custom themes, we handle dark mode separately
+      const baseTheme = `theme-${selectedThemeType}`;
+      // Only preview the default theme name, dark mode will be handled by next-themes
+      newTheme = baseTheme;
+    }
+    setTempTheme(newTheme);
+  }, [selectedThemeType, selectedColorMode]);
+
+  // Add this effect to handle dark mode separately
+  useEffect(() => {
+    if (selectedThemeType !== "default" && selectedColorMode !== "system") {
+      // For custom themes, manually set the dark mode class
+      const root = document.documentElement;
+      if (selectedColorMode === "dark") {
+        root.classList.add("dark");
+      } else {
+        root.classList.remove("dark");
+      }
+    }
+  }, [selectedColorMode, selectedThemeType]);
 
   const { mutate } = useMutation({
     mutationFn: updateLanguage,
@@ -52,8 +98,22 @@ const AppearanceTab = () => {
   const handleSave = () => {
     setIsSaving(true);
 
+    // Apply theme changes only on save
     if (tempTheme !== theme) {
+      // Set the theme first
       setTheme(tempTheme);
+
+      // Then handle dark mode if it's a custom theme
+      if (selectedThemeType !== "default") {
+        if (selectedColorMode === "system") {
+          // Let next-themes handle system preference
+          setTheme(tempTheme);
+        } else {
+          // For custom themes, we need to set both the theme and dark mode
+          setTheme(selectedColorMode === "dark" ? "dark" : "light");
+          setTimeout(() => setTheme(tempTheme), 0);
+        }
+      }
     }
 
     if (tempLocale !== locale) {
@@ -76,6 +136,48 @@ const AppearanceTab = () => {
       });
     }, 1000);
   };
+
+  const themeTypes = [
+    {
+      id: "default",
+      name: "Default",
+      value: "default",
+    },
+    // Add unlocked theme rewards
+    ...(unlockedThemes?.map((theme) => ({
+      id: theme.id,
+      name: theme.reward.title.replace(/_/g, " "),
+      value: theme.reward.title.toLowerCase().replace(/_/g, "-"),
+    })) ?? []),
+  ];
+
+  const availableThemes = [
+    {
+      id: "light",
+      name: t("theme.light"),
+      value: "light",
+      preview: "/themes/light.png",
+    },
+    {
+      id: "dark",
+      name: t("theme.dark"),
+      value: "dark",
+      preview: "/themes/dark.png",
+    },
+    {
+      id: "system",
+      name: t("theme.system"),
+      value: "system",
+      preview: "/themes/system.png",
+    },
+    // Add unlocked theme rewards
+    ...(unlockedThemes?.map((theme) => ({
+      id: theme.id,
+      name: theme.reward.title,
+      value: `theme-${theme.reward.title.replace(/_/g, "-")}`,
+      preview: "/themes/system.png",
+    })) ?? []),
+  ];
   return (
     <div className="space-y-6">
       <div>
@@ -93,7 +195,7 @@ const AppearanceTab = () => {
         </div>
         <Select value={tempLocale} onValueChange={setTempLocale}>
           <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Select Language" />
+            <SelectValue placeholder={t("language.selectLanguage")} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="en">{t("language.english")}</SelectItem>
@@ -118,7 +220,7 @@ const AppearanceTab = () => {
             onValueChange={(value) => setTempFont(value as FontSetting)}
           >
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select font" />
+              <SelectValue placeholder={t("font.selectFont")} />
             </SelectTrigger>
             <SelectContent>
               {fontOptions.map((font) => (
@@ -154,48 +256,93 @@ const AppearanceTab = () => {
             {t("theme.description")}
           </p>
         </div>
-        <TooltipProvider delayDuration={200}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                  <ThemeCard
-                    theme="light"
-                    selectedTheme={tempTheme}
-                    onSelect={setTempTheme}
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>{t("theme.light")}</TooltipContent>
-            </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                  <ThemeCard
-                    theme="dark"
-                    selectedTheme={tempTheme}
-                    onSelect={setTempTheme}
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>{t("theme.dark")}</TooltipContent>
-            </Tooltip>
+        {/* Theme Type Selection */}
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium">{t("theme.themeStyle")}</h4>
+          <Select
+            value={selectedThemeType}
+            onValueChange={setSelectedThemeType}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue>
+                {t(
+                  `theme.style.${
+                    themeTypes.find((t) => t.value === selectedThemeType)?.value
+                  }`
+                ) || t("theme.selectTheme")}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {themeTypes.map((type) => (
+                <SelectItem key={type.id} value={type.value}>
+                  {t(`theme.style.${type.value}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                  <ThemeCard
-                    theme="system"
-                    selectedTheme={tempTheme}
-                    onSelect={setTempTheme}
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>{t("theme.system")}</TooltipContent>
-            </Tooltip>
+        {/* Color Mode Selection */}
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium">{t("theme.appearanceMode")}</h4>
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              variant={selectedColorMode === "light" ? "default" : "outline"}
+              className="w-full"
+              onClick={() => setSelectedColorMode("light")}
+            >
+              <Sun className="h-4 w-4 mr-2" />
+              {t("theme.light")}
+            </Button>
+            <Button
+              variant={selectedColorMode === "dark" ? "default" : "outline"}
+              className="w-full"
+              onClick={() => setSelectedColorMode("dark")}
+            >
+              <Moon className="h-4 w-4 mr-2" />
+              {t("theme.dark")}
+            </Button>
+            <Button
+              variant={selectedColorMode === "system" ? "default" : "outline"}
+              className="w-full"
+              onClick={() => setSelectedColorMode("system")}
+            >
+              <Monitor className="h-4 w-4 mr-2" />
+              {t("theme.system")}
+            </Button>
           </div>
-        </TooltipProvider>
+        </div>
+
+        <div className="border rounded-lg p-4">
+          <h4 className="text-sm font-medium mb-4">{t("theme.preview")}</h4>
+          <div className="w-full max-w-lg mx-auto">
+            <ThemeCard
+              theme={tempTheme}
+              selectedTheme={tempTheme}
+              onSelect={() => {}}
+            />
+          </div>
+        </div>
+
+        {/* <TooltipProvider delayDuration={200}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {availableThemes.map((theme) => (
+              <Tooltip key={theme.id}>
+                <TooltipTrigger asChild>
+                  <div className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                    <ThemeCard
+                      theme={theme.value}
+                      selectedTheme={tempTheme}
+                      onSelect={setTempTheme}
+                    />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>{theme.name}</TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
+        </TooltipProvider> */}
       </div>
 
       <div className="flex items-center justify-end pt-6">

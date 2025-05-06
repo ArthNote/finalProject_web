@@ -11,7 +11,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Check, Clock, MoreHorizontal } from "lucide-react";
+import { Check, Clock, Loader2, MoreHorizontal } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { TaskType } from "@/types/task";
 import { format, set } from "date-fns";
@@ -30,6 +30,7 @@ interface GridViewCardProps {
   setSelectedTask: (task: TaskType) => void;
   handleToggleComplete: (taskId: string) => void;
   handleToggleScheduled: (taskId: string) => void;
+  isScheduling?: boolean;
 }
 
 const getPriorityColor = (priority: string) => {
@@ -40,6 +41,8 @@ const getPriorityColor = (priority: string) => {
       return "bg-amber-500";
     case "low":
       return "bg-green-500";
+    case "urgent":
+      return "bg-red-700";
     default:
       return "bg-slate-500";
   }
@@ -50,6 +53,7 @@ const GridViewCard = ({
   setSelectedTask,
   handleToggleComplete,
   handleToggleScheduled,
+  isScheduling,
 }: GridViewCardProps) => {
   const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
@@ -69,6 +73,10 @@ const GridViewCard = ({
     onSuccess: () => {
       Promise.all([
         queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.invalidateQueries({
+          queryKey: ["tasks-by-date"],
+          type: "all",
+        }),
       ]);
       toast({
         title: t("toast.updateSuccess.title"),
@@ -91,6 +99,10 @@ const GridViewCard = ({
     onSuccess: () => {
       Promise.all([
         queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.invalidateQueries({
+          queryKey: ["tasks-by-date"],
+          type: "all",
+        }),
       ]);
       toast({
         title: t("toast.updateSuccess.title"),
@@ -170,12 +182,23 @@ const GridViewCard = ({
                 {" "}
                 {/* Stop propagation on content */}
                 <DropdownMenuItem
+                  className={task.scheduled ? "hidden" : ""}
                   onClick={(e) => {
                     e.stopPropagation(); // Stop propagation
                     handleToggleScheduled(task.id);
                   }}
+                  disabled={isScheduling}
                 >
-                  {task.scheduled ? t("unscheduleTask") : t("scheduleTask")}
+                  {isScheduling ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {t("scheduling")}
+                    </>
+                  ) : task.scheduled ? (
+                    t("unscheduleTask")
+                  ) : (
+                    t("scheduleTask")
+                  )}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={(e) => {
@@ -196,6 +219,7 @@ const GridViewCard = ({
                           e.stopPropagation();
                           handlePriorityChange("low");
                         }}
+                        disabled={task.priority === "low"}
                       >
                         <div className="flex items-center">
                           <div className="h-3 w-3 rounded-full bg-green-500 mr-2" />
@@ -207,6 +231,7 @@ const GridViewCard = ({
                           e.stopPropagation();
                           handlePriorityChange("medium");
                         }}
+                        disabled={task.priority === "medium"}
                       >
                         <div className="flex items-center">
                           <div className="h-3 w-3 rounded-full bg-amber-500 mr-2" />
@@ -218,10 +243,23 @@ const GridViewCard = ({
                           e.stopPropagation();
                           handlePriorityChange("high");
                         }}
+                        disabled={task.priority === "high"}
                       >
                         <div className="flex items-center">
                           <div className="h-3 w-3 rounded-full bg-red-500 mr-2" />
                           {t("high")}
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePriorityChange("urgent");
+                        }}
+                        disabled={task.priority === "urgent"}
+                      >
+                        <div className="flex items-center">
+                          <div className="h-3 w-3 rounded-full bg-red-700 mr-2" />
+                          {t("urgent")}
                         </div>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
@@ -333,12 +371,23 @@ const GridViewCard = ({
                 {" "}
                 {/* Stop propagation on content */}
                 <DropdownMenuItem
+                  className={task.scheduled ? "hidden" : ""}
                   onClick={(e) => {
                     e.stopPropagation(); // Stop propagation
                     handleToggleScheduled(task.id);
                   }}
+                  disabled={isScheduling}
                 >
-                  {task.scheduled ? t("unscheduleTask") : t("scheduleTask")}
+                  {isScheduling ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {t("scheduling")}
+                    </>
+                  ) : task.scheduled ? (
+                    t("unscheduleTask")
+                  ) : (
+                    t("scheduleTask")
+                  )}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={(e) => {
@@ -359,6 +408,7 @@ const GridViewCard = ({
                           e.stopPropagation();
                           handlePriorityChange("low");
                         }}
+                        disabled={task.priority === "low"}
                       >
                         <div className="flex items-center">
                           <div className="h-3 w-3 rounded-full bg-green-500 mr-2" />
@@ -370,6 +420,7 @@ const GridViewCard = ({
                           e.stopPropagation();
                           handlePriorityChange("medium");
                         }}
+                        disabled={task.priority === "medium"}
                       >
                         <div className="flex items-center">
                           <div className="h-3 w-3 rounded-full bg-amber-500 mr-2" />
@@ -381,10 +432,23 @@ const GridViewCard = ({
                           e.stopPropagation();
                           handlePriorityChange("high");
                         }}
+                        disabled={task.priority === "high"}
                       >
                         <div className="flex items-center">
                           <div className="h-3 w-3 rounded-full bg-red-500 mr-2" />
                           {t("high")}
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePriorityChange("urgent");
+                        }}
+                        disabled={task.priority === "urgent"}
+                      >
+                        <div className="flex items-center">
+                          <div className="h-3 w-3 rounded-full bg-red-700 mr-2" />
+                          {t("urgent")}
                         </div>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
@@ -460,8 +524,8 @@ const GridViewCard = ({
               <div className="flex items-center text-xs text-muted-foreground">
                 <Clock className="mr-1 h-3 w-3" />
                 <span>
-                  {task.date
-                    ? formatDate(task.date.toString())
+                  {task.startTime
+                    ? formatDate(task.startTime.toString())
                     : t("noDateScheduled")}
                 </span>
               </div>

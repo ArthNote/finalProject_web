@@ -13,7 +13,14 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Calendar, Clock, MoreHorizontal, Tag, Users } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  Loader2,
+  MoreHorizontal,
+  Tag,
+  Users,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useLocale, useTranslations } from "next-intl";
 import EditTaskSheet from "./EditTaskSheet";
@@ -32,6 +39,7 @@ interface ListViewCardProps {
   handleViewTaskDetails: (task: TaskType) => void;
   handleToggleComplete: (taskId: string) => void;
   handleToggleScheduled: (taskId: string) => void;
+  isScheduling?: boolean;
 }
 
 const getPriorityColor = (priority: string) => {
@@ -42,6 +50,8 @@ const getPriorityColor = (priority: string) => {
       return "bg-amber-500";
     case "low":
       return "bg-green-500";
+    case "urgent":
+      return "bg-red-700";
     default:
       return "bg-slate-500";
   }
@@ -67,6 +77,7 @@ const ListViewCard = ({
   handleViewTaskDetails,
   handleToggleComplete,
   handleToggleScheduled,
+  isScheduling,
 }: ListViewCardProps) => {
   const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
@@ -80,6 +91,10 @@ const ListViewCard = ({
     onSuccess: () => {
       Promise.all([
         queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.invalidateQueries({
+          queryKey: ["tasks-by-date"],
+          type: "all",
+        }),
       ]);
       toast({
         title: t("toast.updateSuccess.title"),
@@ -102,6 +117,10 @@ const ListViewCard = ({
     onSuccess: () => {
       Promise.all([
         queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+        queryClient.invalidateQueries({
+          queryKey: ["tasks-by-date"],
+          type: "all",
+        }),
       ]);
       toast({
         title: t("toast.updateSuccess.title"),
@@ -243,12 +262,23 @@ const ListViewCard = ({
                   {" "}
                   {/* Stop propagation on content */}
                   <DropdownMenuItem
+                    className={task.scheduled ? "hidden" : ""}
                     onClick={(e) => {
                       e.stopPropagation(); // Stop propagation
                       handleToggleScheduled(task.id);
                     }}
+                    disabled={isScheduling}
                   >
-                    {task.scheduled ? t("unscheduleTask") : t("scheduleTask")}
+                    {isScheduling ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {t("scheduling")}
+                      </>
+                    ) : task.scheduled ? (
+                      t("unscheduleTask")
+                    ) : (
+                      t("scheduleTask")
+                    )}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={(e) => {
@@ -271,6 +301,7 @@ const ListViewCard = ({
                             e.stopPropagation();
                             handlePriorityChange("low");
                           }}
+                          disabled={task.priority === "low"}
                         >
                           <div className="flex items-center">
                             <div className="h-3 w-3 rounded-full bg-green-500 mr-2" />
@@ -282,6 +313,7 @@ const ListViewCard = ({
                             e.stopPropagation();
                             handlePriorityChange("medium");
                           }}
+                          disabled={task.priority === "medium"}
                         >
                           <div className="flex items-center">
                             <div className="h-3 w-3 rounded-full bg-amber-500 mr-2" />
@@ -293,10 +325,23 @@ const ListViewCard = ({
                             e.stopPropagation();
                             handlePriorityChange("high");
                           }}
+                          disabled={task.priority === "high"}
                         >
                           <div className="flex items-center">
                             <div className="h-3 w-3 rounded-full bg-red-500 mr-2" />
                             {t("high")}
+                          </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePriorityChange("urgent");
+                          }}
+                          disabled={task.priority === "urgent"}
+                        >
+                          <div className="flex items-center">
+                            <div className="h-3 w-3 rounded-full bg-red-700 mr-2" />
+                            {t("urgent")}
                           </div>
                         </DropdownMenuItem>
                       </DropdownMenuSubContent>
@@ -370,14 +415,7 @@ const ListViewCard = ({
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             {/* Schedule info */}
-            {task.scheduled ? (
-              <div className="flex items-center text-xs text-muted-foreground">
-                <Clock className="mr-1 h-3.5 w-3.5 shrink-0" />
-                <span className="truncate max-w-[150px] sm:max-w-none">
-                  {task.date ? formatDate(task.date) : t("notScheduled")}
-                </span>
-              </div>
-            ) : (
+            {!task.scheduled ? (
               <Button
                 variant="outline"
                 size="sm"
@@ -386,10 +424,22 @@ const ListViewCard = ({
                   e.stopPropagation();
                   handleToggleScheduled(task.id);
                 }}
+                disabled={isScheduling}
               >
-                <Calendar className="mr-1 h-3.5 w-3.5" />
-                {t("schedule")}
+                {isScheduling ? (
+                  <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Calendar className="mr-1 h-3.5 w-3.5" />
+                )}
+                {isScheduling ? t("scheduling") : t("schedule")}
               </Button>
+            ) : (
+              <div className="flex items-center text-xs text-muted-foreground">
+                <Clock className="mr-1 h-3.5 w-3.5 shrink-0" />
+                <span className="truncate max-w-[150px] sm:max-w-none">
+                  {task.startTime ? formatDate(task.startTime) : t("notScheduled")}
+                </span>
+              </div>
             )}
 
             {/* Show assigned users */}

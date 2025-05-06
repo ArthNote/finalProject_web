@@ -444,3 +444,64 @@ export async function getCalendarTasks(
     throw error;
   }
 }
+
+export async function getTodaysTasks(): Promise<{
+  data: TaskType[];
+  message: string;
+  success: boolean;
+}> {
+  try {
+    const response = await fetch(`${consts.backend}/tasks/today`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch today's tasks");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching today's tasks:", error);
+    throw error;
+  }
+}
+
+// Add this function to the existing file
+export async function getTaskAnalytics(timeframe: string): Promise<{
+  data: Array<{
+    date: string;
+    created: number;
+    completed: number;
+  }>;
+  success: boolean;
+}> {
+  try {
+    const params = new URLSearchParams({
+      timeframe,
+    });
+
+    const response = await fetch(
+      `${consts.backend}/tasks/analytics?${params}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch task analytics");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching task analytics:", error);
+    throw error;
+  }
+}

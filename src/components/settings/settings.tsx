@@ -65,11 +65,11 @@ export default function SettingsPage() {
                           label: "My Plan",
                           icon: CreditCardIcon,
                         },
-                        {
-                          value: "notifications",
-                          label: "Notifications",
-                          icon: BellIcon,
-                        },
+                        // {
+                        //   value: "notifications",
+                        //   label: "Notifications",
+                        //   icon: BellIcon,
+                        // },
                         {
                           value: "prefrences",
                           label: "Preferences",
@@ -101,11 +101,11 @@ export default function SettingsPage() {
                     icon: PaintbrushIcon,
                   },
                   { value: "myplan", label: "My Plan", icon: CreditCardIcon },
-                  {
-                    value: "notifications",
-                    label: "Notifications",
-                    icon: BellIcon,
-                  },
+                  // {
+                  //   value: "notifications",
+                  //   label: "Notifications",
+                  //   icon: BellIcon,
+                  // },
                   { value: "prefrences", label: "Preferences", icon: CogIcon },
                 ].map(({ value, label, icon: Icon }) => (
                   <SelectItem key={value} value={value}>
@@ -135,11 +135,11 @@ export default function SettingsPage() {
                     icon: PaintbrushIcon,
                   },
                   { value: "myplan", label: "My Plan", icon: CreditCardIcon },
-                  {
-                    value: "notifications",
-                    label: "Notifications",
-                    icon: BellIcon,
-                  },
+                  // {
+                  //   value: "notifications",
+                  //   label: "Notifications",
+                  //   icon: BellIcon,
+                  // },
                   {
                     value: "prefrences",
                     label: "Preferences",
@@ -173,9 +173,9 @@ export default function SettingsPage() {
                 <MyPlanTab />
               </TabsContent>
 
-              <TabsContent value="notifications" className="mt-0 border-0 p-0">
+              {/* <TabsContent value="notifications" className="mt-0 border-0 p-0">
                 <NotificationsTab />
-              </TabsContent>
+              </TabsContent> */}
 
               <TabsContent value="prefrences" className="mt-0 border-0 p-0">
                 <PrefrencesTab />

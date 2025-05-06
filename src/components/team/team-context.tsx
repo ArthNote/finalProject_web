@@ -79,29 +79,47 @@ export const TeamProvider = ({ children }: { children: React.ReactNode }) => {
     refetchOnWindowFocus: true,
   });
 
-  const hasTeamSub = subscription?.data?.plan === "team" || false;
+  const { data: sessionData, isPending: orgLoading } = authClient.useSession();
 
-  const { data, isPending: orgLoading } = authClient.useActiveOrganization();
+  const activeOrgId = sessionData?.user.activeOrganizationId || "";
+  const hasTeamSub = subscription?.data?.plan === "team" || false;
 
   const {
     data: teamData,
     isLoading: teamLoading,
     error: teamError,
   } = useQuery({
-    queryKey: ["team", `org-${data?.id}`],
-    queryFn: getTeamData,
+    queryKey: ["team", `org-${activeOrgId}`],
+    queryFn: hasTeamSub ? getTeamData : () => Promise.resolve(null),
+    enabled: hasTeamSub && Boolean(activeOrgId),
     refetchOnWindowFocus: true,
   });
-
-  if (teamLoading) {
-    return <div>Loading...</div>;
-  }
 
   const updateTeam = (updates: Partial<TeamDetails>) => {
     setTeam((prev) => ({ ...prev, ...updates }));
   };
 
+  // Render based on conditions - after all hooks have been called
   if (subLoading || orgLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!hasTeamSub) {
+    return (
+      <TeamContext.Provider
+        value={{
+          team: mockTeamData,
+          hasTeamSub: false,
+          updateTeam: () => {},
+          orgId: "",
+        }}
+      >
+        {children}
+      </TeamContext.Provider>
+    );
+  }
+
+  if (teamLoading) {
     return <div>Loading...</div>;
   }
 
@@ -115,7 +133,7 @@ export const TeamProvider = ({ children }: { children: React.ReactNode }) => {
         team: teamData.data,
         hasTeamSub,
         updateTeam,
-        orgId: data?.id || "",
+        orgId: activeOrgId,
       }}
     >
       {children}

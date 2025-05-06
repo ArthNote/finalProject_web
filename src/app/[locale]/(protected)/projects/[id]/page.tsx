@@ -68,7 +68,11 @@ import { ErrorState } from "@/components/error_state";
 import ProjectLoadingPage from "./loading";
 import { useState } from "react";
 import EditTaskSheet from "@/components/tasks/EditTaskSheet";
-import { updateTaskPriority, updateTaskStatus } from "@/lib/api/tasks";
+import {
+  updateTaskCompleteStatus,
+  updateTaskPriority,
+  updateTaskStatus,
+} from "@/lib/api/tasks";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import TaskDetailsSheet from "@/components/tasks/side_calendar/TaskDetailsSheet";
@@ -183,6 +187,46 @@ export default function ProjectDetailsPage() {
     },
   });
 
+  const { mutate: updateCompleteStatus } = useMutation({
+    mutationFn: updateTaskCompleteStatus,
+    onSuccess: () => {
+      Promise.all([
+        queryClient.refetchQueries({ queryKey: ["tasks"], type: "active" }),
+      ]);
+      toast({
+        title:
+          locale === "en"
+            ? "Task status updated"
+            : "Statut de la tâche mis à jour",
+        description:
+          locale === "en"
+            ? "The task status has been updated successfully."
+            : "Le statut de la tâche a été mis à jour avec succès.",
+      });
+    },
+    onError: () => {
+      toast({
+        title:
+          locale === "en"
+            ? "Error updating task status"
+            : "Erreur de mise à jour du statut de la tâche",
+        description:
+          locale === "en"
+            ? "There was an error updating the task status."
+            : "Il y a eu une erreur lors de la mise à jour du statut de la tâche.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleToggleComplete = async (taskId: string) => {
+    try {
+      updateCompleteStatus(taskId);
+    } catch (error) {
+      console.error("Error updating task completion status:", error);
+    }
+  };
+
   // Rest of the component logic
   if (isLoading) {
     return <ProjectLoadingPage />;
@@ -275,6 +319,8 @@ export default function ProjectDetailsPage() {
                 ? "text-red-500"
                 : row.original.priority === "medium"
                 ? "text-yellow-500"
+                : row.original.priority === "urgent"
+                ? "text-red-700"
                 : "text-green-500"
             }`}
           />
@@ -388,6 +434,15 @@ export default function ProjectDetailsPage() {
                         {t("priority.high")}
                       </div>
                     </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handlePriorityChange("urgent")}
+                      disabled={task.priority === "urgent"}
+                    >
+                      <div className="flex items-center">
+                        <div className="h-3 w-3 rounded-full bg-red-700 mr-2" />
+                        {t("priority.urgent")}
+                      </div>
+                    </DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
               </DropdownMenuSub>
@@ -477,6 +532,8 @@ export default function ProjectDetailsPage() {
         return "secondary";
       case "low":
         return "default";
+      case "urgent":
+        return "destructive";
       default:
         return "default";
     }
@@ -496,7 +553,11 @@ export default function ProjectDetailsPage() {
         queryKey: ["projects", project.id],
         type: "all",
       });
-      router.push("/projects");
+      queryClient.invalidateQueries({
+        queryKey: ["tasks-by-date"],
+        type: "all",
+      }),
+        router.push("/projects");
     } catch (error) {
       console.error("Error deleting project:", error);
     } finally {
@@ -766,7 +827,7 @@ export default function ProjectDetailsPage() {
       <TaskDetailsSheet
         task={detailsSheetOpen ? selectedTask : null}
         onOpenChange={setDetailsSheetOpen}
-        onTaskComplete={() => {}}
+        onTaskComplete={handleToggleComplete}
         onTaskScheduled={() => {}}
       />
     </div>

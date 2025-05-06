@@ -25,7 +25,7 @@ export function createTaskValidators(
       .max(500, { message: t("validation.task.descriptionTooLong") })
       .optional()
       .default(""),
-    priority: z.enum(["high", "medium", "low"]).default("medium"),
+    priority: z.enum(["high", "medium", "low", "urgent"]).default("medium"),
     category: z.string().optional().default(""),
     scheduled: z.boolean().default(false),
     date: z.date().nullable().optional(),
