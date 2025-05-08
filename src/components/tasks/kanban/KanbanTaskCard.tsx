@@ -34,6 +34,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import EditTaskSheet from "../EditTaskSheet";
 import TaskDetailsSheet from "../side_calendar/TaskDetailsSheet";
 import { Draggable } from "@hello-pangea/dnd";
+import Image from "next/image";
 
 interface KanbanTaskCardProps {
   task: TaskType;
@@ -397,7 +398,7 @@ const KanbanTaskCard: React.FC<KanbanTaskCardProps> = ({
                         title={user.name}
                       >
                         {user.profilePic ? (
-                          <img
+                          <Image
                             src={user.profilePic}
                             alt={user.name}
                             className="h-full w-full object-cover"

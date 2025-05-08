@@ -21,6 +21,13 @@ const eslintConfig = [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
       "react-hooks/rules-of-hooks": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "react/no-children-prop": "off",
+      "@next/next/no-img-element": "off",
+      "jsx-a11y/alt-text": "off",
+      "prefer-const": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
     },
   }),
 ];

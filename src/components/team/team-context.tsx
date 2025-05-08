@@ -40,13 +40,14 @@ const mockTeamData: TeamDetails = {
     total: 100,
   },
   members: [
-    { id: "1", name: "John Doe", email: "john@example.com", role: "owner" },
-    { id: "2", name: "Jane Smith", email: "jane@example.com", role: "admin" },
+    { id: "1", name: "John Doe", email: "john@example.com", role: "owner" ,userId: "1"},
+    { id: "2", name: "Jane Smith", email: "jane@example.com", role: "admin" , userId: "2"},
     {
       id: "3",
       name: "Alice Johnson",
       email: "alice@example.com",
       role: "member",
+      userId: "3",
     },
   ],
   activity: [],

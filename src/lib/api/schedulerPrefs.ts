@@ -3,6 +3,7 @@ import { consts } from "../constants";
 export interface SchedulerModeConfig {
   defaultDuration: number;
   maxTasksPerDay: number;
+  considerMood?: boolean;
   maxHoursPerDay: number;
   energyLevels: {
     highEnergyHours: string[];

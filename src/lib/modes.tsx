@@ -32,6 +32,7 @@ export const BUILT_IN_MODES: SchedulingMode[] = [
       defaultDuration: 45,
       maxTasksPerDay: 6,
       maxHoursPerDay: 7,
+      considerMood: true,
       energyLevels: {
         highEnergyHours: ["08:00", "09:00", "10:00", "14:00"],
         mediumEnergyHours: ["11:00", "15:00", "16:00"],
@@ -106,6 +107,7 @@ export const BUILT_IN_MODES: SchedulingMode[] = [
       defaultDuration: 50,
       maxTasksPerDay: 5,
       maxHoursPerDay: 8,
+      considerMood: false,
       energyLevels: {
         highEnergyHours: ["08:00", "09:00", "10:00", "14:00", "15:00"],
         mediumEnergyHours: ["11:00", "16:00", "17:00"],
@@ -180,6 +182,7 @@ export const BUILT_IN_MODES: SchedulingMode[] = [
       defaultDuration: 30,
       maxTasksPerDay: 5,
       maxHoursPerDay: 6,
+      considerMood: true,
       energyLevels: {
         highEnergyHours: ["09:00", "10:00", "15:00"],
         mediumEnergyHours: ["11:00", "14:00", "16:00"],
@@ -249,6 +252,10 @@ export function adaptApiModeToUiMode(apiMode: SchedulerMode): SchedulingMode {
   return {
     ...apiMode,
     icon: getIconForMode(apiMode),
+    config: {
+      ...apiMode.config,
+      considerMood: apiMode.config.considerMood ?? false,
+    },
   };
 }
 
