@@ -102,11 +102,26 @@ export function SigninForm({
             });
           },
           onError(context) {
-            console.error("Error during sign-in:", context.error.message);
-            console.error("Error during sign-in:", context.error.cause);
-            console.error("Error during sign-in:", context.error.error);
-            console.error("Error during sign-in:", context.error.name);
-            console.error("Error during sign-in:", context.error.stack);
+            console.error(
+              "Error during sign-in:",
+              context.error.message.toString()
+            );
+            console.error(
+              "Error during sign-in:",
+              context.error.cause?.toString()
+            );
+            console.error(
+              "Error during sign-in:",
+              context.error.error.toString()
+            );
+            console.error(
+              "Error during sign-in:",
+              context.error.name.toString()
+            );
+            console.error(
+              "Error during sign-in:",
+              context.error.stack?.toString()
+            );
             toast({
               title: t("toast.error.title"),
               description: getAuthErrorMessage(context.error.code, locale),
