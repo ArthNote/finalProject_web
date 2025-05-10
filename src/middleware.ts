@@ -54,7 +54,6 @@ export default async function middleware(request: NextRequest) {
     }/api/auth/get-session`,
     {
       headers: header,
-     
       credentials: "include",
     }
   );
