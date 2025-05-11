@@ -42,6 +42,7 @@ import {
   Loader2,
   Plus,
   Trash2,
+  Pencil,
   X,
 } from "lucide-react";
 import {
@@ -141,9 +142,20 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
       endTime: task.endTime ? new Date(task.endTime) : null,
       tags: task.tags || [],
       assignedTo: task.assignedTo?.map((user) => user.id) || [],
-      resources: task.resources || [],
+      resources:
+        task.resources?.map((resource) => ({
+          id:
+            resource.id ||
+            `default-${Date.now()}-${Math.random()
+              .toString(36)
+              .substring(2, 9)}`,
+          name: resource.name,
+          type: resource.type || "General",
+          category: resource.category,
+          url: resource.url || undefined,
+        })) || [],
       parentId: task.parentId || null, // Explicitly set null when parentId is falsy
-      duration: task.duration || 0,
+      duration: task.duration || null,
       projectId: task.projectId || null || undefined,
     },
   });
@@ -151,6 +163,19 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
   // Reset form values when task changes
   useEffect(() => {
     if (task && open) {
+      const formattedResources =
+        task.resources?.map((resource) => ({
+          id:
+            resource.id ||
+            `default-${Date.now()}-${Math.random()
+              .toString(36)
+              .substring(2, 9)}`,
+          name: resource.name,
+          type: resource.type || "General",
+          category: resource.category,
+          url: resource.url || undefined,
+        })) || [];
+
       form.reset({
         title: task.title || "",
         description: task.description || "",
@@ -162,11 +187,10 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
         endTime: task.endTime ? new Date(task.endTime) : null,
         tags: task.tags || [],
         assignedTo: task.assignedTo?.map((user) => user.id) || [],
-        resources: task.resources || [],
+        resources: formattedResources,
         parentId: task.parentId || null, // Explicitly set null when parentId is falsy
-        duration: task.duration || null, // Use null instead of 0
+        duration: task.duration || null,
         projectId: task.projectId || null || undefined,
-        teamId: task.teamId || undefined,
       });
     }
   }, [task, open, form]);
@@ -286,7 +310,6 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
 
   const handleAddResource = () => {
     if (resourceName.trim() && resourceCategory) {
-      // Validate URL for link resources
       if (resourceCategory === "link" && !resourceUrl.trim()) {
         toast({
           title: t("details.resourcesUrlRequired"),
@@ -296,38 +319,35 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
         return;
       }
 
+      const resourceData = {
+        id:
+          editingResourceId ||
+          `new-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        name: resourceName.trim(),
+        type: resourceType.trim() || "General",
+        category: resourceCategory,
+        url: resourceCategory === "link" ? resourceUrl.trim() : undefined,
+      };
+
+      const currentResources = form.getValues("resources") || [];
+
       if (editingResourceId) {
-        // Update existing resource
-        const updatedResources = resources.map((resource) =>
-          resource.id === editingResourceId
-            ? {
-                ...resource,
-                name: resourceName.trim(),
-                type: resourceType.trim() || "General",
-                category: resourceCategory,
-                url: resourceUrl.trim() || undefined,
-              }
-            : resource
+        const updatedResources = currentResources.map((resource) =>
+          resource.id === editingResourceId ? resourceData : resource
         );
-        form.setValue("resources", updatedResources);
-        setEditingResourceId(null);
+        form.setValue("resources", updatedResources, { shouldValidate: true });
       } else {
-        // Add new resource
-        const newResource: TaskResource = {
-          id: `new-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-          name: resourceName.trim(),
-          type: resourceType.trim() || "General",
-          category: resourceCategory,
-          url: resourceUrl.trim() || undefined,
-        };
-        form.setValue("resources", [...resources, newResource]);
+        form.setValue("resources", [...currentResources, resourceData], {
+          shouldValidate: true,
+        });
       }
 
-      // Reset form fields after adding
+      // Reset form fields
       setResourceName("");
       setResourceType("");
       setResourceUrl("");
       setResourceCategory("link");
+      setEditingResourceId(null);
     }
   };
 
@@ -428,23 +448,35 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
   });
 
   const onSubmit = async (values: TaskFormValues) => {
-    console.log("Form submitted with values:", values);
+    // Ensure resources are properly formatted before submission
+    const formattedResources = values.resources.map((resource) => ({
+      id:
+        resource.id ||
+        `new-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      name: resource.name,
+      type: resource.type || "General",
+      category: resource.category,
+      url: resource.url || undefined,
+    }));
+
+    console.log("Form submitted with values:", {
+      ...values,
+      resources: formattedResources,
+    });
+
     const isScheduled = values.startTime && values.endTime && values.duration;
+
     mutate({
       taskId: task.id,
       taskData: {
         category: values.category || "",
         completed: false,
         description: values.description,
-        duration: values.duration || null, // Use null instead of undefined
+        duration: values.duration || null,
         endTime: values.endTime || null,
-        parentId: values.parentId || null, // Ensure null is explicitly set when parentId is undefined
+        parentId: values.parentId || null,
         priority: values.priority,
-        // Ensure each resource has a defined id
-        resources: values.resources.map((resource) => ({
-          ...resource,
-          id: resource.id || Date.now().toString(),
-        })),
+        resources: formattedResources,
         scheduled: isScheduled ? values.scheduled : false,
         startTime: values.startTime || null,
         tags: values.tags,
@@ -475,7 +507,12 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit(onSubmit)(e);
+            }}
+          >
             <Tabs defaultValue="basic" className="w-full">
               <TabsList className="grid grid-cols-3 mb-4">
                 <TabsTrigger value="basic">{t("basicInfo.title")}</TabsTrigger>
@@ -1360,16 +1397,26 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                                     {resource.url && ` • ${resource.url}`}
                                   </p>
                                 </div>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleRemoveResource(resource.id!)
-                                  }
-                                >
-                                  <Trash2 className="h-4 w-4 text-muted-foreground" />
-                                </Button>
+                                <div className="flex gap-2">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleEditResource(resource)}
+                                  >
+                                    <Pencil className="h-4 w-4 text-muted-foreground" />
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleRemoveResource(resource.id!)
+                                    }
+                                  >
+                                    <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                  </Button>
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -1454,21 +1501,42 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                             )}
                           </FormItem>
 
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full mt-2"
-                            onClick={handleAddResource}
-                            disabled={
-                              !resourceName.trim() ||
-                              !resourceCategory ||
-                              (resourceCategory === "link" &&
-                                !resourceUrl.trim())
-                            }
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            {t("details.addResource")}
-                          </Button>
+                          <div className="flex gap-2 mt-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="w-full"
+                              onClick={handleAddResource}
+                              disabled={
+                                !resourceName.trim() ||
+                                !resourceCategory ||
+                                (resourceCategory === "link" &&
+                                  !resourceUrl.trim())
+                              }
+                            >
+                              {editingResourceId ? (
+                                <>
+                                  <Check className="h-4 w-4 mr-2" />
+                                  {t("details.updateResource")}
+                                </>
+                              ) : (
+                                <>
+                                  <Plus className="h-4 w-4 mr-2" />
+                                  {t("details.addResource")}
+                                </>
+                              )}
+                            </Button>
+                            {editingResourceId && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={handleCancelEditResource}
+                              >
+                                <X className="h-4 w-4 mr-2" />
+                                {t("details.cancel")}
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1487,12 +1555,12 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {t("creating")}
+                    {t("updating")}
                   </>
                 ) : (
                   <>
                     <Check className="h-4 w-4" />
-                    {t("create")}
+                    {t("update")}
                   </>
                 )}
               </Button>

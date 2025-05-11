@@ -470,11 +470,11 @@ export default function ChatComponent() {
                   </div>
                 ) : chatsError ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    Error loading chats
+                    {t("errorLoadingChats")}
                   </div>
                 ) : filteredChats.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    No chats found
+                    {t("noChatsFound")}
                   </div>
                 ) : (
                   filteredChats.map((chat) => (
@@ -524,7 +524,13 @@ export default function ChatComponent() {
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
                           <p className="text-sm text-muted-foreground truncate whitespace-pre-wrap break-all line-clamp-1">
-                            {chat.messages[0]?.content ?? "No messages yet"}
+                            {chat.messages[0]?.content
+                              ? chat.messages[0].type === "image"
+                                ? t("imageAttachment")
+                                : chat.messages[0].type === "file"
+                                ? t("fileAttachment")
+                                : chat.messages[0].content
+                              : t("noMessagesYet")}
                           </p>
                           {/* Add unread count badge if needed */}
                         </div>
@@ -613,16 +619,16 @@ export default function ChatComponent() {
           <DialogContent className="sm:max-w-[425px] p-0">
             <DialogHeader className="px-6 py-4 border-b space-y-0">
               <DialogTitle className="text-lg font-semibold">
-                Start a conversation
+                {t("createIndividual.title")}
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Select a friend to start chatting
+                {t("createIndividual.description")}
               </p>
               <div className="mt-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
-                    placeholder="Search by name or email..."
+                    placeholder={t("createIndividual.searchPlaceholder")}
                     value={friendSearch}
                     onChange={(e) => setFriendSearch(e.target.value)}
                     className="pl-9 bg-background border-muted"
@@ -654,11 +660,13 @@ export default function ChatComponent() {
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
                   <UserX className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="font-medium mb-1">No matches found</h3>
+                <h3 className="font-medium mb-1">
+                  {t("createIndividual.noMatches")}
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   {friendSearch
-                    ? "Try a different search term"
-                    : "You have no friends yet"}
+                    ? t("createIndividual.tryADifferentSearch")
+                    : t("createIndividual.noFriends")}
                 </p>
               </div>
             ) : (
@@ -728,9 +736,9 @@ export default function ChatComponent() {
         <Dialog open={groupDialogOpen} onOpenChange={setGroupDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Create Group Chat</DialogTitle>
+              <DialogTitle>{t("createGroup.title")}</DialogTitle>
               <p className="text-sm text-muted-foreground">
-                Create a new group and add participants
+                {t("createGroup.description")}
               </p>
             </DialogHeader>
             <form
@@ -739,9 +747,11 @@ export default function ChatComponent() {
             >
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Group Name</label>
+                  <label className="text-sm font-medium">
+                    {t("createGroup.groupName")}
+                  </label>
                   <Input
-                    placeholder="Enter group name"
+                    placeholder={t("createGroup.groupNamePlaceholder")}
                     {...groupForm.register("name")}
                   />
                   {groupForm.formState.errors.name && (
@@ -755,7 +765,7 @@ export default function ChatComponent() {
                 {groupForm.watch("participantIds").length > 0 && (
                   <div className="space-y-2">
                     <label className="text-sm font-medium">
-                      Selected Participants
+                      {t("createGroup.addMembers")}
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {groupForm.watch("participantIds").map((id) => {
@@ -807,12 +817,12 @@ export default function ChatComponent() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    Add Participants
+                    {t("createGroup.addMembers")}
                   </label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <Input
-                      placeholder="Search friends..."
+                      placeholder={t("createGroup.addMembersPlaceholder")}
                       value={groupParticipantSearch}
                       onChange={(e) =>
                         setGroupParticipantSearch(e.target.value)
@@ -824,7 +834,7 @@ export default function ChatComponent() {
                     <div className="p-2 space-y-2">
                       {filteredGroupParticipants.length === 0 ? (
                         <p className="text-sm text-muted-foreground text-center py-4">
-                          No friends found
+                          {t("createGroup.noFriends")}
                         </p>
                       ) : (
                         filteredGroupParticipants.map((friend) => {
@@ -888,10 +898,12 @@ export default function ChatComponent() {
                   variant="outline"
                   onClick={() => setGroupDialogOpen(false)}
                 >
-                  Cancel
+                  {t("createGroup.cancel")}
                 </Button>
                 <Button type="submit" disabled={isCreatingGroup}>
-                  {isCreatingGroup ? "Creating..." : "Create Group"}
+                  {isCreatingGroup
+                    ? t("createGroup.creating")
+                    : t("createGroup.create")}
                 </Button>
               </div>
             </form>

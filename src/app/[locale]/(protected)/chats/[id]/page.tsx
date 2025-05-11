@@ -1071,7 +1071,7 @@ export default function ChatPage() {
                                 </div>
                               </div>
 
-                              <div className="space-y-2">
+                              {/* <div className="space-y-2">
                                 <h4 className="text-sm font-medium">
                                   {t("details.actions.title")}
                                 </h4>
@@ -1215,7 +1215,7 @@ export default function ChatPage() {
                                     </>
                                   )}
                                 </div>
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                         </div>
@@ -1432,7 +1432,7 @@ export default function ChatPage() {
                 </ScrollArea>
               </div>
 
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <h4 className="text-sm font-medium">
                   {t("details.actions.title")}
                 </h4>
@@ -1551,7 +1551,7 @@ export default function ChatPage() {
                     </>
                   )}
                 </div>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         </div>

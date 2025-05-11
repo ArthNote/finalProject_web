@@ -270,7 +270,7 @@ const TeamPage = () => {
                               value: "friends",
                               label: t("tabs.friends"),
                               icon: Users2,
-                            }
+                            },
                             // {
                             //   value: "settings",
                             //   label: t("tabs.settings"),

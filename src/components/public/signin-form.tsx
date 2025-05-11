@@ -57,6 +57,7 @@ export function SigninForm({
   const { signinSchema } = createAuthValidators(tValidation);
   const [isPending, startTransition] = useTransition();
   const searchParams = useSearchParams();
+  
   const locale = useLocale() as "en" | "fr";
   const callbackUrl = searchParams.get("callbackUrl");
   const router = useRouter();

@@ -17,7 +17,7 @@ const page = () => {
       {/* <PricingSection /> */}
       <WhyChooseUs />
       <ReviewsSection />
-      <MobileAppSection />
+      {/* <MobileAppSection /> */}
       {/* <ContactSection /> */}
     </section>
   );

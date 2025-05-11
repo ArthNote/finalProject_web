@@ -340,12 +340,16 @@ const TeamFriends = () => {
   };
 
   const getActionButton = (user: SearchUserResult) => {
+    if (!user?.id) {
+      return null;
+    }
+
     // Check if there's a pending request
     const pendingRequest =
       requestsData?.data && isRequestData(requestsData.data)
         ? [...requestsData.data.sent, ...requestsData.data.received].find(
             (request) =>
-              request.sender.id === user.id || request.receiver?.id === user.id
+              request.sender?.id === user.id || request.receiver?.id === user.id
           )
         : null;
 
@@ -354,7 +358,7 @@ const TeamFriends = () => {
       friendsData?.data && Array.isArray(friendsData.data)
         ? friendsData.data.some(
             (friend): friend is Friend =>
-              isFriend(friend) && getOtherUser(friend).id === user.id
+              isFriend(friend) && getOtherUser(friend)?.id === user.id
           )
         : false;
 

@@ -258,7 +258,31 @@
     "features": {
       "subtitle": "Fonctionnalités",
       "title": "Tout ce dont vous avez besoin",
-      "description": "Découvrez comment nos fonctionnalités alimentées par l'IA peuvent transformer votre productivité"
+      "description": "Découvrez comment nos fonctionnalités alimentées par l'IA peuvent transformer votre productivité",
+      "ai": {
+        "title": "Gestion des Tâches par IA",
+        "description": "Laissez l'IA faire le gros du travail ! Obtenez des recommandations de tâches intelligentes, une planification automatisée et des flux de travail optimisés adaptés à votre style de productivité."
+      },
+      "smart": {
+        "title": "Création & Édition Intelligente de Tâches",
+        "description": "Ajoutez manuellement des tâches ou laissez l'IA les générer pour vous. Modifiez, régénérez ou acceptez les tâches suggérées par l'IA sans effort pour répondre à vos besoins."
+      },
+      "gamified": {
+        "title": "Productivité Ludifiée",
+        "description": "Restez motivé avec des séries, des réalisations et des récompenses lorsque vous complétez des tâches et atteignez vos objectifs. La productivité n'a jamais été aussi amusante !"
+      },
+      "sync": {
+        "title": "Synchronisation Multi-Plateformes",
+        "description": "Accédez facilement à vos tâches depuis n'importe quel appareil—que vous soyez sur ordinateur ou mobile, votre progression est toujours synchronisée."
+      },
+      "auth": {
+        "title": "Authentification Sécurisée & Transparente",
+        "description": "Connectez-vous facilement avec plusieurs fournisseurs tout en gardant vos données sécurisées. Un compte, accès total."
+      },
+      "insights": {
+        "title": "Analyses & Suivi de Progression",
+        "description": "Obtenez des analyses en temps réel de votre productivité. Suivez vos habitudes, surveillez vos performances et améliorez votre flux de travail avec des informations basées sur les données."
+      }
     },
     "whyUs": {
       "subtitle": "Pourquoi Nous Choisir",
@@ -1396,6 +1420,10 @@
     },
     "searchPlaceholder": "Rechercher des messages ou des contacts...",
     "noChatsFound": "Aucune discussion trouvée",
+    "fileAttachment": "📎 Fichier jointe",
+    "imageAttachment": "📷 Image jointe",
+    "noMessagesYet": "Aucun message pour le moment",
+    "errorLoadingChats": "Erreur de chargement des discussions",
     "noSelectedChat": "Aucune discussion sélectionnée",
     "selectChatPrompt": "Sélectionnez une discussion dans la liste pour commencer à échanger",
     "messagePlaceholder": "Tapez un message...",
@@ -1413,6 +1441,30 @@
       "activeNow": "{count} actif(s) maintenant",
       "online": "en ligne",
       "offline": "hors ligne"
+    },
+    "createIndividual": {
+      "title": "Démarrer une conversation",
+      "description": "Sélectionnez un ami pour commencer à discuter",
+      "searchPlaceholder": "Rechercher des amis...",
+      "noMatches": "Aucune correspondance trouvée",
+      "noFriends": "Aucun ami trouvé",
+      "tryADifferentSearch": "Essayez un autre terme de recherche"
+    },
+    "createGroup": {
+      "title": "Créer un groupe",
+      "description": "Créer une discussion de groupe avec vos amis",
+      "groupName": "Nom du groupe",
+      "groupNamePlaceholder": "Entrez le nom du groupe",
+      "groupDescription": "Description du groupe",
+      "groupDescriptionPlaceholder": "Entrez la description du groupe",
+      "addMembers": "Ajouter des membres",
+      "addMembersPlaceholder": "Rechercher des amis...",
+      "noMatches": "Aucune correspondance trouvée",
+      "noFriends": "Aucun ami trouvé",
+      "tryADifferentSearch": "Essayez un autre terme de recherche",
+      "cancel": "Annuler",
+      "create": "Créer le groupe",
+      "creating": "Création en cours..."
     }
   },
   "tasks": {
@@ -1472,6 +1524,7 @@
             "endTimeAutoDescription": "L'heure de fin sera automatiquement calculée en fonction de la durée"
           },
           "details": {
+            "cancel": "Annuler",
             "teamMembers": "Membres de l'équipe",
             "friends": "Amis",
             "friend": "Amis",

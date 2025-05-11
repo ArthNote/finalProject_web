@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project Management Application
+
+A modern project management application built with Next.js that helps users organize and track their projects efficiently.
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- Node.js (version 16.x or higher)
+- pnpm package manager
+- Git
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd finalproject/web
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Environment Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Create a `.env.local` file in the root directory
+2. Copy the contents from `.env.example` to `.env.local`
+3. Update the environment variables:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Development URLs
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
+NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
 
-## Learn More
+# Production URLs (update these when deploying)
+NEXT_PUBLIC_BACKEND_URL_PROD=your_backend_url_here
+NEXT_PUBLIC_FRONTEND_URL_PROD=your_frontend_url_here
 
-To learn more about Next.js, take a look at the following resources:
+# Node environment (development/production)
+NEXT_PUBLIC_NODE=development
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Set a secure encryption key
+NEXT_PUBLIC_ENCRYPTION_KEY=your_encryption_key_here
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Install Dependencies
 
-## Deploy on Vercel
+Choose one of the following package managers:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm install
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. Run the Development Server
+
+```bash
+pnpm run dev
+```
+
+The application will be available at [http://localhost:3000](http://localhost:3000)
+
+## Available Scripts
+
+- `dev` - Runs the development server
+- `build` - Builds the application for production
+- `start` - Starts the production server
+- `lint` - Runs ESLint to check code quality
+
+```bash
+
+pnpm run [script-name]
+```
+
+## Features
+
+- Project management with status tracking
+- Task organization and prioritization
+- Team collaboration
+- Multilingual support (English and French)
+- Dark/Light theme support
+- Responsive design
+
+## Project Structure
+
+- `/src` - Application source code
+- `/public` - Static assets
+- `/messages` - Internationalization files
+- `/components` - Reusable React components
+
+## Technologies Used
+
+- Next.js
+- React
+- TypeScript
+- TanStack Table
+- Tailwind CSS
+- Shadcn Ui
+- next-intl for internationalization

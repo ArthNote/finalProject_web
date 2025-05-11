@@ -402,6 +402,8 @@ const KanbanTaskCard: React.FC<KanbanTaskCardProps> = ({
                             src={user.profilePic}
                             alt={user.name}
                             className="h-full w-full object-cover"
+                            width={20}
+                            height={20}
                           />
                         ) : (
                           user.name.charAt(0)

@@ -1409,11 +1409,15 @@
     },
     "searchPlaceholder": "Search messages or contacts...",
     "noChatsFound": "No chats found",
+    "errorLoadingChats": "Error loading chats",
     "noSelectedChat": "No chat selected",
     "selectChatPrompt": "Select a chat from the list to start messaging",
     "messagePlaceholder": "Type a message...",
     "participants": "Participants",
     "showChatList": "Show Chat List",
+    "noMessagesYet": "No messages yet",
+    "fileAttachment": "📎 File Attachment",
+    "imageAttachment": "📷 Image Attachment",
     "filters": {
       "all": "All",
       "direct": "Direct",
@@ -1426,6 +1430,30 @@
       "activeNow": "{count} active now",
       "online": "online",
       "offline": "offline"
+    },
+    "createIndividual": {
+      "title": "Start a conversation",
+      "description": "Select a friend to start chatting",
+      "searchPlaceholder": "Search friends...",
+      "noMatches": "No matches found",
+      "noFriends": "No friends found",
+      "tryADifferentSearch": "Try a different search term"
+    },
+    "createGroup": {
+      "title": "Create a Group",
+      "description": "Create a group chat with your friends",
+      "groupName": "Group Name",
+      "groupNamePlaceholder": "Enter group name",
+      "groupDescription": "Group Description",
+      "groupDescriptionPlaceholder": "Enter group description",
+      "addMembers": "Add Members",
+      "addMembersPlaceholder": "Search friends...",
+      "noMatches": "No matches found",
+      "noFriends": "No friends found",
+      "tryADifferentSearch": "Try a different search term",
+      "cancel": "Cancel",
+      "create": "Create Group",
+      "creating": "Creating..."
     }
   },
   "tasks": {
@@ -1486,6 +1514,7 @@
             "endTimeAutoDescription": "End time will be calculated automatically based on the duration"
           },
           "details": {
+            "cancel": "Cancel",
             "friend": "Friend",
             "teamMembers": "Team Members",
             "noPeopleFound": "No people found",
@@ -1531,6 +1560,7 @@
           "editTitle": "Edit Task",
           "update": "Update Task",
           "updating": "Updating...",
+
           "toast": {
             "success": {
               "title": "Task created",
