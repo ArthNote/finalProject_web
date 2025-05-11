@@ -69,37 +69,37 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // async headers() {
-  //   return [
-  //     {
-  //       // Apply headers to all routes
-  //       source: "/(.*)",
-  //       headers: [
-  //         {
-  //           key: "Access-Control-Allow-Credentials",
-  //           value: "true",
-  //         },
-  //         {
-  //           key: "Access-Control-Allow-Origin",
-  //           // This should match your backend domain
-  //           value:
-  //             process.env.NEXT_PUBLIC_NODE === "development"
-  //               ? "http://localhost:8080"
-  //               : "https://cuthub-bd55d.ew.r.appspot.com",
-  //         },
-  //         {
-  //           key: "Access-Control-Allow-Methods",
-  //           value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-  //         },
-  //         {
-  //           key: "Access-Control-Allow-Headers",
-  //           value:
-  //             "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, Set-Cookie",
-  //         },
-  //       ],
-  //     },
-  //   ];
-  // },
+  async headers() {
+    return [
+      {
+        // Apply headers to all routes
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Access-Control-Allow-Credentials",
+            value: "true",
+          },
+          {
+            key: "Access-Control-Allow-Origin",
+            // This should match your backend domain
+            value:
+              process.env.NEXT_PUBLIC_NODE === "development"
+                ? "http://localhost:8080"
+                : process.env.NEXT_PUBLIC_BACKEND_URL_PROD!,
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value:
+              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, Set-Cookie",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);
