@@ -61,7 +61,7 @@ export default async function middleware(request: NextRequest) {
           ? (url, init) =>
               fetch(url, {
                 ...init,
-                //@ts-ignore
+                //@ts-expect-error
                 agent: new https.Agent({
                   rejectUnauthorized: false,
                 }),
