@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { betterFetch } from "@better-fetch/fetch";
-import https from "https";
 
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
@@ -56,17 +55,6 @@ export default async function middleware(request: NextRequest) {
     {
       headers: header,
       credentials: "include",
-      customFetchImpl:
-        process.env.NEXT_PUBLIC_NODE !== "development"
-          ? (url, init) =>
-              fetch(url, {
-                ...init,
-                //@ts-expect-error
-                agent: new https.Agent({
-                  rejectUnauthorized: false,
-                }),
-              })
-          : undefined,
     }
   );
 
