@@ -214,7 +214,7 @@ const KanbanTaskCard: React.FC<KanbanTaskCardProps> = ({
                   <DropdownMenuContent align="end">
                     {" "}
                     {/* Stop propagation on content */}
-                    <DropdownMenuItem
+                    {/* <DropdownMenuItem
                       className={task.scheduled ? "hidden" : ""}
                       onClick={(e) => {
                         e.stopPropagation(); // Stop propagation
@@ -232,7 +232,7 @@ const KanbanTaskCard: React.FC<KanbanTaskCardProps> = ({
                       ) : (
                         t("scheduleTask")
                       )}
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation(); // Stop propagation

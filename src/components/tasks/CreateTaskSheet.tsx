@@ -193,7 +193,7 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
       // Format team members with source
       let formattedTeamMembers = [] as TeamMember[];
 
-      if (hasTeamSub) {
+      if (hasTeamSub && team?.members) {
         formattedTeamMembers = team.members.map((member) => ({
           id: member.userId,
           email: member.email,
@@ -205,19 +205,24 @@ const CreateTaskSheet: React.FC<CreateTaskSheetProps> = ({
 
       const friends = friendsData?.data as Friend[];
 
-      const formattedFriends = friends.map((friend) => {
-        const otherUser = getOtherUser(friend);
-        return {
-          id: otherUser.id,
-          name: otherUser.username,
-          email: otherUser.email,
-          avatar: otherUser.image,
-          source: "friend" as const,
-        };
-      }) as TeamMember[];
+      if (friends) {
+        const formattedFriends = friends.map((friend) => {
+          const otherUser = getOtherUser(friend);
+          return {
+            id: otherUser.id,
+            name: otherUser.username,
+            email: otherUser.email,
+            avatar: otherUser.image,
+            source: "friend" as const,
+          };
+        }) as TeamMember[];
 
-      // Combine both lists
-      setTeamMembers([...formattedTeamMembers, ...formattedFriends]);
+        // Combine both lists
+        setTeamMembers([...formattedTeamMembers, ...formattedFriends]);
+      } else {
+        // Only set team members if no friends data
+        setTeamMembers(formattedTeamMembers);
+      }
     } catch (error) {
       console.error("Error loading people:", error);
     } finally {

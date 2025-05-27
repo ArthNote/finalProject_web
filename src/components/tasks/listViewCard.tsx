@@ -261,7 +261,7 @@ const ListViewCard = ({
                 >
                   {" "}
                   {/* Stop propagation on content */}
-                  <DropdownMenuItem
+                  {/* <DropdownMenuItem
                     className={task.scheduled ? "hidden" : ""}
                     onClick={(e) => {
                       e.stopPropagation(); // Stop propagation
@@ -279,7 +279,7 @@ const ListViewCard = ({
                     ) : (
                       t("scheduleTask")
                     )}
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation(); // Stop propagation
@@ -420,6 +420,7 @@ const ListViewCard = ({
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs px-2 hidden sm:flex"
+                hidden
                 onClick={(e) => {
                   e.stopPropagation();
                   handleToggleScheduled(task.id);

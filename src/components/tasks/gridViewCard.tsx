@@ -181,7 +181,7 @@ const GridViewCard = ({
               >
                 {" "}
                 {/* Stop propagation on content */}
-                <DropdownMenuItem
+                {/* <DropdownMenuItem
                   className={task.scheduled ? "hidden" : ""}
                   onClick={(e) => {
                     e.stopPropagation(); // Stop propagation
@@ -199,7 +199,7 @@ const GridViewCard = ({
                   ) : (
                     t("scheduleTask")
                   )}
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation(); // Stop propagation
@@ -370,7 +370,7 @@ const GridViewCard = ({
               >
                 {" "}
                 {/* Stop propagation on content */}
-                <DropdownMenuItem
+                {/* <DropdownMenuItem
                   className={task.scheduled ? "hidden" : ""}
                   onClick={(e) => {
                     e.stopPropagation(); // Stop propagation
@@ -388,7 +388,7 @@ const GridViewCard = ({
                   ) : (
                     t("scheduleTask")
                   )}
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation(); // Stop propagation
